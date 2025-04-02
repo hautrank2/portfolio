@@ -1,6 +1,4 @@
 import React from "react";
-import { ShoppingBag } from "lucide-react";
-import Link from "next/link";
 
 async function Header() {
   return (
@@ -9,17 +7,7 @@ async function Header() {
         <h4 className="font-bold">Hautrank2</h4>
       </div>
       <div className="header-search px-16"></div>
-      <div className="header-extra flex items-center gap-4">
-        <Link href={"/cart"}>
-          <ShoppingBag />
-        </Link>
-        <Link href={"/"} className="rounded border p-2">
-          Shop
-        </Link>
-        <Link href={"/admin"} className="rounded border p-2">
-          Admin
-        </Link>
-      </div>
+      <div className="header-extra flex items-center gap-4"></div>
     </header>
   );
 }
