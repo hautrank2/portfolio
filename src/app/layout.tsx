@@ -18,8 +18,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${sans.variable} antialiased`}>{children}</body>
+    <html lang="en" className={sans.className}>
+      <body className={`antialiased`}>{children}</body>
     </html>
   );
 }

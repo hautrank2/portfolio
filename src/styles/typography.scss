@@ -1,0 +1,84 @@
+h1 {
+  font-size: 2rem;
+  /* 40px */
+  line-height: 1.5;
+  /* 48px */
+  font-weight: 500;
+}
+
+h2 {
+  font-size: 1.75rem;
+  /* 32px */
+  line-height: 1.5;
+  /* 40px */
+  font-weight: 500;
+}
+
+h3 {
+  font-size: 1.5rem;
+  /* 28px */
+  line-height: 1.3;
+  font-weight: 500;
+}
+
+h4 {
+  font-size: 1.25rem;
+  /* 24px */
+  line-height: 1.8;
+  font-weight: 500;
+}
+
+h5 {
+  font-size: 1rem;
+  /* 20px */
+  line-height: 1.6;
+  /* 28px */
+  font-weight: 500;
+}
+
+/* Paragraph */
+p {
+  font-size: 1rem;
+  /* 16px */
+  line-height: 1.4;
+  /* 28px */
+  color: #1c1b1d;
+  /* Body text color */
+}
+
+/* Blockquote */
+blockquote {
+  font-style: italic;
+  border-left: 4px solid #1d4ed8;
+  /* Primary color */
+  color: #374151;
+  /* Dark Gray */
+  padding-left: 1rem;
+  /* Spacing for the border */
+  margin: 1.5rem 0;
+  /* Vertical spacing */
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (max-width: 1024px) {
+  .container {
+    max-width: 900px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    max-width: 600px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    width: 95%;
+  }
+}
