@@ -2,6 +2,9 @@ import Image from "next/image";
 import Header from "~/components/layouts/header";
 import { Typography } from "~/components/ui/typography";
 import Experiences from "./Experiences";
+import SectionHeadline from "./components/SectionHeadline";
+import { cn } from "~/lib/utils";
+import ProjectSection from "./components/ProjectSection";
 
 export default function Home() {
   const stacks = [
@@ -15,11 +18,13 @@ export default function Home() {
       title: "Design",
     },
   ];
+
+  const sectionClassName = "max-w-[80rem] mx-auto min-h-[86vh] p-16";
   return (
-    <div className="pt-20">
+    <div className="py-20">
       <Header />
-      <section id="banner" className="mx-auto p-16 min-h-[86vh]">
-        <div className="container flex items-center mx-auto px-32 ">
+      <section id="banner" className={cn(sectionClassName)}>
+        <div className="flex items-center mx-auto">
           <div className="flex-[1] pe-16">
             <Typography
               variant="h1"
@@ -66,7 +71,7 @@ export default function Home() {
             </div>
           </div>
           <Image
-            className="rounded-full"
+            className="rounded-full hidden lg:block"
             src="/img/avt.jpg"
             alt="avatar"
             width={320}
@@ -75,11 +80,14 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="experience" className="mx-auto p-16 max-w-[80vw]">
-        <Typography variant="h1" className="mb-4 border-b">
-          Experiences
-        </Typography>
+      <section id="experiences" className={cn(sectionClassName, "mx-auto")}>
+        <SectionHeadline title="Experiences" href="experiences" />
         <Experiences />
+      </section>
+
+      <section id="projects" className={cn(sectionClassName, "mx-auto")}>
+        <SectionHeadline title="Projects" href="projects" />
+        <ProjectSection />
       </section>
     </div>
   );
