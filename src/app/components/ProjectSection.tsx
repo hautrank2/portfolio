@@ -39,6 +39,29 @@ function ProjectSection({}) {
         },
       ],
     },
+    {
+      title: "Kevin Fans",
+      desc: "This is where i talk about my idol kevin de bruyne",
+      imgUrl: "/img/home/kevin-de-bruyne.png",
+      technologies: [
+        {
+          logoUrl: "/logo/nextjs.png",
+          title: "Nextjs",
+        },
+      ],
+      links: [
+        {
+          title: "Website",
+          icon: SquareArrowOutUpRight,
+          url: "https://football-player-hautran02s-projects.vercel.app",
+        },
+        {
+          title: "Gihub",
+          icon: Github,
+          url: "https://github.com/hautrank2/football-player",
+        },
+      ],
+    },
   ];
   return (
     <div className="grid grid-cols-3 gap-4">
