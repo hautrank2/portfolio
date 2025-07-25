@@ -8,7 +8,7 @@ import { cn } from "~/lib/utils";
 function SectionHeadline({ title, href }: { title: string; href: string }) {
   const [hover, setHover] = useState(false);
   return (
-    <div className="mb-4 border-b">
+    <div className="pb-2 mb-4 border-b">
       <Link href={`#${href}`}>
         <Typography
           variant="h1"

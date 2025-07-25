@@ -19,7 +19,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={sans.className}>
-      <body className={`antialiased`}>{children}</body>
+      <body
+        className={`antialiased dark bg-[url(/svg/bg-gr.svg)] bg-no-repeat bg-[-20vw_-80vh]`}
+      >
+        {children}
+      </body>
     </html>
   );
 }

@@ -76,25 +76,28 @@ function ProjectSection({}) {
             </div>
 
             <div className="p-4">
-              <Typography variant={"h3"} className="uppercase">
+              <Typography variant={"h2"} className="uppercase font-bold">
                 {item.title}
               </Typography>
               <Typography variant={"p"} className="mt-0">
                 {item.desc}
               </Typography>
 
-              <div className="flex items-center gap-2">
-                <Typography variant={"h5"}>Technology:</Typography>
+              <div className="flex items-center gap-2 mt-4">
                 <div className="flex items-center">
                   {item.technologies.map((tech) => (
                     <Tooltip key={tech.title}>
                       <TooltipTrigger asChild>
-                        <Image
-                          src={tech.logoUrl}
-                          alt="logo"
-                          width={32}
-                          height={32}
-                        />
+                        <div className="p-2 px-4 rounded-full flex items-center gap-2 border">
+                          <Image
+                            src={tech.logoUrl}
+                            alt="logo"
+                            width={24}
+                            height={24}
+                            className="bg-foreground/80 p-px rounded-full"
+                          />
+                          <Typography variant={"p"}>{tech.title}</Typography>
+                        </div>
                       </TooltipTrigger>
                       <TooltipContent>{tech.title}</TooltipContent>
                     </Tooltip>
@@ -109,7 +112,7 @@ function ProjectSection({}) {
                     <Link
                       key={link.url}
                       href={link.url}
-                      className="rounded-full px-6 py-2 border hover:bg-foreground/10 flex gap-2 items-center text-sm"
+                      className="p-2 flex gap-2 items-center text-sm hover:text-primary"
                       target="_blank"
                     >
                       <ICON size={16} />

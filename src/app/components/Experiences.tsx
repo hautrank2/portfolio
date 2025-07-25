@@ -71,7 +71,7 @@ function Experiences({}) {
         return (
           <div
             key={exp.company + ix}
-            className="flex gap-4 relative border-s border-s-4 border-primary py-8 px-6"
+            className="flex gap-4 relative border-s-4 border-primary py-8 px-6"
           >
             <div className="dot rounded-full h-4 w-4 bg-primary absolute top-0 left-[-10px]"></div>
             <Exp exp={exp} />
@@ -99,7 +99,9 @@ const Exp = ({ exp }: { exp: Experience }) => {
     <div key={exp.company}>
       <div className="flex gap-4 items-center">
         <Link target="_blank" href={exp.href}>
-          <Typography variant="h4" className="hover:text-primary">{exp.company}</Typography>
+          <Typography variant="h4" className="hover:text-primary">
+            {exp.company}
+          </Typography>
         </Link>
         <Dialog>
           <DialogTrigger asChild>

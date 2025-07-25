@@ -1,10 +1,11 @@
 import Image from "next/image";
 import Header from "~/components/layouts/header";
 import { Typography } from "~/components/ui/typography";
-import Experiences from "./Experiences";
+import Experiences from "./components/Experiences";
 import SectionHeadline from "./components/SectionHeadline";
-import { cn } from "~/lib/utils";
 import ProjectSection from "./components/ProjectSection";
+import { cn } from "~/lib/utils";
+import Script from "next/script";
 
 export default function Home() {
   const stacks = [
@@ -19,7 +20,7 @@ export default function Home() {
     },
   ];
 
-  const sectionClassName = "max-w-[80rem] mx-auto min-h-[86vh] p-16";
+  const sectionClassName = "max-w-[80rem] mx-auto min-h-[86vh] p-16 opacity-0";
   return (
     <div className="py-20">
       <Header />
@@ -89,6 +90,8 @@ export default function Home() {
         <SectionHeadline title="Projects" href="projects" />
         <ProjectSection />
       </section>
+
+      <Script id="homeScript" strategy="afterInteractive" src="/js/app.js" />
     </div>
   );
 }
