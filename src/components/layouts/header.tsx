@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Typography } from "../ui/typography";
 import { cn } from "~/lib/utils";
+import Nav from "./nav";
 
 function Header() {
   const headerHeight = 64;
@@ -42,7 +43,9 @@ function Header() {
         </Typography>
       </div>
       <div className="header-search px-16"></div>
-      <div className="header-extra flex items-center gap-4"></div>
+      <div className="header-extra flex items-center gap-4">
+        <Nav />
+      </div>
     </header>
   );
 }

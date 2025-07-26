@@ -6,6 +6,7 @@ import SectionHeadline from "./components/SectionHeadline";
 import ProjectSection from "./components/ProjectSection";
 import { cn } from "~/lib/utils";
 import Script from "next/script";
+import Contact from "./components/Contact";
 
 export default function Home() {
   const stacks = [
@@ -16,13 +17,14 @@ export default function Home() {
       title: "Backend",
     },
     {
-      title: "Design",
+      title: "UI/UX",
     },
   ];
 
-  const sectionClassName = "max-w-[80rem] mx-auto min-h-[86vh] p-16 opacity-0";
+  const maxWidth = "max-w-[80rem]";
+  const sectionClassName = `${maxWidth} mx-auto min-h-[86vh] p-16 opacity-0`;
   return (
-    <div className="py-20">
+    <div className="pt-20">
       <Header />
       <section id="banner" className={cn(sectionClassName)}>
         <div className="flex items-center mx-auto">
@@ -86,9 +88,24 @@ export default function Home() {
         <Experiences />
       </section>
 
-      <section id="projects" className={cn(sectionClassName, "mx-auto")}>
-        <SectionHeadline title="Projects" href="projects" />
-        <ProjectSection />
+      <section
+        id="projects"
+        className={cn(sectionClassName, "bg-primary/10 max-w-screen")}
+      >
+        <div className={cn(maxWidth, "mx-auto")}>
+          <SectionHeadline title="Projects" href="projects" />
+          <ProjectSection />
+        </div>
+      </section>
+
+      <section
+        id="contact"
+        className={cn(
+          sectionClassName,
+          "max-w-screen border-t min-h-auto bg-[url(/svg/bg-gr.svg)] bg-no-repeat"
+        )}
+      >
+        <Contact />
       </section>
 
       <Script id="homeScript" strategy="afterInteractive" src="/js/app.js" />
