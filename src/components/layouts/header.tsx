@@ -34,7 +34,7 @@ function Header() {
       )}
     >
       <div className="header-branch">
-        <Typography variant={"h3"}>
+        <Typography variant={"h3"} className="flex items-center">
           <span className="font-light">Portfolio</span> |{" "}
           <span className="bg-foreground text-background rounded-full px-4">
             hautrank2

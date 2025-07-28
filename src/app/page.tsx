@@ -60,7 +60,7 @@ export default function Home() {
               do something
             </Typography>
 
-            <div className="flex gap-8 px-8 mt-8">
+            <div className="flex flex-wrap gap-8 px-8 mt-8">
               {stacks.map((stack) => (
                 <div
                   key={stack.title}
