@@ -5,7 +5,9 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "vinahost.vn",
+        hostname: "**",
+        port: "",
+        pathname: "**",
       },
     ],
   },
