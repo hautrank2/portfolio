@@ -1,4 +1,5 @@
-import { Github, Server, SquareArrowOutUpRight } from "lucide-react";
+import { Server, SquareArrowOutUpRight } from "lucide-react";
+import { Github } from "~/components/icons/github";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -72,7 +73,12 @@ function ProjectSection({}) {
             className="card border rounded-lg overflow-hidden"
           >
             <div className="w-full h-64 relative">
-              <Image src={item.imgUrl} alt="img" fill objectFit="cover" />
+              <Image
+                src={item.imgUrl}
+                alt="img"
+                fill
+                className="object-cover"
+              />
             </div>
 
             <div className="p-4">
