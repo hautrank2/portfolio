@@ -1,114 +1,77 @@
-import Image from "next/image";
-import Header from "~/components/layouts/header";
-import { Typography } from "~/components/ui/typography";
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { Button } from "~/components/ui/button";
+import { Reveal } from "~/components/ui/reveal";
+import { featuredProjects, projects } from "~/data/projects";
+import AboutCta from "./components/AboutCta";
 import Experiences from "./components/Experiences";
-import SectionHeadline from "./components/SectionHeadline";
+import Hero from "./components/Hero";
 import ProjectSection from "./components/ProjectSection";
-import { cn } from "~/lib/utils";
-import Script from "next/script";
-import Contact from "./components/Contact";
+import QuickFacts from "./components/QuickFacts";
+import SectionHeadline from "./components/SectionHeadline";
 
 export default function Home() {
-  const stacks = [
-    {
-      title: "Frontend",
-    },
-    {
-      title: "Backend",
-    },
-    {
-      title: "UI/UX",
-    },
-  ];
+  const moreProjects = projects.length - featuredProjects.length;
 
-  const maxWidth = "max-w-[80rem]";
-  const sectionClassName = `${maxWidth} mx-auto min-h-[86vh] p-16 opacity-0`;
   return (
-    <div className="pt-20">
-      <Header />
-      <section id="banner" className={cn(sectionClassName)}>
-        <div className="flex items-center mx-auto">
-          <div className="flex-[1] pe-16">
-            <Typography
-              variant="h1"
-              className="text-bold mb-4 text-8xl uppercase"
-            >
-              <span className="block">I am</span> <span>Hau Tran</span>
-            </Typography>
-            <Typography variant="h1" className="leading-[1.2] mb-8">
-              Web developer
-            </Typography>
-            <Typography
-              variant="h5"
-              className="mb-2 text-2xl font-normal leading-[1.2]"
-            >
-              I studied software engineering at Ho Chi Minh City University of
-              Technology and Education{" "}
-              <a
-                href="https://hcmute.edu.vn"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary"
-              >
-                (HCMUTE)
-              </a>
-            </Typography>
-            <Typography
-              variant="h5"
-              className="font-normal text-2xl leading-[1.2]"
-            >
-              Of all the software, I especially like websites. I want to develop
-              websites that are friendly, useful, where people can go there to
-              do something
-            </Typography>
+    <div className="flex flex-col gap-24 pb-24 sm:gap-32">
+      <Hero />
 
-            <div className="flex flex-wrap gap-8 px-8 mt-8">
-              {stacks.map((stack) => (
-                <div
-                  key={stack.title}
-                  className="px-4 py-2 rounded-full border"
-                >
-                  <Typography variant={"p"}>{stack.title}</Typography>
-                </div>
-              ))}
-            </div>
-          </div>
-          <Image
-            className="rounded-full hidden lg:block"
-            src="/img/avt.jpg"
-            alt="avatar"
-            width={320}
-            height={320}
+      <QuickFacts />
+
+      <section
+        id="experiences"
+        className="mx-auto w-full max-w-6xl scroll-mt-24 px-4 sm:px-8 lg:px-16"
+      >
+        <Reveal>
+          <SectionHeadline
+            index="01"
+            title="Experiences"
+            href="experiences"
+            description="Where I have been studying and shipping over the last few years."
           />
-        </div>
-      </section>
-
-      <section id="experiences" className={cn(sectionClassName, "mx-auto")}>
-        <SectionHeadline title="Experiences" href="experiences" />
+        </Reveal>
         <Experiences />
       </section>
 
       <section
         id="projects"
-        className={cn(sectionClassName, "bg-primary/10 max-w-screen")}
+        className="scroll-mt-24 border-y border-border/60 bg-primary/5 py-16 sm:py-20"
       >
-        <div className={cn(maxWidth, "mx-auto")}>
-          <SectionHeadline title="Projects" href="projects" />
-          <ProjectSection />
+        <div className="mx-auto w-full max-w-6xl px-4 sm:px-8 lg:px-16">
+          <Reveal>
+            <SectionHeadline
+              index="02"
+              title="Projects"
+              href="projects"
+              description="A few things I built on my own time, from first sketch to deploy."
+              action={
+                <Button
+                  asChild
+                  variant="outline"
+                  size="lg"
+                  className="group rounded-full"
+                >
+                  <Link href="/showcase">
+                    {moreProjects > 0
+                      ? `View all (${projects.length})`
+                      : "View all"}
+                    <ArrowRight
+                      size={16}
+                      className="transition-transform group-hover:translate-x-1"
+                    />
+                  </Link>
+                </Button>
+              }
+            />
+          </Reveal>
+          <div className="mt-10">
+            <ProjectSection projects={featuredProjects} />
+          </div>
         </div>
       </section>
 
-      <section
-        id="contact"
-        className={cn(
-          sectionClassName,
-          "max-w-screen border-t min-h-auto bg-[url(/svg/bg-gr.svg)] bg-no-repeat"
-        )}
-      >
-        <Contact />
-      </section>
-
-      <Script id="homeScript" strategy="afterInteractive" src="/js/app.js" />
+      <AboutCta />
     </div>
   );
 }

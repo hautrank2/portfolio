@@ -9,28 +9,31 @@ import { ArrowLeft, ArrowRight } from "lucide-react"
 import { cn } from "~/lib/utils"
 import { Button } from "~/components/ui/button"
 
-type CarouselApi = UseEmblaCarouselType[1]
-type UseCarouselParameters = Parameters<typeof useEmblaCarousel>
-type CarouselOptions = UseCarouselParameters[0]
-type CarouselPlugin = UseCarouselParameters[1]
+type CarouselApiType = UseEmblaCarouselType[1]
+type CarouselParametersType = Parameters<typeof useEmblaCarousel>
+type CarouselOptionsType = CarouselParametersType[0]
+type CarouselPluginType = CarouselParametersType[1]
+type CarouselOrientationEnum = "horizontal" | "vertical"
 
-type CarouselProps = {
-  opts?: CarouselOptions
-  plugins?: CarouselPlugin
-  orientation?: "horizontal" | "vertical"
-  setApi?: (api: CarouselApi) => void
+type CarouselPropsType = {
+  opts?: CarouselOptionsType
+  plugins?: CarouselPluginType
+  orientation?: CarouselOrientationEnum
+  setApi?: (api: CarouselApiType) => void
 }
 
-type CarouselContextProps = {
-  carouselRef: ReturnType<typeof useEmblaCarousel>[0]
-  api: ReturnType<typeof useEmblaCarousel>[1]
+type CarouselContextType = CarouselPropsType & {
+  carouselRef: UseEmblaCarouselType[0]
+  api: CarouselApiType
   scrollPrev: () => void
   scrollNext: () => void
   canScrollPrev: boolean
   canScrollNext: boolean
-} & CarouselProps
+  selectedIndex: number
+  slideCount: number
+}
 
-const CarouselContext = React.createContext<CarouselContextProps | null>(null)
+const CarouselContext = React.createContext<CarouselContextType | null>(null)
 
 function useCarousel() {
   const context = React.useContext(CarouselContext)
@@ -50,7 +53,7 @@ function Carousel({
   className,
   children,
   ...props
-}: React.ComponentProps<"div"> & CarouselProps) {
+}: React.ComponentProps<"div"> & CarouselPropsType) {
   const [carouselRef, api] = useEmblaCarousel(
     {
       ...opts,
@@ -81,6 +84,17 @@ function Carousel({
     subscribeToSelect,
     () => api?.canScrollNext() ?? false,
     () => false
+  )
+  // Both snapshots stay primitives so useSyncExternalStore can compare them.
+  const selectedIndex = React.useSyncExternalStore(
+    subscribeToSelect,
+    () => api?.selectedScrollSnap() ?? 0,
+    () => 0
+  )
+  const slideCount = React.useSyncExternalStore(
+    subscribeToSelect,
+    () => api?.scrollSnapList().length ?? 0,
+    () => 0
   )
 
   const scrollPrev = React.useCallback(() => {
@@ -121,6 +135,8 @@ function Carousel({
         scrollNext,
         canScrollPrev,
         canScrollNext,
+        selectedIndex,
+        slideCount,
       }}
     >
       <div
@@ -190,7 +206,8 @@ function CarouselPrevious({
       variant={variant}
       size={size}
       className={cn(
-        "absolute size-8 rounded-full",
+        "absolute size-10 rounded-full border-border/60 bg-background/50 backdrop-blur",
+        "transition-colors hover:border-primary/60 hover:bg-background/80 hover:text-primary",
         orientation === "horizontal"
           ? "top-1/2 -left-12 -translate-y-1/2"
           : "-top-12 left-1/2 -translate-x-1/2 rotate-90",
@@ -220,7 +237,8 @@ function CarouselNext({
       variant={variant}
       size={size}
       className={cn(
-        "absolute size-8 rounded-full",
+        "absolute size-10 rounded-full border-border/60 bg-background/50 backdrop-blur",
+        "transition-colors hover:border-primary/60 hover:bg-background/80 hover:text-primary",
         orientation === "horizontal"
           ? "top-1/2 -right-12 -translate-y-1/2"
           : "-bottom-12 left-1/2 -translate-x-1/2 rotate-90",
@@ -236,11 +254,42 @@ function CarouselNext({
   )
 }
 
+function CarouselDots({ className, ...props }: React.ComponentProps<"div">) {
+  const { api, selectedIndex, slideCount } = useCarousel()
+
+  if (slideCount <= 1) return null
+
+  return (
+    <div
+      data-slot="carousel-dots"
+      className={cn("flex items-center justify-center gap-2", className)}
+      {...props}
+    >
+      {Array.from({ length: slideCount }, (_, index) => (
+        <button
+          key={index}
+          type="button"
+          aria-label={`Go to slide ${index + 1}`}
+          aria-current={index === selectedIndex}
+          onClick={() => api?.scrollTo(index)}
+          className={cn(
+            "h-1.5 rounded-full transition-all duration-300",
+            index === selectedIndex
+              ? "w-6 bg-primary"
+              : "w-1.5 bg-foreground/25 hover:bg-foreground/50"
+          )}
+        />
+      ))}
+    </div>
+  )
+}
+
 export {
-  type CarouselApi,
+  type CarouselApiType,
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselPrevious,
   CarouselNext,
+  CarouselDots,
 }

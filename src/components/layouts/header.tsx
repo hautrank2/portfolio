@@ -1,51 +1,46 @@
 "use client";
 
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { Typography } from "../ui/typography";
+import { profile } from "~/data/site";
 import { cn } from "~/lib/utils";
 import Nav from "./nav";
 
 function Header() {
-  const headerHeight = 64;
-  const [headerBg, setHeaderBg] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const trackingScroll = () => {
-      if (window.scrollY > headerHeight + 20) {
-        setHeaderBg(true);
-      } else {
-        setHeaderBg(false);
-      }
-    };
+    const trackScroll = () => setScrolled(window.scrollY > 24);
 
-    trackingScroll();
-    window.addEventListener("scroll", trackingScroll);
-
-    return () => {
-      window.removeEventListener("scroll", trackingScroll);
-    };
+    trackScroll();
+    window.addEventListener("scroll", trackScroll, { passive: true });
+    return () => window.removeEventListener("scroll", trackScroll);
   }, []);
 
   return (
     <header
       className={cn(
-        "flex justify-between items-center w-full fixed top-0 h-16 px-16 border-b z-20",
-        "transition-colors easy duration-500",
-        headerBg ? "bg-background/90" : ""
+        "fixed inset-x-0 top-0 z-30 h-16",
+        "flex items-center justify-between gap-4 px-4 sm:px-8 lg:px-16",
+        "border-b transition-colors duration-500",
+        scrolled
+          ? "border-border/60 bg-background/80 backdrop-blur-md"
+          : "border-transparent bg-transparent"
       )}
     >
-      <div className="header-branch">
-        <Typography variant={"h3"} className="flex items-center">
-          <span className="font-light">Portfolio</span> |{" "}
-          <span className="bg-foreground text-background rounded-full px-4">
-            hautrank2
+      <Link href="/" className="group flex items-center gap-3">
+        <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-primary text-sm font-bold tracking-tight text-primary-foreground transition-transform group-hover:-rotate-6">
+          HT
+        </span>
+        <span className="hidden leading-tight sm:block">
+          <span className="block text-sm font-semibold">{profile.name}</span>
+          <span className="block text-xs text-muted-foreground">
+            @{profile.handle}
           </span>
-        </Typography>
-      </div>
-      <div className="header-search px-16"></div>
-      <div className="header-extra flex items-center gap-4">
-        <Nav />
-      </div>
+        </span>
+      </Link>
+
+      <Nav />
     </header>
   );
 }

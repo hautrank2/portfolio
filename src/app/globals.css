@@ -121,3 +121,108 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* the header is fixed at 4rem — keep anchored sections clear of it */
+    scroll-padding-top: 6rem;
+  }
+
+  ::selection {
+    background-color: color-mix(in oklch, var(--primary) 35%, transparent);
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: color-mix(in oklch, var(--primary) 30%, transparent);
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in oklch, var(--primary) 55%, transparent);
+    background-clip: content-box;
+  }
+}
+
+@utility text-gradient {
+  background-image: linear-gradient(
+    100deg,
+    var(--foreground) 0%,
+    var(--foreground) 30%,
+    var(--primary) 100%
+  );
+  background-clip: text;
+  color: transparent;
+}
+
+/* Faint blueprint grid, used behind the hero and page headers. */
+@utility bg-grid {
+  background-image: linear-gradient(
+      to right,
+      color-mix(in oklch, var(--foreground) 6%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in oklch, var(--foreground) 6%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 56px 56px;
+}
+
+@utility surface {
+  background-color: color-mix(in oklch, var(--card) 55%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+/*
+ * Scroll reveal: hidden until <Reveal /> marks the element as visible. Driven by
+ * a transition rather than an animation on purpose — when the browser skips the
+ * transition (background tab, reduced motion) the element still lands on its
+ * final state instead of being stuck on the first keyframe.
+ */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+[data-reveal][data-visible="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Never leave content hidden when scripts cannot run. */
+@media (scripting: none) {
+  [data-reveal] {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  [data-reveal],
+  [data-reveal][data-visible="true"] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

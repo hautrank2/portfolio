@@ -1,42 +1,42 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import React from "react";
+import { navs } from "~/data/site";
 import { cn } from "~/lib/utils";
 
-function Nav({}) {
-  const navs = [
-    {
-      title: "Home",
-      href: "/",
-    },
-    {
-      title: "Experiences",
-      href: "#experiences",
-    },
-    {
-      title: "Projects",
-      href: "#projects",
-    },
-    {
-      title: "Contact",
-      href: "#contact",
-    },
-  ];
-  const classLink = "hover:bg-primary/10 active:bg-primary/10";
+function isActive(pathname: string, href: string) {
+  return href === "/" ? pathname === "/" : pathname.startsWith(href);
+}
+
+function Nav() {
+  const pathname = usePathname();
 
   return (
-    <div className="header-extra">
-      <div className="items-center hidden md:flex gap-2">
-        {navs.map((nav) => (
+    <nav
+      aria-label="Main"
+      className="surface flex items-center gap-1 rounded-full border border-border/60 p-1"
+    >
+      {navs.map((nav) => {
+        const active = isActive(pathname, nav.href);
+        return (
           <Link
             key={nav.href}
             href={nav.href}
-            className={cn("px-4 py-2", classLink)}
+            aria-current={active ? "page" : undefined}
+            className={cn(
+              "rounded-full px-3 py-1.5 text-sm font-medium transition-colors sm:px-4",
+              active
+                ? "bg-primary/15 text-primary"
+                : "text-foreground/70 hover:bg-foreground/5 hover:text-foreground"
+            )}
           >
-            <h4 className="text-2xl">{nav.title}</h4>
+            {nav.title}
           </Link>
-        ))}
-      </div>
-    </div>
+        );
+      })}
+    </nav>
   );
 }
 

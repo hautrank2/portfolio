@@ -22,18 +22,17 @@ const typographyVariants = cva("", {
   },
 });
 
-export interface TypographyProps
-  extends React.HTMLAttributes<HTMLElement>,
-    VariantProps<typeof typographyVariants> {
-  asChild?: boolean;
-}
+type TypographyPropsType = React.HTMLAttributes<HTMLElement> &
+  VariantProps<typeof typographyVariants> & {
+    asChild?: boolean;
+  };
 
 function Typography({
   className,
   variant,
   asChild = false,
   ...props
-}: TypographyProps) {
+}: TypographyPropsType) {
   const Comp = asChild ? Slot : variant || "p";
 
   return (
