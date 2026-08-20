@@ -77,6 +77,7 @@ export const socials: SocialModel[] = [
 
 export const navs: NavItemModel[] = [
   { title: "Home", href: "/" },
+  { title: "Blog", href: "/blog" },
   { title: "Showcase", href: "/showcase" },
   { title: "About", href: "/about" },
 ];

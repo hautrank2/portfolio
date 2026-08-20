@@ -226,3 +226,162 @@
     transition: none;
   }
 }
+
+/*
+ * Typography for rendered markdown notes. Written by hand rather than pulled in
+ * from @tailwindcss/typography so the rhythm and colours stay tied to the theme
+ * tokens above instead of a second, parallel palette.
+ */
+.prose-note {
+  color: color-mix(in oklch, var(--foreground) 88%, transparent);
+  line-height: 1.75;
+}
+
+.prose-note > * + * {
+  margin-top: 1.25em;
+}
+
+.prose-note h2,
+.prose-note h3,
+.prose-note h4 {
+  color: var(--foreground);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  scroll-margin-top: 6rem;
+}
+
+.prose-note h2 {
+  margin-top: 2.5em;
+  font-size: 1.5rem;
+  padding-bottom: 0.4em;
+  border-bottom: 1px solid color-mix(in oklch, var(--border) 60%, transparent);
+}
+
+.prose-note h3 {
+  margin-top: 2em;
+  font-size: 1.2rem;
+}
+
+.prose-note a {
+  color: var(--primary);
+  text-underline-offset: 3px;
+  text-decoration-line: underline;
+  text-decoration-color: color-mix(in oklch, var(--primary) 40%, transparent);
+}
+
+.prose-note a:hover {
+  text-decoration-color: var(--primary);
+}
+
+.prose-note strong {
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+.prose-note ul,
+.prose-note ol {
+  padding-left: 1.4em;
+}
+
+.prose-note ul {
+  list-style: disc;
+}
+
+.prose-note ol {
+  list-style: decimal;
+}
+
+.prose-note li::marker {
+  color: color-mix(in oklch, var(--primary) 70%, transparent);
+}
+
+.prose-note li + li {
+  margin-top: 0.4em;
+}
+
+.prose-note blockquote {
+  border-left: 3px solid var(--primary);
+  padding: 0.2em 0 0.2em 1.2em;
+  color: color-mix(in oklch, var(--foreground) 70%, transparent);
+  font-style: italic;
+}
+
+/* Inline code only — the fenced-block rule below resets these. */
+.prose-note code {
+  background-color: color-mix(in oklch, var(--primary) 14%, transparent);
+  border-radius: var(--radius-sm);
+  padding: 0.15em 0.4em;
+  font-size: 0.875em;
+  word-break: break-word;
+}
+
+.prose-note pre {
+  background-color: color-mix(in oklch, var(--card) 70%, transparent);
+  border: 1px solid color-mix(in oklch, var(--border) 70%, transparent);
+  border-radius: var(--radius-lg);
+  padding: 1rem 0;
+  overflow-x: auto;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.prose-note pre code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+  display: grid; /* one row per line, so line numbers/highlights can hang off */
+}
+
+.prose-note pre code [data-line] {
+  padding: 0 1.25rem;
+}
+
+/* Language tag that rehype-pretty-code hands us. */
+.prose-note figure[data-rehype-pretty-code-figure] {
+  position: relative;
+}
+
+.prose-note [data-rehype-pretty-code-title] {
+  background-color: color-mix(in oklch, var(--card) 85%, transparent);
+  border: 1px solid color-mix(in oklch, var(--border) 70%, transparent);
+  border-bottom: none;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.8rem;
+  color: color-mix(in oklch, var(--foreground) 65%, transparent);
+}
+
+.prose-note [data-rehype-pretty-code-title] + pre {
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+.prose-note table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.925rem;
+  display: block;
+  overflow-x: auto;
+}
+
+.prose-note th,
+.prose-note td {
+  border: 1px solid color-mix(in oklch, var(--border) 70%, transparent);
+  padding: 0.6rem 0.9rem;
+  text-align: left;
+}
+
+.prose-note th {
+  background-color: color-mix(in oklch, var(--primary) 10%, transparent);
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+.prose-note hr {
+  border-color: color-mix(in oklch, var(--border) 60%, transparent);
+  margin: 2.5em 0;
+}
+
+.prose-note img {
+  border-radius: var(--radius-lg);
+  border: 1px solid color-mix(in oklch, var(--border) 60%, transparent);
+}
