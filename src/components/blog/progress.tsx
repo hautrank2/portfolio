@@ -1,15 +1,13 @@
 import { cn } from "~/lib/utils";
 
-/** `3 / 8 notes` plus a thin bar. Reads as coverage of a section's backlog. */
-function BlogProgress({
-  done,
-  total,
-  className,
-}: {
+export type BlogProgressProps = {
   done: number;
   total: number;
   className?: string;
-}) {
+};
+
+/** `3 / 8 notes` plus a thin bar. Reads as coverage of a section's backlog. */
+const BlogProgress = ({ done, total, className }: BlogProgressProps) => {
   if (!total) return null;
   const pct = Math.round((done / total) * 100);
 
@@ -26,6 +24,6 @@ function BlogProgress({
       </span>
     </div>
   );
-}
+};
 
 export { BlogProgress };

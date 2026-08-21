@@ -8,7 +8,7 @@ import { projects } from "~/data/projects";
 import ProjectSection from "../components/ProjectSection";
 
 export const metadata: Metadata = {
-  title: "Showcase",
+  title: "showcase",
   description:
     "Every side project I have built and shipped, with links to the live site and the source.",
 };

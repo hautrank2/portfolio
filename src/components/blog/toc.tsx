@@ -3,15 +3,19 @@ import { cn } from "~/lib/utils";
 
 type HeadingType = { depth: number; text: string; id: string };
 
+export type BlogTocProps = {
+  headings: HeadingType[];
+};
+
 /**
  * Sticky, link-only. Deliberately not a scroll-spy: that needs a client
  * component and an observer for something a reader glances at once.
  */
-function BlogToc({ headings }: { headings: HeadingType[] }) {
+const BlogToc = ({ headings }: BlogTocProps) => {
   if (headings.length < 3) return null;
 
   return (
-    <aside className="hidden lg:block">
+    <aside className="hidden xl:block">
       <div className="sticky top-24">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground/40">
           Trong bài
@@ -34,6 +38,6 @@ function BlogToc({ headings }: { headings: HeadingType[] }) {
       </div>
     </aside>
   );
-}
+};
 
 export { BlogToc };

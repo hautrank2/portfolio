@@ -1,23 +1,25 @@
 import { CalendarDays, Clock } from "lucide-react";
 import { Reveal } from "~/components/ui/reveal";
 import { Typography } from "~/components/ui/typography";
-import { extractHeadings, readingTime, renderMarkdown } from "~/lib/markdown";
+import { extractHeadings, readingTime, renderMarkdown } from "./markdown";
 import type { BlogNodeContextType } from "~/types";
 import { BlogBreadcrumb } from "./breadcrumb";
 import { DocNav } from "./doc-nav";
 import { StatusBadge } from "./status-badge";
 import { BlogToc } from "./toc";
 
+export type DocViewProps = BlogNodeContextType;
+
 /** A single note. */
-async function DocView({ node, trail, prev, next }: BlogNodeContextType) {
-  const html = await renderMarkdown(node.body);
+const DocView = async ({ node, trail, prev, next }: DocViewProps) => {
+  const content = await renderMarkdown(node.body);
   const headings = extractHeadings(node.body);
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-8 lg:px-16 lg:py-16">
+    <div className="mx-auto w-full max-w-5xl px-4 py-12 sm:px-8 lg:py-16">
       <BlogBreadcrumb trail={trail} />
 
-      <div className="mt-10 gap-12 lg:grid lg:grid-cols-[minmax(0,1fr)_15rem]">
+      <div className="mt-10 gap-12 xl:grid xl:grid-cols-[minmax(0,1fr)_14rem]">
         <article className="min-w-0">
           <header className="border-b border-border/60 pb-8">
             <Typography
@@ -61,10 +63,7 @@ async function DocView({ node, trail, prev, next }: BlogNodeContextType) {
           </header>
 
           <Reveal>
-            <div
-              className="prose-note mt-10"
-              dangerouslySetInnerHTML={{ __html: html }}
-            />
+            <div className="prose-note mt-10">{content}</div>
           </Reveal>
 
           <DocNav prev={prev} next={next} />
@@ -74,6 +73,6 @@ async function DocView({ node, trail, prev, next }: BlogNodeContextType) {
       </div>
     </div>
   );
-}
+};
 
 export { DocView };

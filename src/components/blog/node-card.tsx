@@ -6,11 +6,16 @@ import { BlogProgress } from "./progress";
 import { StatusBadge } from "./status-badge";
 
 /** `01`, `02`, ... — derived from position, never stored in the content. */
-function ordinal(index: number) {
+const ordinal = (index: number) => {
   return String(index + 1).padStart(2, "0");
-}
+};
 
-function NodeCard({ node, index }: { node: BlogNodeType; index: number }) {
+export type NodeCardProps = {
+  node: BlogNodeType;
+  index: number;
+};
+
+const NodeCard = ({ node, index }: NodeCardProps) => {
   const planned = node.kind === "planned";
   const isSection = node.kind === "section";
   const Icon = planned ? Lock : isSection ? FolderTree : FileText;
@@ -105,6 +110,6 @@ function NodeCard({ node, index }: { node: BlogNodeType; index: number }) {
       {body}
     </Link>
   );
-}
+};
 
 export { NodeCard };

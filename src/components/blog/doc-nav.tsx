@@ -2,11 +2,16 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import type { BlogNodeType } from "~/types";
 
+export type DocNavProps = {
+  prev?: BlogNodeType;
+  next?: BlogNodeType;
+};
+
 /**
  * Previous/next follow the roadmap's reading order, not publish date — the
  * point of the order lists is that they beat chronology for a learning track.
  */
-function DocNav({ prev, next }: { prev?: BlogNodeType; next?: BlogNodeType }) {
+const DocNav = ({ prev, next }: DocNavProps) => {
   if (!prev && !next) return null;
 
   return (
@@ -40,6 +45,6 @@ function DocNav({ prev, next }: { prev?: BlogNodeType; next?: BlogNodeType }) {
       )}
     </nav>
   );
-}
+};
 
 export { DocNav };

@@ -15,7 +15,7 @@ import SectionHeadline from "../components/SectionHeadline";
 const current = experiences[0];
 
 export const metadata: Metadata = {
-  title: "About",
+  title: "about",
   description: profile.bio,
 };
 

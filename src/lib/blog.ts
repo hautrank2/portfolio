@@ -6,6 +6,7 @@ import type {
   BlogFrontmatterType,
   BlogNodeContextType,
   BlogNodeType,
+  BlogTreeItemType,
   OrderEntryType,
 } from "~/types";
 
@@ -230,4 +231,45 @@ export function getAllBlogPaths(): string[][] {
 /** Flattens to docs only — used by the "all notes" listing. */
 export function getAllDocs(): BlogNodeType[] {
   return getReadingOrder().filter((node) => node.kind === "doc");
+}
+
+/** Strips bodies so the nav tree can cross the server/client boundary cheaply. */
+export function toSidebarTree(node: BlogNodeType): BlogTreeItemType {
+  return {
+    kind: node.kind,
+    slug: node.slug,
+    href: node.href,
+    title: node.title,
+    progress: node.progress,
+    children: node.children.map(toSidebarTree),
+  };
+}
+
+/**
+ * Document title for a blog path, prefix aside: `blog | k8s | nen-tang`.
+ *
+ * Capped at three segments. A note five folders deep would otherwise produce a
+ * title no browser tab can show, and the middle folders are the least useful
+ * part — the track and the page itself are what identify it.
+ */
+export function blogPathTitle(segments: string[] = []): string {
+  const parts = ["blog", ...segments];
+  if (parts.length <= 3) return parts.join(" | ");
+  return [parts[0], parts[1], parts[parts.length - 1]].join(" | ");
+}
+
+/** Every doc below `node`, newest first — powers the "all notes" tab. */
+export function flattenDocs(node: BlogNodeType): BlogNodeType[] {
+  const out: BlogNodeType[] = [];
+
+  const walk = (current: BlogNodeType) => {
+    for (const child of current.children) {
+      if (child.kind === "doc") out.push(child);
+      walk(child);
+    }
+  };
+  walk(node);
+
+  // Undated notes sort last rather than jumping to the top on an empty string.
+  return out.sort((a, b) => (b.updated ?? "").localeCompare(a.updated ?? ""));
 }

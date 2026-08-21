@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { DocView } from "~/components/blog/doc-view";
 import { SectionView } from "~/components/blog/section-view";
-import { getAllBlogPaths, getBlogNode } from "~/lib/blog";
+import { blogPathTitle, getAllBlogPaths, getBlogNode } from "~/lib/blog";
 
 type PagePropsType = { params: Promise<{ slug: string[] }> };
 
@@ -22,8 +22,13 @@ export async function generateMetadata({
   if (!found) return {};
 
   return {
-    title: found.node.title,
+    title: blogPathTitle(slug),
     description: found.node.description,
+    // Link previews still deserve the human name, not the path.
+    openGraph: {
+      title: found.node.title,
+      description: found.node.description,
+    },
   };
 }
 

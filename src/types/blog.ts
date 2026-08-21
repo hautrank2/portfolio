@@ -59,3 +59,17 @@ export type BlogNodeContextType = {
   prev?: BlogNodeType;
   next?: BlogNodeType;
 };
+
+/**
+ * Trimmed-down node for the sidebar. Deliberately drops `body` — shipping every
+ * note's markdown to the client just to draw a nav tree would dwarf the pages
+ * themselves.
+ */
+export type BlogTreeItemType = {
+  kind: BlogNodeKindType;
+  slug: string;
+  href: string;
+  title: string;
+  children: BlogTreeItemType[];
+  progress: { done: number; total: number };
+};

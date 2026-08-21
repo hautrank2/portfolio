@@ -2,8 +2,12 @@ import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import type { BlogNodeType } from "~/types";
 
+export type BlogBreadcrumbProps = {
+  trail: BlogNodeType[];
+};
+
 /** Ancestors of the current node, outermost first. */
-function BlogBreadcrumb({ trail }: { trail: BlogNodeType[] }) {
+const BlogBreadcrumb = ({ trail }: BlogBreadcrumbProps) => {
   return (
     <nav
       aria-label="Breadcrumb"
@@ -22,6 +26,6 @@ function BlogBreadcrumb({ trail }: { trail: BlogNodeType[] }) {
       ))}
     </nav>
   );
-}
+};
 
 export { BlogBreadcrumb };

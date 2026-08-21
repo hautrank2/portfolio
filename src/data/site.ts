@@ -12,6 +12,9 @@ import {
   REACT_LOGO,
 } from "~/utils/logo";
 
+/** Prefix on every document title, e.g. `htk2 | blog | k8s`. */
+export const titlePrefix = "htk2";
+
 export const profile: ProfileModel = {
   name: "Hau Tran",
   handle: "hautrank2",

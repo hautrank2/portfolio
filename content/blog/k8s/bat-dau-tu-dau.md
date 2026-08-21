@@ -1,53 +1,63 @@
 ---
-title: Bắt đầu từ đâu khi bạn là dev frontend
-description: Vì sao tôi học K8s, và thứ tự nào hợp lý khi không làm ops.
+title: Bắt đầu từ đâu, và học tới đâu thì dừng
+description: Mục tiêu cụ thể, phạm vi cắt bỏ, và vì sao lộ trình này bắt đầu từ Linux.
 status: seed
 created: 2026-08-18
-updated: 2026-08-20
+updated: 2026-08-21
 tags: [k8s, mindset]
 ---
 
-Tôi làm frontend. Lý do học Kubernetes không phải để vận hành cluster production, mà vì
-một chuyện rất cụ thể: mỗi lần app lên staging bị lỗi, tôi không đọc nổi thứ team ops
-gửi qua Slack.
+Tôi làm web — cả frontend lẫn backend với NestJS và .NET. Lý do học Kubernetes không
+phải để vận hành cluster production, mà vì một chuyện rất cụ thể: mỗi lần app lên
+staging bị lỗi, tôi không đọc nổi thứ team ops gửi qua Slack.
 
-## Mục tiêu tôi đặt ra
+## Mục tiêu
 
 Không phải "thành thạo K8s". Cụ thể hơn nhiều:
 
-1. Đọc hiểu một file manifest bất kỳ trong repo của team
-2. Tự debug được tới bước "Pod của tôi lỗi vì lý do X", thay vì chỉ báo "nó không chạy"
-3. Deploy được một app Next.js lên cluster local từ số 0
+1. Đọc hiểu một manifest bất kỳ trong repo của team
+2. Tự debug tới bước *"Pod của tôi lỗi vì lý do X"*, thay vì chỉ báo "nó không chạy"
+3. Deploy được một hệ nhiều service lên cluster từ số 0
 
-## Môi trường tôi dùng
+## Thứ tôi chủ động bỏ qua
 
-Không cần cloud, không tốn tiền. `kind` chạy cluster ngay trong Docker:
+Đây là phần quan trọng nhất và ít ai nói ra. Cắt được những thứ này thì lộ trình
+còn lại vừa sức trong khoảng 3 tháng.
+
+| Bỏ qua | Lý do |
+|---|---|
+| Bootstrap cluster bằng `kubeadm` | Tôi sẽ không tự dựng cluster production |
+| Nội tại CNI (Calico, Cilium, BGP) | Biết "Pod có IP riêng, route được với nhau" là đủ |
+| Backup/restore etcd, upgrade cluster | Việc của platform team |
+| Viết CSI driver, Operator | Để sau, nếu có nhu cầu thật |
+| Chứng chỉ CKA | CKA thi cho ops. Đúng vai tôi là **CKAD** |
+
+## Vì sao không bắt đầu từ `kubectl`
+
+Lần đầu tôi nhảy thẳng vào `Deployment` và copy YAML từ blog. Kết quả: gõ được lệnh
+nhưng không hiểu gì. `Deployment` chỉ có nghĩa khi đã hiểu `Pod`, mà `Pod` chỉ có
+nghĩa khi đã biết container là gì ở mức kernel.
+
+Nên lộ trình này bắt đầu từ namespace và cgroup của Linux. Nghe xa, nhưng đó là chỗ
+duy nhất khiến phần còn lại hết huyền bí.
+
+## Môi trường
+
+Một VM Linux chạy trên máy Windows, cài k3s bằng một lệnh:
 
 ```bash
-kind create cluster --name lab
-kubectl cluster-info --context kind-lab
+curl -sfL https://get.k3s.io | sh -
 ```
 
-Xong thì kiểm tra:
+Kéo kubeconfig về Windows để `kubectl` từ máy thật:
 
 ```bash
-kubectl get nodes
+sudo cat /etc/rancher/k3s/k3s.yaml
 ```
 
-```
-NAME                 STATUS   ROLES           AGE   VERSION
-lab-control-plane    Ready    control-plane   40s   v1.31.0
-```
-
-## Thứ tự tôi thấy sai khi mới bắt đầu
-
-Tôi nhảy thẳng vào `Deployment` và copy YAML từ blog. Kết quả là gõ được lệnh nhưng
-không hiểu gì — vì `Deployment` chỉ có nghĩa khi đã hiểu `Pod`, mà `Pod` chỉ có nghĩa
-khi đã hiểu container là gì ở mức kernel.
-
-Nên roadmap này bắt đầu từ container, không phải từ `kubectl apply`.
+Copy vào `~/.kube/config`, sửa `server: https://127.0.0.1:6443` thành IP của VM.
 
 ## Câu hỏi còn mở
 
-- `kind` khác `minikube` ở điểm nào đáng kể ngoài chuyện nó chạy node bằng container?
-- Có nên học qua managed cluster (GKE/EKS) sớm không, hay để sau?
+- k3s lược bỏ những gì so với K8s đầy đủ? Có chỗ nào lược bỏ ảnh hưởng tới việc học không?
+- Khi nào nên chuyển từ single-node sang multi-node để học scheduling cho đúng?

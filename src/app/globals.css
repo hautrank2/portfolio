@@ -295,6 +295,27 @@
   color: color-mix(in oklch, var(--primary) 70%, transparent);
 }
 
+/* GFM task lists ("- [ ] …"): remark-gfm renders a real checkbox, so the
+   list marker would sit next to it as a second bullet. */
+.prose-note .contains-task-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.prose-note .task-list-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65em;
+}
+
+.prose-note .task-list-item input[type="checkbox"] {
+  margin-top: 0.45em;
+  flex-shrink: 0;
+  accent-color: var(--primary);
+  width: 0.95em;
+  height: 0.95em;
+}
+
 .prose-note li + li {
   margin-top: 0.4em;
 }
@@ -306,8 +327,10 @@
   font-style: italic;
 }
 
-/* Inline code only — the fenced-block rule below resets these. */
-.prose-note code {
+/* Inline code only. Scoped by structure rather than undone afterwards: as a
+   bare `.prose-note code` it outranked the utilities on <CodeBlock>'s <code>
+   and quietly replaced their padding. */
+.prose-note :not(pre) > code {
   background-color: color-mix(in oklch, var(--primary) 14%, transparent);
   border-radius: var(--radius-sm);
   padding: 0.15em 0.4em;
@@ -315,30 +338,13 @@
   word-break: break-word;
 }
 
-.prose-note pre {
-  background-color: color-mix(in oklch, var(--card) 70%, transparent);
-  border: 1px solid color-mix(in oklch, var(--border) 70%, transparent);
-  border-radius: var(--radius-lg);
-  padding: 1rem 0;
-  overflow-x: auto;
-  font-size: 0.875rem;
-  line-height: 1.6;
-}
-
-.prose-note pre code {
-  background: none;
-  padding: 0;
-  font-size: inherit;
-  display: grid; /* one row per line, so line numbers/highlights can hang off */
-}
-
+/* The <pre> chrome lives in <CodeBlock>; these rules only dress the markup that
+   rehype-pretty-code emits inside it. */
+/* Horizontal padding belongs to the <pre>, not to these: rehype-pretty-code
+   only emits [data-line] for fenced blocks that declare a language, so keying
+   the padding off it left plain output blocks flush against the border. */
 .prose-note pre code [data-line] {
-  padding: 0 1.25rem;
-}
-
-/* Language tag that rehype-pretty-code hands us. */
-.prose-note figure[data-rehype-pretty-code-figure] {
-  position: relative;
+  min-height: 1lh;
 }
 
 .prose-note [data-rehype-pretty-code-title] {
@@ -351,29 +357,32 @@
   color: color-mix(in oklch, var(--foreground) 65%, transparent);
 }
 
-.prose-note [data-rehype-pretty-code-title] + pre {
+.prose-note [data-rehype-pretty-code-title] + [data-slot="code-block"] pre {
   border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 }
 
-.prose-note table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.925rem;
-  display: block;
-  overflow-x: auto;
-}
-
-.prose-note th,
-.prose-note td {
+/* Tables are shadcn's <Table>; target its data-slots so the component itself
+   stays unmodified and reusable outside prose. */
+.prose-note [data-slot="table-container"] {
   border: 1px solid color-mix(in oklch, var(--border) 70%, transparent);
-  padding: 0.6rem 0.9rem;
-  text-align: left;
+  border-radius: var(--radius-lg);
 }
 
-.prose-note th {
+.prose-note [data-slot="table-head"],
+.prose-note [data-slot="table-cell"] {
+  padding: 0.6rem 0.9rem;
+  white-space: normal;
+  vertical-align: top;
+}
+
+.prose-note [data-slot="table-head"] {
+  height: auto;
   background-color: color-mix(in oklch, var(--primary) 10%, transparent);
-  color: var(--foreground);
-  font-weight: 600;
+}
+
+.prose-note [data-slot="table-head"]:not(:last-child),
+.prose-note [data-slot="table-cell"]:not(:last-child) {
+  border-right: 1px solid color-mix(in oklch, var(--border) 50%, transparent);
 }
 
 .prose-note hr {
