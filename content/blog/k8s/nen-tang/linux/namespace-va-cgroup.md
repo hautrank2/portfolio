@@ -255,7 +255,7 @@ ping -c1 8.8.8.8
 tạo và trước khi CNI plugin vào cấu hình. Mọi thứ CNI làm — cấp IP, dựng veth pair,
 thêm route — là để biến trạng thái trống rỗng này thành một Pod nói chuyện được.
 
-Nắm chỗ này thì [Giai đoạn 5 — Networking](/blog/k8s/networking) nhẹ đi rất nhiều.
+Nắm chỗ này thì [Section 4 — Networking](/blog/k8s/networking) nhẹ đi rất nhiều.
 
 ## Bài tập 3 — Tự tay gây ra OOMKilled
 

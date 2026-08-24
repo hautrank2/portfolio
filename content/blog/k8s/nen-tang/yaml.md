@@ -49,7 +49,7 @@ Nên `country: NO` trở thành `country: false`. Trong K8s hay gặp ở dạng
 
 ```yaml
 data:
-  ENABLE_CACHE: yes      # ❌ boolean -> ConfigMap từ chối, vì data phải là string
+  ENABLE_CACHE: yes      # ❌ thành boolean -> ConfigMap từ chối
   ENABLE_CACHE: "yes"    # ✅
 ```
 

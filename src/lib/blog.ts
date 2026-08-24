@@ -77,6 +77,7 @@ function applyOrder(
       body: "",
       children: [],
       progress: { done: 0, total: 1 },
+      numberPath: [],
     });
   }
 
@@ -118,6 +119,7 @@ function buildDoc(file: string, parentPath: string[]): BlogNodeType | null {
     body,
     children: [],
     progress: { done: 1, total: 1 },
+    numberPath: [],
   };
 }
 
@@ -162,6 +164,7 @@ function buildSection(dir: string, parentPath: string[]): BlogNodeType | null {
     body: index.body,
     children: ordered,
     progress: rollUp(ordered, { isDoc: false }),
+    numberPath: [],
   };
 }
 
@@ -178,9 +181,25 @@ export const getBlogTree = cache((): BlogNodeType => {
       body: "",
       children: [],
       progress: { done: 0, total: 0 },
+      numberPath: [],
     };
   }
-  return buildSection(BLOG_ROOT, [])!;
+  const root = buildSection(BLOG_ROOT, [])!;
+
+  // Positions are per-parent and include planned nodes, so the chips a
+  // reader sees stay stable as notes get written. Numbering restarts at each
+  // track: a track card is "02", but inside it the count begins again at 1 —
+  // "01" for its first section, "3.1" for a note inside its third.
+  const number = (node: BlogNodeType, path: number[]) => {
+    node.numberPath = path;
+    node.children.forEach((child, i) => number(child, [...path, i + 1]));
+  };
+  root.numberPath = [];
+  root.children.forEach((track, i) => {
+    track.numberPath = [i + 1];
+    track.children.forEach((child, j) => number(child, [j + 1]));
+  });
+  return root;
 });
 
 /** Depth-first, in reading order. Planned nodes are skipped — nothing to open. */

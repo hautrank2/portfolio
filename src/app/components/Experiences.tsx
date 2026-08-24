@@ -69,7 +69,20 @@ const Exp = ({ exp }: ExpPropsType) => {
               <Images size={14} />
               {exp.photos.length} photos
             </DialogTrigger>
-            <DialogContent className="sm:max-w-3xl">
+            <DialogContent className="sm:max-w-3xl bg-transparent!">
+              {/*
+               * Decorative sheen. Negative z-index keeps it above the panel's own
+               * translucent background but behind the content, so nothing here can
+               * cover the children or swallow a click.
+               */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-40 bg-gradient-to-b from-primary/15 to-transparent"
+              />
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-x-10 top-0 -z-10 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent"
+              />
               <DialogHeader>
                 <DialogTitle>{exp.company}</DialogTitle>
                 <DialogDescription>{exp.duration}</DialogDescription>

@@ -49,6 +49,11 @@ export type BlogNodeType = {
   children: BlogNodeType[];
   /** How many descendant docs exist vs. how many are planned. */
   progress: { done: number; total: number };
+  /**
+   * Hierarchical position from the track root: [4] for a top-level card,
+   * [4, 2] for the second child inside it. Drives the "4.2" chips.
+   */
+  numberPath: number[];
 };
 
 /** A node plus its neighbours in flattened reading order. */

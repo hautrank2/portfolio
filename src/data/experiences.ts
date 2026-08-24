@@ -26,6 +26,12 @@ export const experiences: ExperienceModel[] = [
         imageUrl:
           "https://res.cloudinary.com/dhl9sisnc/image/upload/v1753500793/my-self/bcm/teambuilding2025_ysqkrn.jpg",
       },
+      {
+        title: "Team building - Mui Ne - 2026",
+        description: "June 2026",
+        imageUrl:
+          "https://res.cloudinary.com/dhl9sisnc/image/upload/v1787535449/my-self/bcm/vntt_muine_2026.jpg",
+      },
     ],
   },
   {

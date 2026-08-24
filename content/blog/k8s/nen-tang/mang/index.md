@@ -9,7 +9,7 @@ order:
   - { slug: tls-sni-chain, title: "TLS handshake, SNI và chain chứng chỉ" }
 ---
 
-Giai đoạn Networking của K8s là phần khó nhất và phân hoá trình độ nhiều nhất — nhưng
+Section 4 — Networking của K8s là phần khó nhất và phân hoá trình độ nhiều nhất — nhưng
 chỉ vì người ta bỏ qua phần này.
 
 Hai thứ trả về nhiều nhất cho công sức bỏ ra:

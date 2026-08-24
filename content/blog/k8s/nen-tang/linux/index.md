@@ -54,7 +54,7 @@ mà đó là thứ đáng học.
 Ba note đầu chạy được ngay trên một VM Ubuntu trắng. Chỉ note `systemd` mới cần cluster —
 nếu chưa cài k3s thì cứ để dành note đó, hoặc cài luôn theo bước dưới.
 
-### Cài k3s (chỉ khi cần note systemd, hoặc muốn đi trước sang Giai đoạn 2)
+### Cài k3s (chỉ khi cần note systemd, hoặc muốn đi trước sang Section 2)
 
 ```bash
 curl -sfL https://get.k3s.io | sh -
@@ -86,6 +86,21 @@ qua bước này thì vẫn lỗi y như cũ.
 ```bash
 ls -l $(command -v kubectl)     # sẽ thấy trỏ sang /usr/local/bin/k3s
 ```
+
+**Nếu dùng zsh/fish (prompt starship đẹp đẽ thường đi kèm zsh):** dòng
+`export` ở trên ghi vào `~/.bashrc` sẽ **không có tác dụng** — ghi vào file
+của shell bạn đang dùng:
+
+```bash
+echo $SHELL                     # xem shell thật
+# zsh:
+echo 'export KUBECONFIG=$HOME/.kube/config' >> ~/.zshrc
+# fish:
+# set -Ux KUBECONFIG $HOME/.kube/config
+```
+
+Và đừng quen tay `sudo kubectl` để né lỗi — nó chạy được nhưng che mất cấu
+hình sai, và file kubectl tạo ra sẽ thuộc root.
 
 **Hai lỗi hay gặp, đọc kỹ để phân biệt:**
 

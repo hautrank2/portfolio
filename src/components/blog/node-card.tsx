@@ -5,17 +5,20 @@ import type { BlogNodeType } from "~/types";
 import { BlogProgress } from "./progress";
 import { StatusBadge } from "./status-badge";
 
-/** `01`, `02`, ... — derived from position, never stored in the content. */
-const ordinal = (index: number) => {
-  return String(index + 1).padStart(2, "0");
+/**
+ * `01` at the top level, `4.2` inside a section — read off the node's
+ * numberPath, which the loader derives from position. Never stored in content.
+ */
+const chip = (path: number[]) => {
+  if (path.length <= 1) return String(path[0] ?? 1).padStart(2, "0");
+  return path.join(".");
 };
 
 export type NodeCardProps = {
   node: BlogNodeType;
-  index: number;
 };
 
-const NodeCard = ({ node, index }: NodeCardProps) => {
+const NodeCard = ({ node }: NodeCardProps) => {
   const planned = node.kind === "planned";
   const isSection = node.kind === "section";
   const Icon = planned ? Lock : isSection ? FolderTree : FileText;
@@ -29,7 +32,7 @@ const NodeCard = ({ node, index }: NodeCardProps) => {
             planned ? "text-foreground/25" : "text-primary/70"
           )}
         >
-          {ordinal(index)}
+          {chip(node.numberPath)}
         </span>
 
         <div className="min-w-0 flex-1">

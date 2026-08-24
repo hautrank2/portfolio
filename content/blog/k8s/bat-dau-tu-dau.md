@@ -32,6 +32,15 @@ còn lại vừa sức trong khoảng 3 tháng.
 | Viết CSI driver, Operator | Để sau, nếu có nhu cầu thật |
 | Chứng chỉ CKA | CKA thi cho ops. Đúng vai tôi là **CKAD** |
 
+## Giáo trình đi theo cái gì
+
+Tôi bám sát **Section 11→16 của khoá** *Docker & Kubernetes: The Practical Guide*, mỗi
+bài giảng một note, giữ nguyên số hiệu để đối chiếu. Lý do: khoá kéo **một dự án duy
+nhất** đi xuyên suốt, nên mỗi khái niệm mới đều có chỗ để dùng ngay.
+
+Tôi chỉ thêm đúng một thứ khoá không có — [Section 0](/blog/k8s/nen-tang) về Linux —
+và ghi rõ ở cuối mỗi section những mảng khoá bỏ trắng, để sau này biết đường bổ sung.
+
 ## Vì sao không bắt đầu từ `kubectl`
 
 Lần đầu tôi nhảy thẳng vào `Deployment` và copy YAML từ blog. Kết quả: gõ được lệnh

@@ -46,7 +46,7 @@ export const projects: ProjectModel[] = [
     slug: "portfolio",
     title: "This portfolio",
     desc: "The site you are reading right now.",
-    featured: false,
+    featured: true,
     technologies: [{ logoUrl: "/logo/nextjs.png", title: "Next.js" }],
     links: [
       {

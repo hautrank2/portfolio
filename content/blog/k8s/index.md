@@ -1,44 +1,67 @@
 ---
 title: Kubernetes
-description: Lộ trình 10 giai đoạn, từ nền tảng Linux tới GitOps. Note viết dần trong lúc học.
+description: Bảy section bám sát khoá Docker & Kubernetes, cộng một section nền tảng Linux.
 status: seed
 updated: 2026-08-21
 tags: [k8s, devops, container]
 order:
   - bat-dau-tu-dau
+  - du-an-xuyen-suot
   - nen-tang
-  - mo-hinh-tu-duy
-  - kien-truc-cluster
-  - workload
-  - debug
-  - config-storage
+  - bat-dau-voi-k8s
+  - k8s-thuc-chien
+  - du-lieu-va-volume
   - networking
-  - scheduling
-  - bao-mat
-  - observability
-  - dong-goi-gitops
-  - mo-rong
+  - deploy-len-cloud
+  - tong-ket
 ---
 
-Lộ trình dưới đây đi theo thứ tự **phụ thuộc**, không theo thứ tự tài liệu. Mỗi tầng
-chỉ mở ra khi tầng dưới đã vững — nên nó bắt đầu từ Linux và mạng, không phải từ
-`kubectl apply`.
+Giáo trình này **bám sát Section 11→16** của khoá *Docker & Kubernetes: The Practical
+Guide* (Maximilian Schwarzmüller) — mỗi bài giảng là một note, giữ nguyên thứ tự và
+số hiệu bài để đối chiếu.
+
+Cộng thêm đúng **một section tôi tự thêm**: [Section 0 — Nền tảng](/blog/k8s/nen-tang).
+Khoá giả định bạn đã biết Docker và không chạm tới Linux; thiếu namespace và cgroup
+thì K8s mãi là ma thuật.
+
+## Đối chiếu số section
+
+Ở đây đánh số lại từ **0**, cho gọn. Bảng này để khỏi nhầm khi mở khoá ra xem:
+
+| Ở đây | Trong khoá | Bài |
+| --- | --- | --- |
+| **Section 0** — Nền tảng | *không có* | — |
+| **Section 1** — Bắt đầu với Kubernetes | Section 11 | 172–179 |
+| **Section 2** — Kubernetes thực chiến | Section 12 | 182–206 |
+| **Section 3** — Dữ liệu & Volume | Section 13 | 209–224 |
+| **Section 4** — Networking | Section 14 | 227–241 |
+| **Section 5** — Deploy lên cloud | Section 15 | 244–257 |
+| **Section 6** — Tổng kết | Section 16 | 259–262 |
+
+## Cách đọc số hiệu note
+
+Tiêu đề note giữ nguyên **số bài của khoá** — `188. Deployment đầu tiên`. Xem xong bài
+188 thì viết note 188. Không phải đoán mình đang ở đâu.
+
+Ba loại bài tôi **không** tạo note:
+
+| Loại | Vì sao bỏ |
+| --- | --- |
+| Module Introduction / Resources | Nhịp của video, không có nội dung để ghi |
+| **184, 185** — setup macOS/Windows | Đã thay bằng k3s trên VM Linux |
+| 263 — Bonus | Quảng cáo khoá khác |
 
 ## Hai nguyên tắc tôi tự đặt ra
 
-**70% thời gian phải là gõ lệnh.** Mỗi khái niệm mới đi qua bốn bước: tạo → xem →
-phá → sửa. Bước "phá" học được nhiều nhất và cũng là bước tôi hay bỏ.
+**70% thời gian phải là gõ lệnh.** Xem video xong mà không mở terminal thì note viết
+ra chỉ là chép lại lời giảng.
 
-**Không đọc quá 30 phút mà không chạm vào cluster.** K8s chỉ vào đầu qua tay.
-
-## Môi trường
-
-k3s chạy trên một VM Linux, không dùng `kind` hay Docker Desktop. Lý do: containerd
-thật, systemd thật, sống qua reboot — đúng thứ sẽ gặp khi debug cluster của công ty.
+**Mỗi bài tập đoán trước khi chạy.** Đoán sai là kết quả tốt hơn đoán đúng — đoán đúng
+chỉ xác nhận cái đã biết, đoán sai mới lộ ra lỗ hổng.
 
 ## Nhịp dự kiến
 
-12 tuần, khoảng 6 giờ mỗi tuần. Hai giai đoạn không được nén là **Nền tảng** và
-**Networking** — đi tắt ở đó thì mãi phải copy YAML từ blog mà không hiểu.
+Khoá là **8h42 video**. Cộng thời gian thực hành và ghi note, khoảng 10 tuần ở nhịp
+6 giờ/tuần — chưa tính Section 0 (2 tuần).
 
-Node màu xám là thứ tôi biết mình cần học nhưng chưa viết.
+Node màu xám là bài tôi chưa viết note.

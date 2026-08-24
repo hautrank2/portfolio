@@ -41,7 +41,7 @@ const SectionView = async ({ node, trail, standalone }: SectionViewProps) => {
 
   const cards = node.children.map((child, index) => (
     <Reveal key={child.slug} delay={Math.min(index, 6) * 60}>
-      <NodeCard node={child} index={index} />
+      <NodeCard node={child} />
     </Reveal>
   ));
 

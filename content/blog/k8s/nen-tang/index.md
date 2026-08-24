@@ -1,5 +1,5 @@
 ---
-title: "Giai đoạn 0 — Nền tảng trước K8s"
+title: "Nền tảng trước K8s"
 description: Linux, mạng, container và YAML. Thiếu phần này thì K8s mãi là ma thuật.
 status: seed
 updated: 2026-08-21

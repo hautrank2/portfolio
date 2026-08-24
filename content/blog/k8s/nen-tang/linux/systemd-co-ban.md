@@ -24,7 +24,7 @@ journalctl -u k3s --since "10 min ago" -p err   # chỉ lấy lỗi
 Điểm đáng chú ý về mặt khái niệm: **systemd với service cũng giống kubelet với
 container**. Cả hai đều là một vòng lặp giám sát — khai báo trạng thái mong muốn, có
 chính sách restart, và ghi lại lý do khi tiến trình chết. Đây chính là control loop
-của [Giai đoạn 1](/blog/k8s/mo-hinh-tu-duy), chỉ ở tầng thấp hơn.
+của [Section 1](/blog/k8s/bat-dau-voi-k8s), chỉ ở tầng thấp hơn.
 
 ```bash
 systemctl show k3s -p Restart -p RestartSec
@@ -95,7 +95,7 @@ kubectl delete deployment probe
 ```
 
 Quan sát log ở terminal 1 khi bạn tạo và xoá. Bạn sẽ thấy dấu vết của đúng chuỗi đã
-học ở [Giai đoạn 2](/blog/k8s/kien-truc-cluster): apiserver nhận request → scheduler
+học ở [Section 1](/blog/k8s/bat-dau-voi-k8s): apiserver nhận request → scheduler
 gán node → kubelet kéo image và khởi động container.
 
 **Nối với K8s:** khi Pod kẹt ở `Pending` hoặc `ContainerCreating` mà `describe` không
