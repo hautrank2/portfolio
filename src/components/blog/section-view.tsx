@@ -8,7 +8,9 @@ import { BlogBreadcrumb } from "./breadcrumb";
 import { NodeCard } from "./node-card";
 import { NoteList } from "./note-list";
 import { BlogProgress } from "./progress";
+import { BlogResume } from "./resume-card";
 import { TrackTabs } from "./track-tabs";
+import { BlogVisitTracker } from "./visit-tracker";
 
 /** Maps every doc under a track to the top-level section it belongs to. */
 const sectionLabels = (track: BlogNodeType) => {
@@ -38,6 +40,10 @@ const SectionView = async ({ node, trail, standalone }: SectionViewProps) => {
   // enough that a flat listing would just repeat the cards above it.
   const isTrackRoot = node.path.length === 1;
   const notes = isTrackRoot ? flattenDocs(node) : [];
+
+  // `/blog` resumes from anywhere; a track resumes only within itself. Deeper
+  // sections get nothing — the reader is already inside what they left.
+  const showResume = standalone || isTrackRoot;
 
   const cards = node.children.map((child, index) => (
     <Reveal key={child.slug} delay={Math.min(index, 6) * 60}>
@@ -76,10 +82,29 @@ const SectionView = async ({ node, trail, standalone }: SectionViewProps) => {
 
   return (
     <div className="pb-24">
+      {/* The blog root is a landing page, not a stop on the trail. */}
+      {node.path.length > 0 && (
+        <BlogVisitTracker
+          href={node.href}
+          title={node.title}
+          kind="section"
+          track={node.path[0]}
+          trail={trail.map((item) => item.title).join(" · ")}
+        />
+      )}
+
       {standalone && header}
 
       <div className="mx-auto w-full max-w-4xl px-4 py-12 sm:px-8 lg:py-16">
         {!standalone && header}
+
+        {showResume && (
+          <BlogResume
+            track={isTrackRoot ? node.slug : undefined}
+            className={standalone ? "mb-10" : "mt-10"}
+          />
+        )}
+
         {intro && (
           <Reveal className={standalone ? undefined : "mt-10"}>
             <div className="prose-note">{intro}</div>

@@ -2,14 +2,14 @@
 title: "Bắt đầu với Kubernetes"
 description: Vì sao K8s tồn tại, nó là gì, và kiến trúc cluster. Toàn lý thuyết, chưa gõ lệnh.
 order:
-  - { slug: van-de-deploy-thu-cong, title: "172. Vấn đề của deploy thủ công" }
-  - { slug: vi-sao-k8s, title: "173. Vì sao Kubernetes?" }
+  - van-de-deploy-thu-cong
+  - vi-sao-k8s
   - cluster-la-gi
-  - { slug: kien-truc-va-khai-niem-cot-loi, title: "175. Kiến trúc & khái niệm cốt lõi" }
-  - { slug: k8s-khong-quan-ly-ha-tang, title: "176. Kubernetes KHÔNG quản lý hạ tầng của bạn" }
-  - { slug: worker-node, title: "177. Nhìn kỹ vào Worker Node" }
-  - { slug: master-node, title: "178. Nhìn kỹ vào Master Node" }
-  - { slug: thuat-ngu-quan-trong, title: "179. Thuật ngữ & khái niệm quan trọng" }
+  - kien-truc-va-khai-niem-cot-loi
+  - k8s-khong-quan-ly-ha-tang
+  - worker-node
+  - master-node
+  - thuat-ngu-quan-trong
 ---
 
 Section đầu tiên của phần Kubernetes — tương ứng **Section 11 của khoá**. 44 phút,

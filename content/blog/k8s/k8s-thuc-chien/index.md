@@ -2,29 +2,29 @@
 title: "Kubernetes thực chiến: các khái niệm cốt lõi"
 description: Module lớn nhất khoá, 2h33. Deployment, Service, và đường từ imperative sang declarative.
 order:
-  - { slug: k8s-khong-quan-ly-ha-tang-2, title: "182. Kubernetes không quản lý hạ tầng" }
-  - { slug: cai-dat-can-gi, title: "183. Cần chuẩn bị và cài những gì" }
-  - { slug: k8s-object-la-gi, title: "186. Hiểu về Kubernetes Object (Resource)" }
-  - { slug: deployment-object, title: "187. Object Deployment" }
-  - { slug: deployment-dau-tien-imperative, title: "188. Deployment đầu tiên — kiểu imperative" }
-  - { slug: kubectl-phia-sau-hau-truong, title: "189. kubectl: chuyện gì xảy ra phía sau" }
-  - { slug: service-object, title: "190. Object Service" }
-  - { slug: phoi-deployment-bang-service, title: "191. Phơi Deployment ra bằng Service" }
-  - { slug: restart-container, title: "192. Container restart lúc nào" }
-  - { slug: scaling, title: "193. Scaling trong thực tế" }
-  - { slug: cap-nhat-deployment, title: "194. Cập nhật Deployment" }
-  - { slug: rollback-va-lich-su, title: "195. Rollback & lịch sử revision" }
-  - { slug: imperative-vs-declarative, title: "196. Imperative vs Declarative" }
-  - { slug: viet-file-deployment, title: "197. Viết file cấu hình Deployment" }
-  - { slug: pod-va-container-spec, title: "198. Thêm Pod spec và Container spec" }
-  - { slug: label-va-selector, title: "199. Làm việc với Label & Selector" }
-  - { slug: viet-file-service, title: "200. Viết Service bằng YAML" }
-  - { slug: cap-nhat-va-xoa-resource, title: "201. Cập nhật & xoá resource" }
-  - { slug: nhieu-file-hay-mot-file, title: "202. Nhiều file hay một file cấu hình" }
-  - { slug: them-ve-label-selector, title: "203. Thêm về Label & Selector" }
-  - { slug: liveness-probe, title: "204. Liveness Probe" }
-  - { slug: cac-tuy-chon-cau-hinh, title: "205. Nhìn kỹ các tuỳ chọn cấu hình" }
-  - { slug: tom-tat-module, title: "206. Tóm tắt module" }
+  - k8s-khong-quan-ly-ha-tang-2
+  - cai-dat-can-gi
+  - k8s-object-la-gi
+  - deployment-object
+  - deployment-dau-tien-imperative
+  - kubectl-phia-sau-hau-truong
+  - service-object
+  - phoi-deployment-bang-service
+  - restart-container
+  - scaling
+  - cap-nhat-deployment
+  - rollback-va-lich-su
+  - imperative-vs-declarative
+  - viet-file-deployment
+  - pod-va-container-spec
+  - label-va-selector
+  - viet-file-service
+  - cap-nhat-va-xoa-resource
+  - nhieu-file-hay-mot-file
+  - them-ve-label-selector
+  - liveness-probe
+  - cac-tuy-chon-cau-hinh
+  - tom-tat-module
 ---
 
 **Module lớn nhất của cả khoá — 2h33, 27 bài.** Gần bằng ba module sau cộng lại.
@@ -41,6 +41,18 @@ Khoá đi theo thứ tự này:
 
 Học YAML trước khi thấy nó làm được gì là cách nhanh nhất để nản. Thứ tự này tránh
 được điều đó.
+
+## Sợi chỉ xuyên suốt: `first-app`
+
+Toàn bộ 23 note dùng **một** app duy nhất. Nó ra đời ở
+[Deployment đầu tiên](/blog/k8s/k8s-thuc-chien/deployment-dau-tien-imperative) bằng một
+lệnh, rồi lần lượt được phơi ra, scale, cập nhật, rollback, viết lại thành YAML và gắn
+probe — cho tới note tóm tắt.
+
+**Đừng xoá nó giữa chừng.** Mỗi bài tập nối tiếp trạng thái bài trước, không dựng lại từ
+đầu. Bỏ dở một note là note sau thiếu hiện trường.
+
+Chỉ cần `nginx:1.27-alpine`, không phải build image nào.
 
 ## Thay đổi so với khoá: bỏ Minikube
 

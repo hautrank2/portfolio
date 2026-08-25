@@ -7,6 +7,7 @@ import { BlogBreadcrumb } from "./breadcrumb";
 import { DocNav } from "./doc-nav";
 import { StatusBadge } from "./status-badge";
 import { BlogToc } from "./toc";
+import { BlogVisitTracker } from "./visit-tracker";
 
 export type DocViewProps = BlogNodeContextType;
 
@@ -17,6 +18,13 @@ const DocView = async ({ node, trail, prev, next }: DocViewProps) => {
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-12 sm:px-8 lg:py-16">
+      <BlogVisitTracker
+        href={node.href}
+        title={node.title}
+        kind="doc"
+        track={node.path[0]}
+        trail={trail.map((item) => item.title).join(" · ")}
+      />
       <BlogBreadcrumb trail={trail} />
 
       <div className="mt-10 gap-12 xl:grid xl:grid-cols-[minmax(0,1fr)_14rem]">

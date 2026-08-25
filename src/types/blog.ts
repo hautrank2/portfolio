@@ -78,3 +78,21 @@ export type BlogTreeItemType = {
   children: BlogTreeItemType[];
   progress: { done: number; total: number };
 };
+
+/**
+ * One node this browser has opened, as kept in localStorage. Deliberately flat
+ * and self-contained — the history has to render without loading the tree, and
+ * an entry may outlive the note it points at.
+ */
+export type VisitedEntryType = {
+  href: string;
+  title: string;
+  /** `planned` nodes have no page, so they can never end up here. */
+  kind: Exclude<BlogNodeKindType, "planned">;
+  /** Top-level track slug (`k8s`), so a track page can scope its own resume. */
+  track?: string;
+  /** Ancestor titles joined for display, e.g. `Kubernetes · Nền tảng`. */
+  trail?: string;
+  /** Epoch ms. Only used to sort — nothing renders the timestamp. */
+  visitedAt: number;
+};

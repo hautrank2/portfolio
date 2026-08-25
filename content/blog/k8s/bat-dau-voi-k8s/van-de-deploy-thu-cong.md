@@ -1,5 +1,5 @@
 ---
-title: "172. Vấn đề của deploy thủ công"
+title: "Vấn đề của deploy thủ công"
 description: Docker đã đóng gói xong app. Vậy còn thiếu gì mà phải cần thêm một tầng nữa?
 status: seed
 created: 2026-08-21

@@ -40,8 +40,8 @@ thì K8s mãi là ma thuật.
 
 ## Cách đọc số hiệu note
 
-Tiêu đề note giữ nguyên **số bài của khoá** — `188. Deployment đầu tiên`. Xem xong bài
-188 thì viết note 188. Không phải đoán mình đang ở đâu.
+Tiêu đề note **không** mang số bài — số nằm ở mục *Đối chiếu khoá học* cuối mỗi index
+section. Xem xong một bài thì viết note tương ứng; tra bảng đó để biết mình đang ở đâu.
 
 Ba loại bài tôi **không** tạo note:
 

@@ -302,15 +302,21 @@
   padding-left: 0;
 }
 
+/* Deliberately NOT `display: flex`. A flex container turns every child into a
+   flex item and drops the whitespace text nodes between them — so an item like
+   "lỗi là `connection refused` chứ không phải…" loses the spaces either side of
+   the <code> and the chip gets pushed around as an unbreakable box. The
+   checkbox hangs in the gutter instead, leaving the text one normal inline run
+   that wraps like prose. */
 .prose-note .task-list-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.65em;
+  position: relative;
+  padding-left: 1.6em;
 }
 
 .prose-note .task-list-item input[type="checkbox"] {
-  margin-top: 0.45em;
-  flex-shrink: 0;
+  position: absolute;
+  left: 0;
+  top: 0.42em;
   accent-color: var(--primary);
   width: 0.95em;
   height: 0.95em;
@@ -335,7 +341,9 @@
   border-radius: var(--radius-sm);
   padding: 0.15em 0.4em;
   font-size: 0.875em;
-  word-break: break-word;
+  /* `overflow-wrap`, not `word-break: break-word`: the latter behaves like
+     `anywhere` and lets a chip split mid-word even when it would have fit. */
+  overflow-wrap: break-word;
 }
 
 /* The <pre> chrome lives in <CodeBlock>; these rules only dress the markup that
