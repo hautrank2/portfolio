@@ -13,9 +13,9 @@ import {
 } from "~/utils/logo";
 
 /** Prefix on every document title, e.g. `htk2 | blog | k8s`. */
-export const titlePrefix = "htk2";
+export const titlePrefixData = "htk2";
 
-export const profile: ProfileModel = {
+export const profileData: ProfileModel = {
   name: "Hau Tran",
   handle: "hautrank2",
   role: "Web developer",
@@ -25,14 +25,14 @@ export const profile: ProfileModel = {
     "Of all the software, I especially like websites. I want to build websites that are friendly, useful, places where people can go to actually get something done.",
   bio: "I studied software engineering at Ho Chi Minh City University of Technology and Education (HCMUTE). Today I work as a frontend developer at Becamex IDC, where I sit close to both the UI/UX side and the code that ships.",
   email: "hautrantrung.02@gmail.com",
-  cv: "/my-cv.pdf",
+  cv: "/docs/CV.pdf",
   university: {
     name: "HCMUTE",
     href: "https://hcmute.edu.vn",
   },
 };
 
-export const stacks: StackModel[] = [
+export const stackData: StackModel[] = [
   {
     title: "Frontend",
     desc: "Where I spend most of my day — building the screens people actually touch.",
@@ -55,7 +55,7 @@ export const stacks: StackModel[] = [
   },
 ];
 
-export const socials: SocialModel[] = [
+export const socialData: SocialModel[] = [
   {
     title: "GitHub",
     href: "https://github.com/hautrank2",
@@ -73,12 +73,14 @@ export const socials: SocialModel[] = [
   },
   {
     title: "CV",
-    href: "/my-cv.pdf",
+    // Cùng một file với `profileData.cv` — trỏ thẳng vào đó để hai chỗ không
+    // trôi khỏi nhau khi đổi đường dẫn.
+    href: profileData.cv,
     handle: "Download PDF",
   },
 ];
 
-export const navs: NavItemModel[] = [
+export const navData: NavItemModel[] = [
   { title: "Home", href: "/" },
   { title: "Blog", href: "/blog" },
   { title: "Showcase", href: "/showcase" },

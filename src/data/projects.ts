@@ -1,13 +1,14 @@
 import type { ProjectModel } from "~/types";
+import { technologyData } from "./technology";
 
-export const projects: ProjectModel[] = [
+export const projectData: ProjectModel[] = [
   {
     slug: "weather-forecast",
     title: "Weather forecast",
     desc: "A website to display weather informations.",
     imgUrl: "/img/home/weather-forecase.png",
     featured: true,
-    technologies: [{ logoUrl: "/logo/angular.png", title: "Angular" }],
+    technologies: [technologyData.angular],
     links: [
       {
         title: "Website",
@@ -28,7 +29,7 @@ export const projects: ProjectModel[] = [
     desc: "This is where I talk about my idol Kevin De Bruyne.",
     imgUrl: "/img/home/kevin-de-bruyne.png",
     featured: true,
-    technologies: [{ logoUrl: "/logo/nextjs.png", title: "Next.js" }],
+    technologies: [technologyData.next],
     links: [
       {
         title: "Website",
@@ -43,11 +44,27 @@ export const projects: ProjectModel[] = [
     ],
   },
   {
+    slug: "ops-desk-client",
+    title: "OpsDesk",
+    desc: "This is software for managing assets and tickets",
+    featured: true,
+    imgUrl: "/img/ops-desk-page.png",
+    technologies: [technologyData.next],
+    links: [
+      {
+        title: "GitHub",
+        kind: "github",
+        url: "https://github.com/hautrank2/portfolio",
+      },
+    ],
+  },
+  {
     slug: "portfolio",
     title: "This portfolio",
     desc: "The site you are reading right now.",
+    imgUrl: "/img/portfolio-page.png",
     featured: true,
-    technologies: [{ logoUrl: "/logo/nextjs.png", title: "Next.js" }],
+    technologies: [technologyData.next],
     links: [
       {
         title: "GitHub",
@@ -58,4 +75,4 @@ export const projects: ProjectModel[] = [
   },
 ];
 
-export const featuredProjects = projects.filter((p) => p.featured);
+export const featuredProjectData = projectData.filter((p) => p.featured);

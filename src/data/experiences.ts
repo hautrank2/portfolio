@@ -1,6 +1,6 @@
 import type { ExperienceModel } from "~/types";
 
-export const experiences: ExperienceModel[] = [
+export const experienceData: ExperienceModel[] = [
   {
     company: "VNTT",
     role: "Frontend developer",

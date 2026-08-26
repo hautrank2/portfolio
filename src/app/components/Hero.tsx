@@ -5,7 +5,7 @@ import React from "react";
 import { Button } from "~/components/ui/button";
 import { Reveal } from "~/components/ui/reveal";
 import { Typography } from "~/components/ui/typography";
-import { profile, stacks } from "~/data/site";
+import { profileData, stackData } from "~/data/site";
 
 function Hero() {
   return (
@@ -20,7 +20,7 @@ function Hero() {
           <Reveal>
             <p className="surface inline-flex items-center gap-2 rounded-full border border-border/60 px-3 py-1.5 text-xs font-medium text-muted-foreground">
               <MapPin size={14} className="text-primary" />
-              {profile.role} · {profile.location}
+              {profileData.role} · {profileData.location}
             </p>
 
             <Typography
@@ -30,18 +30,18 @@ function Hero() {
               <span className="block text-2xl font-medium normal-case tracking-normal text-muted-foreground sm:text-3xl">
                 I am
               </span>
-              <span className="text-gradient block">{profile.name}</span>
+              <span className="text-gradient block">{profileData.name}</span>
             </Typography>
 
             <Typography
               variant="p"
               className="mt-6 max-w-xl text-lg leading-relaxed text-foreground/80 sm:text-xl"
             >
-              {profile.tagline}
+              {profileData.tagline}
             </Typography>
 
             <div className="mt-8 flex flex-wrap gap-2">
-              {stacks.map((stack) => (
+              {stackData.map((stack) => (
                 <span
                   key={stack.title}
                   className="surface rounded-full border border-border/60 px-4 py-1.5 text-sm font-medium"
@@ -81,8 +81,8 @@ function Hero() {
               <div className="relative rounded-full bg-gradient-to-br from-primary via-primary/40 to-transparent p-[3px]">
                 <Image
                   className="size-48 rounded-full object-cover sm:size-64 lg:size-80"
-                  src={profile.avatar}
-                  alt={profile.name}
+                  src={profileData.avatar}
+                  alt={profileData.name}
                   width={320}
                   height={320}
                   priority

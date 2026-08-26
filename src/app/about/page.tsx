@@ -7,16 +7,16 @@ import PageHeader from "~/components/layouts/page-header";
 import { Button } from "~/components/ui/button";
 import { Reveal } from "~/components/ui/reveal";
 import { Typography } from "~/components/ui/typography";
-import { experiences } from "~/data/experiences";
-import { profile, stacks } from "~/data/site";
+import { experienceData } from "~/data/experiences";
+import { profileData, stackData } from "~/data/site";
 import Experiences from "../components/Experiences";
 import SectionHeadline from "../components/SectionHeadline";
 
-const current = experiences[0];
+const current = experienceData[0];
 
 export const metadata: Metadata = {
   title: "about",
-  description: profile.bio,
+  description: profileData.bio,
 };
 
 export default function AboutPage() {
@@ -24,8 +24,8 @@ export default function AboutPage() {
     <div className="pb-24">
       <PageHeader
         kicker="About"
-        title={`Hi, I am ${profile.name}`}
-        description={profile.tagline}
+        title={`Hi, I am ${profileData.name}`}
+        description={profileData.tagline}
       />
 
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-24 px-4 py-16 sm:px-8 sm:gap-32 lg:px-16">
@@ -38,8 +38,8 @@ export default function AboutPage() {
               />
               <Image
                 className="relative size-56 rounded-3xl border border-border/60 object-cover sm:size-64"
-                src={profile.avatar}
-                alt={profile.name}
+                src={profileData.avatar}
+                alt={profileData.name}
                 width={320}
                 height={320}
                 priority
@@ -55,7 +55,7 @@ export default function AboutPage() {
               I studied software engineering at Ho Chi Minh City University of
               Technology and Education{" "}
               <Link
-                href={profile.university.href}
+                href={profileData.university.href}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary hover:underline"
@@ -98,7 +98,7 @@ export default function AboutPage() {
             />
           </Reveal>
           <div className="mt-10 grid gap-6 md:grid-cols-3">
-            {stacks.map((stack, index) => (
+            {stackData.map((stack, index) => (
               <Reveal key={stack.title} delay={index * 90}>
                 <div className="surface h-full rounded-2xl border border-border/60 p-6 transition-colors hover:border-primary/50">
                   <Typography variant="h3" className="text-xl">
@@ -155,7 +155,7 @@ export default function AboutPage() {
             </Link>
           </Button>
           <Button asChild size="lg" variant="outline" className="rounded-full">
-            <Link href={`mailto:${profile.email}`}>Say hello</Link>
+            <Link href={`mailto:${profileData.email}`}>Say hello</Link>
           </Button>
         </Reveal>
       </div>

@@ -20,13 +20,13 @@ import {
 } from "~/components/ui/dialog";
 import { Reveal } from "~/components/ui/reveal";
 import { Typography } from "~/components/ui/typography";
-import { experiences } from "~/data/experiences";
+import { experienceData } from "~/data/experiences";
 import type { ExperienceModel } from "~/types";
 
 function Experiences() {
   return (
     <ol className="relative mt-10 space-y-6 border-s border-border/60 ps-6 sm:ps-10">
-      {experiences.map((exp, index) => (
+      {experienceData.map((exp, index) => (
         <li key={exp.company} className="relative">
           <span
             aria-hidden

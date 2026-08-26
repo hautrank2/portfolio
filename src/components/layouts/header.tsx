@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { profile } from "~/data/site";
+import { profileData } from "~/data/site";
 import { cn } from "~/lib/utils";
 import Nav from "./nav";
 
@@ -33,9 +33,9 @@ function Header() {
           HT
         </span>
         <span className="hidden leading-tight sm:block">
-          <span className="block text-sm font-semibold">{profile.name}</span>
+          <span className="block text-sm font-semibold">{profileData.name}</span>
           <span className="block text-xs text-muted-foreground">
-            @{profile.handle}
+            @{profileData.handle}
           </span>
         </span>
       </Link>

@@ -1,7 +1,10 @@
+import Image from "next/image";
 import PageHeader from "~/components/layouts/page-header";
 import { Reveal } from "~/components/ui/reveal";
 import { Typography } from "~/components/ui/typography";
+import { trackLogoData } from "~/data/blog";
 import { flattenDocs } from "~/lib/blog";
+import { cn } from "~/lib/utils";
 import { renderMarkdown } from "./markdown";
 import type { BlogNodeContextType, BlogNodeType } from "~/types";
 import { BlogBreadcrumb } from "./breadcrumb";
@@ -9,6 +12,7 @@ import { NodeCard } from "./node-card";
 import { NoteList } from "./note-list";
 import { BlogProgress } from "./progress";
 import { BlogResume } from "./resume-card";
+import { TrackCard } from "./track-card";
 import { TrackTabs } from "./track-tabs";
 import { BlogVisitTracker } from "./visit-tracker";
 
@@ -44,10 +48,14 @@ const SectionView = async ({ node, trail, standalone }: SectionViewProps) => {
   // `/blog` resumes from anywhere; a track resumes only within itself. Deeper
   // sections get nothing — the reader is already inside what they left.
   const showResume = standalone || isTrackRoot;
+  const logo = isTrackRoot ? trackLogoData[node.slug] : undefined;
+
+  // Gốc `/blog`: con của nó là các track, mỗi track một card lớn có logo.
+  const isBlogRoot = node.path.length === 0;
 
   const cards = node.children.map((child, index) => (
     <Reveal key={child.slug} delay={Math.min(index, 6) * 60}>
-      <NodeCard node={child} />
+      {isBlogRoot ? <TrackCard node={child} /> : <NodeCard node={child} />}
     </Reveal>
   ));
 
@@ -61,12 +69,23 @@ const SectionView = async ({ node, trail, standalone }: SectionViewProps) => {
   ) : (
     <header className="border-b border-border/60 pb-8">
       <BlogBreadcrumb trail={trail} />
-      <Typography
-        variant="h1"
-        className="text-gradient mt-5 text-3xl font-extrabold leading-tight sm:text-4xl"
-      >
-        {node.title}
-      </Typography>
+      <div className="mt-5 flex items-center gap-3">
+        {logo && (
+          <Image
+            src={logo.logoUrl}
+            alt=""
+            width={48}
+            height={48}
+            className="size-9 shrink-0 object-contain sm:size-11"
+          />
+        )}
+        <Typography
+          variant="h1"
+          className="text-gradient text-3xl font-extrabold leading-tight sm:text-4xl"
+        >
+          {node.title}
+        </Typography>
+      </div>
       {node.description && (
         <Typography variant="p" className="mt-4 text-lg text-foreground/70">
           {node.description}
@@ -123,7 +142,14 @@ const SectionView = async ({ node, trail, standalone }: SectionViewProps) => {
               />
             </div>
           ) : (
-            <div className={intro ? "mt-14 space-y-4" : "mt-10 space-y-4"}>
+            <div
+              className={cn(
+                intro ? "mt-14" : "mt-10",
+                isBlogRoot
+                  ? "grid gap-5 sm:grid-cols-2"
+                  : "space-y-4"
+              )}
+            >
               {cards}
             </div>
           ))}

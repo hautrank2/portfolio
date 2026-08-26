@@ -2,7 +2,7 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import { Reveal } from "~/components/ui/reveal";
-import { featuredProjects, projects } from "~/data/projects";
+import { featuredProjectData, projectData } from "~/data/projects";
 import AboutCta from "./components/AboutCta";
 import Experiences from "./components/Experiences";
 import Hero from "./components/Hero";
@@ -11,7 +11,7 @@ import QuickFacts from "./components/QuickFacts";
 import SectionHeadline from "./components/SectionHeadline";
 
 export default function Home() {
-  const moreProjects = projects.length - featuredProjects.length;
+  const moreProjects = projectData.length - featuredProjectData.length;
 
   return (
     <div className="flex flex-col gap-24 pb-24 sm:gap-32">
@@ -54,7 +54,7 @@ export default function Home() {
                 >
                   <Link href="/showcase">
                     {moreProjects > 0
-                      ? `View all (${projects.length})`
+                      ? `View all (${projectData.length})`
                       : "View all"}
                     <ArrowRight
                       size={16}
@@ -66,7 +66,7 @@ export default function Home() {
             />
           </Reveal>
           <div className="mt-10">
-            <ProjectSection projects={featuredProjects} />
+            <ProjectSection projects={featuredProjectData} />
           </div>
         </div>
       </section>

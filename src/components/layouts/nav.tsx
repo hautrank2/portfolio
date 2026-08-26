@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
-import { navs } from "~/data/site";
+import { navData } from "~/data/site";
 import { cn } from "~/lib/utils";
 
 function isActive(pathname: string, href: string) {
@@ -18,7 +18,7 @@ function Nav() {
       aria-label="Main"
       className="surface flex items-center gap-1 rounded-full border border-border/60 p-1"
     >
-      {navs.map((nav) => {
+      {navData.map((nav) => {
         const active = isActive(pathname, nav.href);
         return (
           <Link

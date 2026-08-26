@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import Footer from "~/components/layouts/footer";
 import Header from "~/components/layouts/header";
-import { profile, titlePrefix } from "~/data/site";
+import { profileData, titlePrefixData } from "~/data/site";
 import "./globals.css";
 
 const sans = Nunito({
@@ -12,10 +12,10 @@ const sans = Nunito({
 
 export const metadata: Metadata = {
   title: {
-    default: titlePrefix,
-    template: `${titlePrefix} | %s`,
+    default: titlePrefixData,
+    template: `${titlePrefixData} | %s`,
   },
-  description: profile.tagline,
+  description: profileData.tagline,
 };
 
 export default function RootLayout({

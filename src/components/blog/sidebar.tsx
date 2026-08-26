@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronRight } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -8,6 +9,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "~/components/ui/collapsible";
+import { trackLogoData } from "~/data/blog";
 import { cn } from "~/lib/utils";
 import type { BlogTreeItemType } from "~/types";
 import { BlogProgress } from "./progress";
@@ -134,16 +136,26 @@ export type TrackNavProps = {
 
 const TrackNav = ({ tree }: TrackNavProps) => {
   const pathname = usePathname();
+  const logo = trackLogoData[tree.slug];
 
   return (
     <nav aria-label="Nội dung track">
       <Link
         href={tree.href}
         className={cn(
-          "block text-sm font-semibold tracking-tight transition-colors hover:text-primary",
+          "flex items-center gap-2 text-sm font-semibold tracking-tight transition-colors hover:text-primary",
           pathname === tree.href ? "text-primary" : "text-foreground"
         )}
       >
+        {logo && (
+          <Image
+            src={logo.logoUrl}
+            alt=""
+            width={24}
+            height={24}
+            className="size-4 shrink-0 object-contain"
+          />
+        )}
         {tree.title}
       </Link>
 

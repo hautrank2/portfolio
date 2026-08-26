@@ -1,5 +1,7 @@
 import { ArrowUpRight, FileText, FolderTree, Lock } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
+import { trackLogoData } from "~/data/blog";
 import { cn } from "~/lib/utils";
 import type { BlogNodeType } from "~/types";
 import { BlogProgress } from "./progress";
@@ -23,6 +25,10 @@ const NodeCard = ({ node }: NodeCardProps) => {
   const isSection = node.kind === "section";
   const Icon = planned ? Lock : isSection ? FolderTree : FileText;
 
+  // Only a track (`/blog/k8s`) carries a brand. A section three folders deep is
+  // not "Kubernetes the technology", so it keeps the generic folder icon.
+  const logo = node.path.length === 1 && !planned ? trackLogoData[node.slug] : undefined;
+
   const body = (
     <>
       <div className="flex items-start gap-4">
@@ -37,10 +43,20 @@ const NodeCard = ({ node }: NodeCardProps) => {
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <Icon
-              size={14}
-              className={planned ? "text-foreground/30" : "text-primary/70"}
-            />
+            {logo ? (
+              <Image
+                src={logo.logoUrl}
+                alt=""
+                width={36}
+                height={36}
+                className="size-5 shrink-0 object-contain"
+              />
+            ) : (
+              <Icon
+                size={14}
+                className={planned ? "text-foreground/30" : "text-primary/70"}
+              />
+            )}
             <h3
               className={cn(
                 "font-semibold tracking-tight",

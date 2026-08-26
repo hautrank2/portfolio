@@ -1,10 +1,10 @@
 import Link from "next/link";
 import React from "react";
 import { Reveal } from "~/components/ui/reveal";
-import { experiences } from "~/data/experiences";
-import { profile } from "~/data/site";
+import { experienceData } from "~/data/experiences";
+import { profileData } from "~/data/site";
 
-const current = experiences[0];
+const current = experienceData[0];
 
 const facts = [
   {
@@ -15,9 +15,9 @@ const facts = [
   },
   {
     label: "Studied at",
-    value: profile.university.name,
+    value: profileData.university.name,
     detail: "Software Engineering",
-    href: profile.university.href,
+    href: profileData.university.href,
   },
   {
     label: "Based in",
