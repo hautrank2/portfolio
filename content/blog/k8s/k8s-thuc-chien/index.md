@@ -5,6 +5,7 @@ order:
   - k8s-khong-quan-ly-ha-tang-2
   - cai-dat-can-gi
   - k8s-object-la-gi
+  - pod-object
   - deployment-object
   - deployment-dau-tien-imperative
   - kubectl-phia-sau-hau-truong
@@ -52,7 +53,8 @@ probe — cho tới note tóm tắt.
 **Đừng xoá nó giữa chừng.** Mỗi bài tập nối tiếp trạng thái bài trước, không dựng lại từ
 đầu. Bỏ dở một note là note sau thiếu hiện trường.
 
-Chỉ cần `nginx:1.27-alpine`, không phải build image nào.
+App là một service Node hai route, trong đó `/error` cố tình tự giết tiến trình. Source
+tải ở note 5.6, build một lần rồi dùng lại suốt module.
 
 ## Thay đổi so với khoá: bỏ Minikube
 

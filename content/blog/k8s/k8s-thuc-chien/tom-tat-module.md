@@ -1,5 +1,5 @@
 ---
-title: "Tóm tắt module"
+title: "5.24 Tóm tắt module"
 description: Bài kiểm tra thật của module này không phải đọc lại, mà là dựng lại toàn bộ từ một thư mục trống.
 status: seed
 created: 2026-08-25

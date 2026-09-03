@@ -1,5 +1,5 @@
 ---
-title: "Nhìn kỹ các tuỳ chọn cấu hình"
+title: "5.23 Nhìn kỹ các tuỳ chọn cấu hình"
 description: Bốn nhóm trường còn lại, và hai con số quyết định Pod của bạn bị đối xử ra sao khi node hết chỗ.
 status: seed
 created: 2026-08-25

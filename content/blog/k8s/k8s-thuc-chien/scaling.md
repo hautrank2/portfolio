@@ -1,5 +1,5 @@
 ---
-title: "Scaling trong thực tế"
+title: "5.11 Scaling trong thực tế"
 description: Một con số đổi, và cân tải hiện ra — nhìn tận mắt bằng tên Pod trả lời từng request.
 status: seed
 created: 2026-08-25

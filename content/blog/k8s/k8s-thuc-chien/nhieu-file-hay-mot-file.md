@@ -1,5 +1,5 @@
 ---
-title: "Nhiều file hay một file cấu hình"
+title: "5.20 Nhiều file hay một file cấu hình"
 description: Dấu `---` gộp mọi thứ vào một file. Câu hỏi thật không phải gộp hay tách, mà là xoá bằng gì.
 status: seed
 created: 2026-08-25

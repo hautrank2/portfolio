@@ -1,5 +1,5 @@
 ---
-title: "Object Service"
+title: "5.8 Object Service"
 description: Pod không có địa chỉ đáng tin. Service là cái tên không đổi đứng trước một danh sách luôn đổi.
 status: seed
 created: 2026-08-25

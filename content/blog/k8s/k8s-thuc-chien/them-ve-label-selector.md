@@ -1,5 +1,5 @@
 ---
-title: "Thêm về Label & Selector"
+title: "5.21 Thêm về Label & Selector"
 description: matchExpressions, và một trường bạn sẽ không bao giờ sửa được sau khi tạo.
 status: seed
 created: 2026-08-25

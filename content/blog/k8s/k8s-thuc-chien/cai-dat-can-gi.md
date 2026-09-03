@@ -1,5 +1,5 @@
 ---
-title: "Cần chuẩn bị và cài những gì"
+title: "5.2 Cần chuẩn bị và cài những gì"
 description: Bốn thứ, không hơn — và vì sao tôi bỏ Minikube của khoá để dùng k3s.
 status: seed
 created: 2026-08-25

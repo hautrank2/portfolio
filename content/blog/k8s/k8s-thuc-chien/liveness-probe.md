@@ -1,5 +1,5 @@
 ---
-title: "Liveness Probe"
+title: "5.22 Liveness Probe"
 description: Docker chỉ biết tiến trình còn sống. Probe là cách nói cho K8s biết app còn phục vụ được.
 status: seed
 created: 2026-08-25

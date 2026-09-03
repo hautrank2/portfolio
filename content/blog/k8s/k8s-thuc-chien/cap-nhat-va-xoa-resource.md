@@ -1,5 +1,5 @@
 ---
-title: "Cập nhật & xoá resource"
+title: "5.19 Cập nhật & xoá resource"
 description: apply lại là xong, nhưng xoá thì có bốn cách và một cái đủ sức xoá nhầm cả namespace.
 status: seed
 created: 2026-08-25

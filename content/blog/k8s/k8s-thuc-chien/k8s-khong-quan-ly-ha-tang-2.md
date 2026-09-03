@@ -1,9 +1,9 @@
 ---
-title: "Kubernetes không quản lý hạ tầng"
+title: "5.1 Kubernetes không quản lý hạ tầng"
 description: Khoá nhắc lại lần thứ hai, ngay trước khi bạn gõ lệnh đầu tiên — để trả lời câu hỏi cái cluster sắp dùng ở đâu ra.
 status: seed
 created: 2026-08-25
-updated: 2026-08-25
+updated: 2026-08-30
 tags: [k8s, mindset, infra]
 ---
 
@@ -11,7 +11,22 @@ tags: [k8s, mindset, infra]
 Khoá nhắc lại ở đây không phải vì quên — mà vì **vị trí**: bạn sắp gõ `kubectl` lần đầu,
 và câu hỏi *"cái cluster này ở đâu ra"* đúng lúc này mới thành câu hỏi thật.
 
+## Chia việc: K8s làm gì, bạn phải tự làm gì
+
+Toàn bộ ranh giới gói được trong một bảng:
+
+| K8s sẽ làm | Bạn phải tự làm |
+| --- | --- |
+| Tạo các object bạn khai báo (vd. Pod) và quản lý chúng | Dựng cluster và các Node instance (worker + master) |
+| Theo dõi Pod, tạo lại khi chết, scale khi cần | Cài API server, kubelet và các service/phần mềm K8s khác lên Node |
+| Tận dụng tài nguyên (cloud) được cấp để hiện thực cấu hình / mục tiêu của bạn | Tạo các tài nguyên khác của (cloud) provider nếu cần — load balancer, filesystem… |
+
+Đọc theo cột dọc: cột trái toàn là **object và vòng lặp điều khiển**; cột phải toàn là
+**máy móc, phần mềm nền và tài nguyên** — thứ phải có *trước* khi cột trái chạy được.
+
 ## Lần trước là nguyên tắc, lần này là hoá đơn
+
+Cột phải của bảng trên chính là "hoá đơn". Đây là phiên bản k3s của nó:
 
 | Trước khi có `kubectl` chạy được | Ai làm |
 | --- | --- |

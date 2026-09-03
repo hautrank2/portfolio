@@ -1,5 +1,5 @@
 ---
-title: "Container restart lúc nào"
+title: "5.10 Container restart lúc nào"
 description: Ai bấm nút restart, backoff tăng theo cấp số nhân, và vì sao Pod không bao giờ "restart".
 status: seed
 created: 2026-08-25

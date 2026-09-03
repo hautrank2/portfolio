@@ -1,5 +1,5 @@
 ---
-title: "Rollback & lịch sử revision"
+title: "5.13 Rollback & lịch sử revision"
 description: Vì sao quay lại bản cũ chỉ mất vài giây, và vì sao cột CHANGE-CAUSE của bạn luôn rỗng.
 status: seed
 created: 2026-08-25

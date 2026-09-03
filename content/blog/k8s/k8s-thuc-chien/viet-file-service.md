@@ -1,5 +1,5 @@
 ---
-title: "Viết Service bằng YAML"
+title: "5.18 Viết Service bằng YAML"
 description: Service YAML ngắn hơn Deployment, và có đúng một chỗ dễ sai — cùng chỗ đã sai bằng lệnh.
 status: seed
 created: 2026-08-25

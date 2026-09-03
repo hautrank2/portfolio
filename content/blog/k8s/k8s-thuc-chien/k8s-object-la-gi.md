@@ -1,5 +1,5 @@
 ---
-title: "Hiểu về Kubernetes Object (Resource)"
+title: "5.3 Hiểu về Kubernetes Object (Resource)"
 description: Mọi thứ trong cluster đều là một bản ghi cùng khuôn — bốn trường, và ranh giới giữa spec và status.
 status: seed
 created: 2026-08-25

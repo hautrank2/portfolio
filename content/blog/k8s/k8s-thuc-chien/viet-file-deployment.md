@@ -1,5 +1,5 @@
 ---
-title: "Viết file cấu hình Deployment"
+title: "5.15 Viết file cấu hình Deployment"
 description: Bốn trường bắt buộc, và một lỗi kinh điển K8s bắt được ngay từ lúc apply.
 status: seed
 created: 2026-08-25

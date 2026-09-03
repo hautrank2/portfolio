@@ -1,5 +1,5 @@
 ---
-title: "Thêm Pod spec và Container spec"
+title: "5.16 Thêm Pod spec và Container spec"
 description: Ba chữ `spec` lồng nhau, và cách tra tài liệu ngay trong terminal thay vì mở Google.
 status: seed
 created: 2026-08-25

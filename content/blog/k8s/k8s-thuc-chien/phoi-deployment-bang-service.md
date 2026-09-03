@@ -1,5 +1,5 @@
 ---
-title: "Phơi Deployment ra bằng Service"
+title: "5.9 Phơi Deployment ra bằng Service"
 description: Ba con số cổng dễ lẫn nhất trong K8s, phân biệt bằng một bài tập cố tình làm sai.
 status: seed
 created: 2026-08-25

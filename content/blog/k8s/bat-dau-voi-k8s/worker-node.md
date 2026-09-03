@@ -1,5 +1,5 @@
 ---
-title: "Nhìn kỹ vào Worker Node"
+title: "Worker Node"
 description: Ba thành phần trên mỗi máy chạy việc, và vì sao node mất mạng một lúc thì Pod vẫn sống.
 status: seed
 created: 2026-08-25

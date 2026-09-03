@@ -1,5 +1,5 @@
 ---
-title: "Object Deployment"
+title: "5.5 Object Deployment"
 description: Vì sao không bao giờ tạo Pod trực tiếp, và ai thật sự giữ cho Pod sống lại.
 status: seed
 created: 2026-08-25

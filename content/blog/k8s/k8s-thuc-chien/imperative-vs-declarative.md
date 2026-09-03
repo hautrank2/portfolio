@@ -1,5 +1,5 @@
 ---
-title: "Imperative vs Declarative"
+title: "5.14 Imperative vs Declarative"
 description: Bản lề của cả module. Khác biệt gói gọn trong hai lệnh chạy hai lần.
 status: seed
 created: 2026-08-25

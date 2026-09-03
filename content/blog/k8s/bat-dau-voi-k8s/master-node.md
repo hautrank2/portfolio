@@ -1,5 +1,5 @@
 ---
-title: "Nhìn kỹ vào Master Node"
+title: "Master Node"
 description: Bốn thành phần của control plane, và vì sao không thành phần nào ra lệnh cho thành phần nào.
 status: seed
 created: 2026-08-25

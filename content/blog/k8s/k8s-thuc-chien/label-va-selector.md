@@ -1,5 +1,5 @@
 ---
-title: "Làm việc với Label & Selector"
+title: "5.17 Làm việc với Label & Selector"
 description: Thứ duy nhất nối các object với nhau trong K8s — và nó chỉ là chuỗi ký tự, không ai kiểm tra hộ.
 status: seed
 created: 2026-08-25

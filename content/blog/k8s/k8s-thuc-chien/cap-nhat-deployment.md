@@ -1,5 +1,5 @@
 ---
-title: "Cập nhật Deployment"
+title: "5.12 Cập nhật Deployment"
 description: Rolling update nhìn từ bên trong — hai ReplicaSet cùng sống, và hai con số quyết định nhịp.
 status: seed
 created: 2026-08-25
