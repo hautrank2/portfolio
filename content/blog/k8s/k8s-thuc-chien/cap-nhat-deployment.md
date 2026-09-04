@@ -1,36 +1,97 @@
 ---
 title: "5.12 Cập nhật Deployment"
-description: Rolling update nhìn từ bên trong — hai ReplicaSet cùng sống, và hai con số quyết định nhịp.
-status: seed
+description: Sửa một dòng code, build tag mới, rồi xem hai ReplicaSet đổi ca mà dịch vụ không đứt giây nào.
+status: growing
 created: 2026-08-25
-updated: 2026-08-25
-tags: [k8s, deployment, rollout]
+updated: 2026-09-04
+tags: [k8s, deployment, rollout, image]
 ---
 
-Đổi image không phải "sửa Pod". Không có Pod nào được sửa cả — **Pod là bất biến**.
-Cái xảy ra là một ReplicaSet mới ra đời và hai bên đổi ca cho nhau.
+> **Cần làm xong [note 5.11](/blog/k8s/k8s-thuc-chien/scaling) trước.** Nên để
+> `replicas: 3` — rolling update chỉ lộ ra hết khi có nhiều hơn một Pod.
 
-## Bài tập 1 — Nhìn hai ReplicaSet đổi ca
+Đổi image không phải "sửa Pod". Không có Pod nào được sửa cả — **Pod là bất biến**. Cái
+xảy ra là một ReplicaSet mới ra đời và hai bên đổi ca cho nhau.
+
+## Bước 1 — Sửa code
+
+Mở `app.js`, đổi câu chào để lát nữa nhìn là biết ngay bản nào đang chạy:
+
+```js
+app.get('/', (req, res) => {
+  res.send(`
+    <h1>Hello from this NodeJS app! -- phien ban 2</h1>
+    <p>Try sending a request to /error and see what happens</p>
+  `);
+});
+```
+
+## Bước 2 — Build với tag MỚI
+
+Đây là chỗ quyết định cả bài. Tag phải khác lần trước:
+
+```bash
+cd ~/k8s-lab/first-app && docker build -t hautrank2/kub-first-app:2 .
+```
+
+```bash
+docker save hautrank2/kub-first-app:2 | sudo k3s ctr images import -
+```
+
+Vẫn phải import như [note 5.9](/blog/k8s/k8s-thuc-chien/phoi-deployment-bang-service) —
+build lại là kho containerd lại lạc hậu.
+
+## Bước 3 — Lấy đúng tên container
+
+Lệnh `set image` nhận **tên container bên trong Pod**, không phải tên deployment. Lấy nó
+ra:
+
+```bash
+kubectl get deploy first-app -o jsonpath='{.spec.template.spec.containers[*].name}{"\n"}'
+```
+
+**Kết quả:** `kub-first-app`.
+
+Cách xem khác, thấy luôn cả image đang dùng:
+
+```bash
+kubectl describe deploy first-app | grep -A2 "Containers:"
+```
+
+## Bước 4 — Đổi image và nhìn nó lăn
+
+Mở terminal thứ hai, để nguyên đó:
+
+```bash
+kubectl get pods -w
+```
 
 **Đoán trước:** trong lúc đổi từ 3 Pod cũ sang 3 Pod mới, tổng số Pod cao nhất là bao
 nhiêu? Đúng 3, hay hơn?
 
-Mở terminal thứ hai:
+Terminal đầu:
 
 ```bash
-kubectl get rs -l app=first-app -w
+kubectl set image deployment/first-app kub-first-app=hautrank2/kub-first-app:2
 ```
 
-Terminal đầu — nhớ là tên container trùng tên deployment:
+**Kết quả:** Pod mới mọc lên **trước khi** Pod cũ chết, xen kẽ nhau. Tổng số Pod có lúc
+lên tới **4**.
 
 ```bash
-kubectl set image deployment/first-app first-app=nginx:1.28-alpine
+kubectl get rs -l app=first-app
 ```
 
-**Kết quả:** ReplicaSet cũ tụt dần 3→2→1→0 trong khi cái mới lên 0→1→2→3, **xen kẽ nhau**
-chứ không tuần tự. Tổng số Pod có lúc lên tới **4**.
+```
+NAME                   DESIRED   CURRENT   READY   AGE
+first-app-57d69676b9   0         0         0       48m
+first-app-6c4b8d9f77   3         3         3       35s
+```
 
-Vì mặc định của `strategy: RollingUpdate` là:
+**Hai ReplicaSet cùng tồn tại.** Cái cũ bị vắt về 0 nhưng không bị xoá — nó là bản ghi
+lịch sử, và là thứ để rollback ở note sau.
+
+Nhịp đổi ca do hai con số quyết định:
 
 | Tham số | Mặc định | Nghĩa |
 | --- | --- | --- |
@@ -38,69 +99,82 @@ Vì mặc định của `strategy: RollingUpdate` là:
 | `maxUnavailable` | 25% | Được thiếu bao nhiêu so với `replicas` |
 
 Với `replicas: 3`, 25% làm tròn lên thành 1: nhiều nhất 4 Pod, ít nhất 2 Pod sẵn sàng.
-Đó là lý do dịch vụ không có phút nào chết hẳn.
+Đó là lý do dịch vụ **không đứt giây nào** — khác hẳn cảnh một Pod chết ở
+[note 5.10](/blog/k8s/k8s-thuc-chien/restart-container).
 
-Theo dõi có sẵn lệnh riêng, dừng đúng lúc xong:
+Lệnh theo dõi riêng, tự dừng đúng lúc xong:
 
 ```bash
 kubectl rollout status deployment/first-app
 ```
 
-## Bài tập 2 — Xác nhận đã đổi thật
+## Bước 5 — Xác nhận bằng mắt
 
-**Đoán trước:** `kubectl get deploy` hiện `UP-TO-DATE 3` nghĩa là image mới đã chạy?
+Mở lại `http://192.168.103.154:8080` và F5 vài lần. Phải thấy `-- phien ban 2`.
 
-```bash
-kubectl exec deploy/first-app -- nginx -v
-```
-
-**Kết quả:** in ra đúng phiên bản mới. Đây là kiểm tra đáng tin hơn hẳn cột
-`UP-TO-DATE` — cột đó chỉ nói *"Pod đã được tạo theo template mới nhất"*, không nói gì
-về việc bên trong container thật sự là gì.
-
-## Bài tập 3 — Cập nhật mà không đổi gì
-
-**Đoán trước:** chạy lại đúng lệnh `set image` với **cùng** tag. Có rollout mới không?
+Đừng tin cột `UP-TO-DATE` trong `kubectl get deploy`: nó chỉ nói *"Pod đã được tạo theo
+template mới nhất"*, không nói gì về nội dung thật bên trong container. Muốn chắc thì hỏi
+thẳng:
 
 ```bash
-kubectl set image deployment/first-app first-app=nginx:1.28-alpine
+kubectl exec deploy/first-app -- cat /app/app.js | grep h1
 ```
 
-**Kết quả:** `deployment.apps/first-app image updated` — nhưng `kubectl get rs` cho thấy
-**không có ReplicaSet mới**, không Pod nào bị thay.
+## Bài tập — Cập nhật mà không đổi gì
+
+**Đoán trước:** chạy lại đúng lệnh `set image` với **cùng** tag `:2`. Có rollout mới
+không?
+
+```bash
+kubectl set image deployment/first-app kub-first-app=hautrank2/kub-first-app:2; kubectl get rs -l app=first-app
+```
+
+**Kết quả:** kubectl in ra `image updated`, nhưng **không có ReplicaSet mới**, không Pod
+nào bị thay.
 
 Vì ReplicaSet được định danh bằng **hash của Pod template**. Template không đổi thì hash
-không đổi, hash không đổi thì không có gì để tạo. Cũng vì vậy mà "restart deployment"
-không phải một lệnh có sẵn — muốn ép thì:
+không đổi, hash không đổi thì không có gì để tạo. Đây cũng là lý do "restart deployment"
+không phải một cơ chế riêng — muốn ép thì:
 
 ```bash
 kubectl rollout restart deployment/first-app
 ```
 
-Lệnh này lén thêm một annotation timestamp vào template, làm hash đổi, và rollout diễn
-ra như bình thường. Một mẹo, không phải cơ chế riêng.
+Lệnh này lén thêm một annotation timestamp vào template, làm hash đổi, và rollout diễn ra
+như bình thường. Một mẹo, không phải tính năng.
 
-## Cạm bẫy `:latest`
+## Vì sao bắt buộc phải đổi tag
 
-```bash
-kubectl set image deployment/first-app first-app=nginx:latest
-```
+Đây là hệ quả trực tiếp của bài tập trên, và là lỗi tốn nhiều giờ nhất trong cả module.
 
-Tag di động là thảm hoạ: đẩy image mới lên cùng tag thì template **không đổi**, hash
-không đổi, K8s không thấy có gì để làm. Pod chỉ nhận bản mới khi tình cờ được tạo lại vì
-lý do khác — nên cụm Pod chạy hai phiên bản khác nhau mà không ai hay.
+Giả sử bạn build lại code mới nhưng **giữ nguyên tag `:1`**, rồi import vào containerd.
+Deployment vẫn ghi `hautrank2/kub-first-app:1` — y hệt trước. Template không đổi → hash
+không đổi → **K8s không thấy có việc gì để làm**. Pod cũ chạy tiếp với code cũ, và không
+có thông báo lỗi nào cả.
 
-Quy tắc: **luôn dùng tag bất biến** (`v1.4.2`) hoặc digest. Cùng bài học ở
+Tệ hơn: Pod nào tình cờ được tạo lại vì lý do khác (crash, scale, dời node) sẽ nhận bản
+mới. Kết quả là cụm chạy **hai phiên bản code khác nhau dưới cùng một tag**, và không ai
+biết Pod nào là bản nào.
+
+Với `:latest` thì còn thêm một tầng hỏng nữa: `imagePullPolicy` mặc định thành `Always`,
+kubelet bỏ qua image có sẵn trong containerd để đi hỏi registry — và lab local không có
+registry, nên Pod rơi thẳng vào `ImagePullBackOff`. Đúng cái bẫy ở
+[note 5.6](/blog/k8s/k8s-thuc-chien/deployment-dau-tien-imperative).
+
+Quy tắc gọn: **mỗi lần build là một tag mới, bất biến.** `:1`, `:2`, `:v1.4.2`, hoặc
+digest. Cùng bài học ở
 [tag vs digest](/blog/k8s/nen-tang/container/tag-vs-digest).
 
 ## Tự kiểm
 
+- [ ] Lấy được tên container mà không cần đoán, và nói được nó sinh ra từ đâu
 - [ ] Giải thích được vì sao tổng số Pod tạm thời vượt `replicas`
 - [ ] Nói được `maxSurge` và `maxUnavailable` mặc định là bao nhiêu
-- [ ] Giải thích được vì sao set cùng một image hai lần thì lần hai không làm gì
-- [ ] Nói được vì sao `:latest` nguy hiểm trong Deployment
+- [ ] Giải thích được vì sao build code mới mà giữ tag cũ thì không có gì xảy ra
+- [ ] Nói được vì sao ReplicaSet cũ không bị xoá sau khi rollout xong
 
 ## Câu hỏi còn mở
 
 - `maxUnavailable: 0` thì cần thêm điều kiện gì để rollout không kẹt?
 - Rollout đang chạy dở mà bạn `set image` lần nữa thì sao?
+- Hai ReplicaSet cùng sống — vậy trong lúc rollout, request rơi vào bản cũ hay bản mới?

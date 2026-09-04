@@ -182,8 +182,13 @@ Bạn tạo **một**, hai cái còn lại do controller tạo — đúng bướ
 template**. Đổi image là hash đổi, nên ReplicaSet mới có tên mới — cơ chế nền của rolling
 update.
 
-Container bên trong được đặt tên **trùng tên deployment** — `first-app`. Chi tiết vụn vặt
-này sẽ cần tới ở note cập nhật image, nên nhớ lấy.
+Container bên trong mang tên `kub-first-app`, không phải tên deployment. Lấy ra khi cần:
+
+```bash
+kubectl get deploy first-app -o jsonpath='{.spec.template.spec.containers[*].name}{"\n"}'
+```
+
+Nhớ lấy — [note cập nhật](/blog/k8s/k8s-thuc-chien/cap-nhat-deployment) cần đúng tên này.
 
 `--port=8080` chỉ ghi `containerPort` vào spec. Nó **không** mở cổng nào ra ngoài; phơi
 app là việc của [Service](/blog/k8s/k8s-thuc-chien/service-object).

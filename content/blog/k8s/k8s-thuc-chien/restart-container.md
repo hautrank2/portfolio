@@ -1,101 +1,187 @@
 ---
 title: "5.10 Container restart lúc nào"
-description: Ai bấm nút restart, backoff tăng theo cấp số nhân, và vì sao Pod không bao giờ "restart".
-status: seed
+description: Tự tay giết app bằng trình duyệt, rồi xem kubelet dựng nó dậy — live, trong một cửa sổ terminal.
+status: growing
 created: 2026-08-25
-updated: 2026-08-25
-tags: [k8s, kubelet, troubleshooting]
+updated: 2026-09-04
+tags: [k8s, kubelet, troubleshooting, restart]
 ---
 
-Câu hỏi nghe đơn giản nhưng trả lời sai thì debug sai suốt: **ai** khởi động lại
-container, và **khi nào**.
+> **Cần làm xong [note 5.9](/blog/k8s/k8s-thuc-chien/phoi-deployment-bang-service)
+> trước.** Note này không tạo gì mới — nó phá cái bạn vừa dựng xong.
 
-## Không phải control plane
+Kiểm tra điều kiện đầu vào: mở `http://192.168.103.154:8080` (đổi thành IP node của bạn)
+và thấy `Hello from this NodeJS app!`. Chưa thấy thì quay lại 5.9, đừng đọc tiếp.
 
-kubelet trên chính node đó làm việc này, theo `restartPolicy` ghi trong Pod spec:
+Nhớ lại `app.js` có hai route, và route thứ hai là một cái nút tự sát:
+
+```js
+app.get('/error', (req, res) => {
+  process.exit(1);          // giết luôn tiến trình Node
+});
+```
+
+Giờ bấm nó, và xem chuyện gì xảy ra.
+
+## Bài tập — Giết app rồi xem nó sống lại
+
+Mở terminal, cho nó chạy và **để nguyên đó**:
+
+```bash
+kubectl get pods -w
+```
+
+Cờ `-w` là *watch*: nó không thoát ra, mà in thêm một dòng mới mỗi lần Pod đổi trạng
+thái. Đây là cách xem vòng đời **trực tiếp**, không phải gõ `get pods` liên tục.
+
+**Đoán trước:** sang trình duyệt, vào `http://192.168.103.154:8080/error`. Tiến trình
+Node chết chắc chắn rồi — nhưng Pod sẽ thế nào? Biến mất và một Pod mới tên khác mọc lên,
+hay vẫn là Pod cũ?
+
+Bấm vào đường dẫn `/error` đó.
+
+**Kết quả trên trình duyệt:** không có trang nào cả — `ERR_EMPTY_RESPONSE`, hoặc *"kết
+nối đã bị đặt lại"*. Response không bao giờ được gửi, vì tiến trình chết trước khi kịp
+trả lời.
+
+**Kết quả ở terminal đang `-w`:** vài dòng mới hiện ra, rất nhanh.
+
+```
+NAME                        READY   STATUS    RESTARTS   AGE
+first-app-d775f889b-5dvsn   1/1     Running   0          4m
+first-app-d775f889b-5dvsn   0/1     Error     0          4m
+first-app-d775f889b-5dvsn   1/1     Running   1          4m
+```
+
+Đọc kỹ ba dòng đó, vì gần như toàn bộ note nằm ở đây:
+
+- **Tên Pod không đổi.** Vẫn `first-app-d775f889b-5dvsn`, từ đầu tới cuối. Không có Pod
+  nào bị xoá, không có Pod nào được tạo.
+- **`AGE` không reset.** Vẫn `4m` — Pod chưa hề trẻ lại.
+- **`RESTARTS` nhảy từ 0 lên 1.** Đây là thứ duy nhất thật sự đổi.
+
+Bấm F5 lại trang chủ: app trả lời bình thường. Toàn bộ chuyện xảy ra trong khoảng một
+giây, không ai gọi bạn dậy.
+
+## Vì sao mở một trang web lại giết được cả container
+
+Nghe vô lý: bạn chỉ gõ một URL, sao cả container chết theo? Chuỗi domino đúng bốn mắt
+xích, và mắt xích thứ hai mới là chỗ đáng nhớ.
+
+**1. `process.exit(1)` giết tiến trình Node ngay lập tức.** Không phải trả về lỗi 500 —
+`process.exit()` là lệnh của Node bảo hệ điều hành kết thúc tiến trình, ngay tại đó.
+Response chưa kịp gửi, nên trình duyệt nhận được một kết nối đứt giữa chừng.
+
+**2. Tiến trình đó là PID 1 của container.** Nhìn lại `Dockerfile`:
+
+```dockerfile
+CMD [ "node", "app.js" ]
+```
+
+`CMD` định nghĩa **tiến trình chính**. Container không phải một máy ảo có init system
+trông coi nhiều dịch vụ — nó là *một cái vỏ bọc quanh một tiến trình*. Vòng đời của
+container **chính là** vòng đời của tiến trình đó. PID 1 chết là container kết thúc, dù
+bên trong còn file, còn thư mục, còn mọi thứ khác nguyên vẹn.
+
+Kiểm chứng ngay, trước khi bấm `/error`:
+
+```bash
+kubectl exec deploy/first-app -- ps aux
+```
+
+Chỉ có đúng `node app.js` ở PID 1. Không có gì khác giữ container sống hộ nó.
+
+**3. containerd ghi nhận exit code 1 và báo lên kubelet.**
+
+**4. kubelet đọc `restartPolicy: Always` rồi dựng container mới** từ cùng image đó, đặt
+lại vào **đúng Pod cũ**.
+
+Đó là lý do một dòng code ba chữ trong `app.js` lại điều khiển được cả vòng đời container
+— và cũng là lý do note này dùng `/error` thay vì đi `kill` tiến trình thủ công: nó cho
+bạn bấm nút từ trình duyệt, ở đầu bên kia của cả chuỗi.
+
+Cùng ý đó ở tầng Linux: [process và signal](/blog/k8s/nen-tang/linux/process-va-signal).
+
+## Vậy ai vừa làm việc đó
+
+Không phải control plane. Không phải Deployment. Là **kubelet trên chính node đó** — nó
+canh container mình quản, thấy tiến trình thoát thì dựng lại, theo `restartPolicy` ghi
+trong Pod spec:
 
 | `restartPolicy` | Nghĩa | Mặc định của |
 | --- | --- | --- |
-| `Always` | Thoát kiểu gì cũng khởi động lại | Deployment |
+| `Always` | Thoát kiểu gì cũng chạy lại | Deployment |
 | `OnFailure` | Chỉ khi exit code ≠ 0 | Job |
 | `Never` | Không bao giờ | — |
 
-Điểm dễ nhầm nhất: **Pod không bao giờ được restart.** Chỉ **container bên trong** nó
-được chạy lại, còn Pod vẫn là Pod cũ — cùng tên, cùng IP. Cột `RESTARTS` đếm số lần
-container chạy lại, không phải số Pod mới.
+Deployment mặc định `Always`, nên `first-app` được dựng lại kể cả khi nó thoát với mã 0.
 
-Đó là lý do `RESTARTS: 47` mà `AGE: 2d` hoàn toàn hợp lý.
+Và đây là chỗ dễ nhầm nhất, cũng là điều ba dòng output ở trên vừa chứng minh:
 
-## Bài tập — Xem backoff giãn ra
+> **Pod không bao giờ được restart.** Chỉ **container bên trong** nó được chạy lại. Pod
+> vẫn là Pod cũ — cùng tên, cùng IP, cùng tuổi.
 
-**Đoán trước:** một container thoát ngay sau 5 giây, lặp mãi. kubelet chạy lại **ngay
-lập tức** mỗi lần, hay chờ lâu dần?
+Đó là lý do một Pod `RESTARTS: 47` mà `AGE: 2d` hoàn toàn hợp lý, và cũng là lý do cột
+`RESTARTS` đáng nhìn hơn cột `STATUS` khi đi tìm dấu vết sự cố.
+
+Xem chính xác lần chết vừa rồi:
 
 ```bash
-kubectl create deployment hay-chet --image=busybox:1.36 -- sh -c 'sleep 5; exit 1'
-kubectl get pods -l app=hay-chet -w
+kubectl describe pod -l app=first-app | grep -A6 "Last State"
 ```
 
-Để chạy khoảng ba phút rồi Ctrl-C.
+`Reason: Error`, `Exit Code: 1` — đúng con số `process.exit(1)` trong `app.js` viết ra.
 
-**Kết quả:** vài lần đầu chạy lại gần như tức thì, sau đó chậm dần và Pod chuyển sang
-`CrashLoopBackOff`:
+## Bấm nhiều lần thì sao
+
+**Đoán trước:** bấm `/error` liên tục năm sáu lần. kubelet vẫn dựng lại tức thì mỗi lần?
+
+Cứ giữ `kubectl get pods -w` chạy rồi F5 trang `/error` vài lần liên tiếp.
+
+**Kết quả:** vài lần đầu lên lại gần như tức thì, sau đó chậm dần, và `STATUS` chuyển
+sang `CrashLoopBackOff`:
 
 ```
-NAME                        READY   STATUS             RESTARTS   AGE
-hay-chet-7f8c9d5b4-nm2xq    0/1     CrashLoopBackOff   4          2m13s
+first-app-d775f889b-5dvsn   0/1     CrashLoopBackOff   4     6m
 ```
 
 kubelet chờ **10s → 20s → 40s → 80s…**, gấp đôi mỗi lần, **chặn trên 5 phút**. Bộ đếm
-chỉ được reset khi container sống liên tục đủ 10 phút.
+chỉ reset khi container sống liên tục đủ 10 phút.
 
-Xem lý do thoát:
-
-```bash
-kubectl describe pod -l app=hay-chet | grep -A6 "Last State"
-```
-
-`Reason: Error`, `Exit Code: 1` — đúng cái container tự làm.
-
-Dọn:
+`CrashLoopBackOff` **không phải một lỗi**. Nó không nói app hỏng chỗ nào — nó chỉ nói
+*"tôi đang chờ trước khi thử lại"*. Nguyên nhân thật luôn nằm ở log của lần chạy **đã
+chết**, không phải lần đang chạy:
 
 ```bash
-kubectl delete deployment hay-chet
+kubectl logs -l app=first-app --previous
 ```
 
-## `CrashLoopBackOff` không phải một lỗi
+Cờ `--previous` là thứ đáng nhớ nhất của note này. Thiếu nó, bạn đang đọc log của
+container vừa mới dựng — thường rỗng không, và chẳng nói gì về nguyên nhân.
 
-Đây là chỗ đọc sai nhiều nhất. Nó **không** nói app bị lỗi gì. Nó chỉ nói *"tôi đang
-chờ trước khi thử lại"*. Nguyên nhân thật luôn nằm ở chỗ khác:
+Đợi khoảng một phút cho backoff nguội, Pod tự về `Running`. Không cần làm gì cả.
 
-```bash
-kubectl logs <pod> --previous
-```
+## Vì sao chuyện này quan trọng
 
-Cờ `--previous` là thứ đáng nhớ nhất của cả note này: nó lấy log của **lần chạy trước**,
-tức lần vừa chết. Không có nó thì bạn đang đọc log của container mới vừa dựng, thường
-rỗng không.
+Đây là lần đầu bạn thấy K8s **tự chữa** mà không ai ra lệnh. Bạn không gõ lệnh nào để
+dựng app dậy — vòng lặp reconcile làm, đúng như nó vẫn làm với mọi thứ khác.
 
-## Ba nguyên nhân thường gặp
+Nhưng để ý cái giá: trong khoảng một giây đó, **dịch vụ đứt hoàn toàn**. Chỉ có một Pod,
+Pod đó chết là không còn ai trả lời. Người dùng thấy đúng cái `ERR_EMPTY_RESPONSE` bạn
+vừa thấy.
 
-| Triệu chứng | Thường là |
-| --- | --- |
-| Exit code 1 ngay lập tức | App lỗi cấu hình, thiếu biến môi trường |
-| Exit code 0 rồi vẫn restart | Tiến trình chính chạy xong rồi thoát — sai `command` |
-| Exit code 137 | Bị `SIGKILL` — hết bộ nhớ (OOMKilled) |
-
-137 = 128 + 9. Cùng quy ước exit code của shell ở
-[process và signal](/blog/k8s/nen-tang/linux/process-va-signal).
+Đó chính là bài toán mà [note sau](/blog/k8s/k8s-thuc-chien/scaling) giải.
 
 ## Tự kiểm
 
 - [ ] Nói được ai restart container, và theo trường nào trong spec
-- [ ] Giải thích được vì sao Pod không bao giờ restart
+- [ ] Giải thích được vì sao tên Pod và `AGE` không đổi sau khi container chết
+- [ ] Đọc được ý nghĩa cột `RESTARTS`
 - [ ] Nhớ dãy backoff và mức chặn trên
-- [ ] Phản xạ dùng `logs --previous` khi gặp CrashLoopBackOff
-- [ ] Dịch được exit code 137
+- [ ] Phản xạ dùng `logs --previous` khi gặp `CrashLoopBackOff`
 
 ## Câu hỏi còn mở
 
 - `restartPolicy: Never` trong Deployment thì sao? (gợi ý: apply thử đi)
-- Container bị restart thì file nó ghi ra có còn không?
+- Container bị restart thì file nó vừa ghi ra có còn không?
+- Exit code `137` nghĩa là gì, và ai gửi tín hiệu đó?

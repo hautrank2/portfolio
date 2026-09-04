@@ -79,7 +79,7 @@ Deployment mà selector không khớp template sẽ đẻ ra Pod rồi lập t�
 là của mình — đếm mãi vẫn thấy 0, nên tạo tiếp, vô hạn. Không cho tạo là đúng.
 
 Đối chiếu với bài `targetPort` sai ở
-[Phơi Deployment ra bằng Service](/blog/k8s/k8s-thuc-chien/phoi-deployment-bang-service):
+[Exposing một Deployment với một Service](/blog/k8s/k8s-thuc-chien/phoi-deployment-bang-service):
 chỗ đó K8s **không** bắt được, vì nó không có cách nào biết container nghe cổng nào.
 Ranh giới giữa hai loại lỗi này đáng nhớ.
 
