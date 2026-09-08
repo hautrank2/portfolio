@@ -56,7 +56,14 @@ const processor = unified()
   .use(rehypeSlug)
   // Highlighting runs at build time, so the client ships zero highlighter JS.
   // That matters here: K8s notes are mostly long YAML blocks.
-  .use(rehypePrettyCode, { theme: "github-dark-default", keepBackground: false })
+  //
+  // Hai theme chứ không một: mỗi token nhận cả `--shiki-light` lẫn
+  // `--shiki-dark`, rồi CSS chọn biến nào theo class trên <html>. Vẫn chỉ tô
+  // một lần lúc build — không có highlighter nào chạy ở client.
+  .use(rehypePrettyCode, {
+    theme: { light: "github-light", dark: "github-dark-default" },
+    keepBackground: false,
+  })
   .use(rehypeCodeLanguage)
   .use(rehypeReact, {
     Fragment,

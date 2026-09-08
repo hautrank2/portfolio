@@ -355,6 +355,19 @@
   min-height: 1lh;
 }
 
+/* Dual-theme highlighting. rehype-pretty-code gắn cả hai màu lên từng token
+   dưới dạng custom property, ở đây chỉ việc chọn cái nào theo class trên
+   <html>. Vẫn không có highlighter nào chạy ở client.
+   Span `[data-line]` không mang biến nào — khai báo thành không hợp lệ và nó
+   rơi về `inherit`, đúng thứ ta muốn. */
+.prose-note pre span {
+  color: var(--shiki-light);
+}
+
+.dark .prose-note pre span {
+  color: var(--shiki-dark);
+}
+
 .prose-note [data-rehype-pretty-code-title] {
   background-color: color-mix(in oklch, var(--card) 85%, transparent);
   border: 1px solid color-mix(in oklch, var(--border) 70%, transparent);

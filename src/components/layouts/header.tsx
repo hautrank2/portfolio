@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { profileData } from "~/data/site";
 import { cn } from "~/lib/utils";
 import Nav from "./nav";
+import { ThemeToggle } from "./theme-toggle";
 
 function Header() {
   const [scrolled, setScrolled] = useState(false);
@@ -40,7 +41,10 @@ function Header() {
         </span>
       </Link>
 
-      <Nav />
+      <div className="flex items-center gap-2">
+        <Nav />
+        <ThemeToggle />
+      </div>
     </header>
   );
 }
