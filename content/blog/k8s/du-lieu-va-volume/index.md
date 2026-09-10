@@ -2,23 +2,49 @@
 title: "Quản lý dữ liệu & Volume"
 description: Giữ dữ liệu lại sau khi Pod chết. Từ emptyDir tới PersistentVolume.
 order:
-  - { slug: du-an-khoi-diem, title: "209. Dự án khởi điểm & những gì đã biết" }
-  - { slug: volume-nhieu-hon-docker, title: "210. Volume của K8s — nhiều hơn Docker volume" }
-  - { slug: ly-thuyet-volume, title: "211. Lý thuyết Volume & so sánh với Docker" }
-  - { slug: tao-deployment-va-service-moi, title: "212. Tạo Deployment & Service mới" }
-  - { slug: bat-dau-voi-volume, title: "213. Bắt đầu với Kubernetes Volume" }
-  - { slug: emptydir, title: "214. Volume đầu tiên: kiểu emptyDir" }
-  - { slug: hostpath, title: "215. Volume thứ hai: kiểu hostPath" }
-  - { slug: csi-volume, title: "216. Hiểu về kiểu Volume CSI" }
-  - { slug: tu-volume-den-persistent-volume, title: "217. Từ Volume tới Persistent Volume" }
-  - { slug: dinh-nghia-persistent-volume, title: "218. Định nghĩa một Persistent Volume" }
-  - { slug: persistent-volume-claim, title: "219. Tạo Persistent Volume Claim" }
-  - { slug: dung-claim-trong-pod, title: "220. Dùng Claim trong Pod" }
-  - { slug: volume-vs-persistent-volume, title: "221. Volume vs Persistent Volume" }
-  - { slug: bien-moi-truong, title: "222. Dùng biến môi trường" }
-  - { slug: bien-moi-truong-va-configmap, title: "223. Biến môi trường & ConfigMap" }
-  - { slug: tom-tat-module, title: "224. Tóm tắt module" }
+  - { slug: du-an-khoi-diem, title: "6.1 Dự án khởi điểm & những gì đã biết" }
+  - { slug: volume-nhieu-hon-docker, title: "6.2 Volume của K8s — nhiều hơn Docker volume" }
+  - { slug: ly-thuyet-volume, title: "6.3 Lý thuyết Volume & so sánh với Docker" }
+  - { slug: tao-deployment-va-service-moi, title: "6.4 Tạo Deployment & Service mới" }
+  - { slug: bat-dau-voi-volume, title: "6.5 Bắt đầu với Kubernetes Volume" }
+  - { slug: emptydir, title: "6.6 Volume đầu tiên: kiểu emptyDir" }
+  - { slug: hostpath, title: "6.7 Volume thứ hai: kiểu hostPath" }
+  - { slug: csi-volume, title: "6.8 Hiểu về kiểu Volume CSI" }
+  - { slug: tu-volume-den-persistent-volume, title: "6.9 Từ Volume tới Persistent Volume" }
+  - { slug: dinh-nghia-persistent-volume, title: "6.10 Định nghĩa một Persistent Volume" }
+  - { slug: persistent-volume-claim, title: "6.11 Tạo Persistent Volume Claim" }
+  - { slug: dung-claim-trong-pod, title: "6.12 Dùng Claim trong Pod" }
+  - { slug: volume-vs-persistent-volume, title: "6.13 Volume vs Persistent Volume" }
+  - { slug: bien-moi-truong, title: "6.14 Dùng biến môi trường" }
+  - { slug: bien-moi-truong-va-configmap, title: "6.15 Biến môi trường & ConfigMap" }
+  - { slug: tom-tat-module, title: "6.16 Tóm tắt module" }
 ---
+
+## Sợi chỉ xuyên suốt: app `stories`
+
+Cả section dùng **một** app duy nhất, và nó được chọn rất khéo: một service Node hai
+route, trong đó toàn bộ trạng thái nằm trong **một file trên đĩa**.
+
+📦 [Tải source về](/code/kub-data-01-starting-setup.zip) — giải nén ra thư mục
+`kub-data-01-starting-setup`.
+
+```js
+app.get('/story',  ...);   // đọc  story/text.txt
+app.post('/story', ...);   // ghi thêm vào story/text.txt
+```
+
+Không database, không cache, không gì khác — chỉ `fs.readFile` và `fs.appendFile`. Đó
+chính là điều làm nó hợp: mọi thứ bạn gửi lên app đều rơi vào **lớp ghi của container**,
+nên bạn thấy tận mắt nó biến mất lúc nào.
+
+`first-app` ở [module trước](/blog/k8s/k8s-thuc-chien) là app **không trạng thái** —
+giết bao nhiêu lần cũng chẳng mất gì, đó là lý do restart và scale trông đẹp đẽ đến thế.
+`stories` là app **có trạng thái**, và toàn bộ section này tồn tại để giải quyết đúng
+khác biệt đó.
+
+Trong source còn sẵn một `docker-compose.yaml` với `volumes: - stories:/app/story`. Đó
+là lời giải của Docker cho cùng bài toán. Giữ file đó lại để đối chiếu — K8s sẽ cần
+nhiều hơn một dòng, và note 6.3 giải thích vì sao.
 
 ## Thứ tự của module này rất tốt
 

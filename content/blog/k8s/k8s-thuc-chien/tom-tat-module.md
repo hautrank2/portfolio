@@ -1,32 +1,108 @@
 ---
 title: "5.24 Tóm tắt module"
 description: Bài kiểm tra thật của module này không phải đọc lại, mà là dựng lại toàn bộ từ một thư mục trống.
-status: seed
+status: growing
 created: 2026-08-25
-updated: 2026-08-25
+updated: 2026-09-10
 tags: [k8s, tong-ket]
 ---
 
 Module lớn nhất khoá kết thúc ở đây. Đừng đọc lại 22 note — làm bài tập cuối là biết
 ngay mình thủng chỗ nào.
 
-## Bản đồ những gì đã đi qua
-
-```
-Object  ──►  Deployment  ──►  Service        (khái niệm)
-                 │               │
-            imperative      kubectl expose   (làm bằng lệnh)
-                 │               │
-              scale, set image, rollback
-                 │
-                 ▼
-            declarative: apply -f            (làm bằng file)
-                 │
-        label ── selector ── probe ── resources
-```
-
 Một câu cho cả module: **bạn không ra lệnh, bạn khai báo — và mọi thứ nối với nhau bằng
-label, không bằng tên.**
+label, không bằng tên.** Ba mục dưới đây là ba lát cắt của câu đó: hệ thống gồm những gì,
+bạn gõ ra cái gì, và ai chịu trách nhiệm phần nào.
+
+## Kiến trúc, gói lại trong một hình
+
+```
+  kubectl  ──►  Cluster
+                  │
+                  ├─ Master Node  ──►  Cloud Provider API
+                  │     Control Plane + component quản lý worker
+                  │
+                  ├─ Worker Node ── Proxy/Config ── Pod (Container)
+                  └─ Worker Node ── Proxy/Config ── Pod (Container)
+```
+
+| Thành phần | Là gì |
+| --- | --- |
+| `kubectl` | Công cụ **gửi chỉ thị** tới cluster — "tạo cho tôi một deployment" |
+| **Cluster** | Tập hợp các node, ranh giới của mọi thứ bên trong |
+| **Master Node** | Control plane cùng các component quản lý worker; cũng là nơi phát lệnh ra **Cloud Provider API** khi cần hạ tầng |
+| **Worker Node** | **Máy thật hoặc máy ảo của bạn** — nơi container của app thật sự chạy |
+| **Pod** | Đơn vị chạy container. Tạo thêm hay bớt Pod chính là **scale** |
+
+Ba câu gọn nếu quên hết bảng trên:
+
+- **Master Node điều khiển toàn bộ Worker Node** — bạn không nói chuyện trực tiếp với
+  worker bao giờ.
+- **"Node" là máy của bạn**, không phải khái niệm trừu tượng. Cụm của bạn có đúng một
+  node vì bạn có đúng một VM.
+- **Mọi node đều phải được cài phần mềm K8s** — kubelet, proxy, và bạn bè. Không tự có,
+  và không phải việc của K8s.
+
+Đào sâu ở [Master Node](/blog/k8s/bat-dau-voi-k8s/master-node) và
+[Worker Node](/blog/k8s/bat-dau-voi-k8s/worker-node).
+
+## Thứ bạn thật sự gõ ra: Object
+
+Cluster dựng xong rồi thì mọi việc còn lại chỉ là **tạo và sửa Object**. K8s không nhận
+"lệnh làm gì" — nó nhận **mô tả về thứ cần tồn tại**.
+
+```
+             Kubernetes làm việc với OBJECT
+                          │
+    ┌────────┬────────────┼────────────┬────────┐
+   Pod   Deployment    Service      Volume     …
+```
+
+Module này đi hết ba cái đầu. `Volume` là của
+[Section 3](/blog/k8s/du-lieu-va-volume), và dấu `…` còn dài — ConfigMap, Secret,
+Ingress, Job, StatefulSet.
+
+Và mỗi Object đều tạo được bằng **đúng hai cách**:
+
+| | Imperative | Declarative |
+| --- | --- | --- |
+| Cách gõ | `kubectl create`, `scale`, `set image` | `kubectl apply -f` |
+| Bạn nói | *"làm việc này"* | *"trạng thái phải là thế này"* |
+| Chạy lại lần hai | Lỗi hoặc đè lung tung | Kết quả y hệt |
+| Dùng ở đâu | Học, thử, chữa cháy | Mọi cụm thật |
+
+Nửa đầu module dùng cột trái để bạn thấy kết quả ngay; nửa sau chuyển sang cột phải —
+chi tiết ở [Imperative vs Declarative](/blog/k8s/k8s-thuc-chien/imperative-vs-declarative)
+và [Object là gì](/blog/k8s/k8s-thuc-chien/k8s-object-la-gi).
+
+## Ranh giới: việc của K8s, việc của bạn
+
+Cả module chạy dọc theo một đường phân chia. Vẽ sai đường này là đi sửa nhầm chỗ, và
+nhầm rất lâu.
+
+| K8s sẽ làm | Bạn phải tự dựng (thứ K8s **đòi** phải có sẵn) |
+| --- | --- |
+| Tạo các object bạn khai (Pod, Deployment, Service) và quản lý chúng | **Cluster** cùng các node instance — master và worker |
+| Giám sát Pod, dựng lại khi chết, scale theo `replicas` | **API server, kubelet** và phần mềm K8s trên từng node |
+| Dùng tài nguyên hạ tầng **đã có** để hiện thực hoá cấu hình của bạn | Chính tài nguyên đó: load balancer, filesystem, registry |
+
+Cột trái là *điều bạn muốn xảy ra*. Cột phải là *điều phải có sẵn thì cột trái mới xảy ra
+được*. K8s là **bộ điều phối** — nó tiêu thụ tài nguyên hạ tầng chứ không sinh ra chúng.
+Ý này đã mở đầu module ở
+[K8s không quản lý hạ tầng](/blog/k8s/k8s-thuc-chien/k8s-khong-quan-ly-ha-tang-2), và
+đóng lại ở đây.
+
+Trong module bạn đã va vào đường này đúng ba lần, lần nào cũng vì rơi sang cột phải:
+
+| Triệu chứng | Cột phải thiếu gì |
+| --- | --- |
+| `EXTERNAL-IP` đứng `<pending>` vĩnh viễn | Không ai cấp được load balancer thật cho cụm |
+| `ImagePullBackOff` dù `docker build` đã xong | Đưa image tới runtime của node là việc của bạn |
+| Pod `Pending`, không node nào nhận | Không đủ node — thêm máy cũng là việc của bạn |
+
+Cài `k3s` bằng một dòng lệnh thì hai hàng đầu của cột phải xong trong ba mươi giây, nên
+rất dễ tưởng K8s tự lo. Trên cụm thật, đó là công việc của cả một đội hạ tầng — hoặc là
+hoá đơn hàng tháng bạn trả cho EKS, GKE.
 
 ## Năm điều nếu chỉ được nhớ năm
 
@@ -34,7 +110,7 @@ label, không bằng tên.**
 | --- | --- |
 | **Pod là bất biến** | Không sửa Pod. Đổi gì cũng là tạo Pod mới, tên mới, IP mới |
 | **Label là sợi dây duy nhất** | Không có khoá ngoại. Sai một chữ là đứt, và không ai báo |
-| **`apply` idempotent, `create` thì không** | Đó là toàn bộ khác biệt imperative/declarative |
+| **Pod không restart, container mới restart** | `RESTARTS 47` mà `AGE 2d` là bình thường — vẫn Pod cũ, cùng tên, cùng IP |
 | **Lỗi im lặng nguy hơn lỗi ồn ào** | Sai `targetPort`, sai `selector`: mọi thứ xanh, chỉ là không chạy |
 | **Deploy hỏng ≠ dịch vụ sập** | Rollout kẹt, Pod cũ vẫn phục vụ. Phải `rollout status` mới biết |
 
@@ -130,6 +206,7 @@ nào là qua.
 
 ## Tự kiểm
 
+- [ ] Vẽ được ranh giới hai cột, và xếp đúng ba triệu chứng đã gặp vào cột phải
 - [ ] Làm xong bài tập cuối, không mở note nào
 - [ ] Thuộc ba bảng chẩn đoán, hoặc biết chúng nằm ở đâu
 - [ ] Giải thích được cả năm điều ở bảng "nếu chỉ được nhớ năm"
