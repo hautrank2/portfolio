@@ -5,18 +5,18 @@ status: seed
 updated: 2026-08-23
 tags: [threejs, webgl, 3d, frontend]
 order:
-  - chuan-bi
-  - ba-thanh-phan
+  - getting-started
+  - core-components
   - object3d
   - geometry-material
-  - anh-sang
-  - tai-tai-nguyen
-  - tuong-tac
+  - lighting
+  - assets
+  - interaction
   - animation
   - physics
   - game
   - deploy
-  - phu-luc
+  - appendix
 ---
 
 Track này bám theo đúng thứ tự **45 bài** của giáo trình đang học, chia thành 11 chặng
@@ -27,8 +27,8 @@ một **bài tập có code đầy đủ** — dán vào `src/main.ts` là chạ
 
 Ba bước, không hơn:
 
-1. Dựng project một lần theo [Bài 2–4](/blog/threejs/chuan-bi)
-2. Chép `lab.ts` ở [Bài 8](/blog/threejs/chuan-bi/course-boilerplate) vào `src/`
+1. Dựng project một lần theo [Bài 2–4](/blog/threejs/getting-started)
+2. Chép `lab.ts` ở [Bài 8](/blog/threejs/getting-started/course-boilerplate) vào `src/`
 3. Mỗi bài tập sau đó chỉ việc dán đè lên `src/main.ts`
 
 Không bài nào cần cài thêm gì cho tới Bài 29 — kể cả `OrbitControls`, `Stats` và

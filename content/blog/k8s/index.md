@@ -5,22 +5,22 @@ status: seed
 updated: 2026-08-21
 tags: [k8s, devops, container]
 order:
-  - bat-dau-tu-dau
-  - du-an-xuyen-suot
-  - nen-tang
-  - bat-dau-voi-k8s
-  - k8s-thuc-chien
-  - du-lieu-va-volume
+  - where-to-start
+  - the-running-project
+  - foundations
+  - getting-started
+  - k8s-in-action
+  - data-and-volumes
   - networking
-  - deploy-len-cloud
-  - tong-ket
+  - deploy-to-cloud
+  - wrap-up
 ---
 
 Giáo trình này **bám sát Section 11→16** của khoá *Docker & Kubernetes: The Practical
 Guide* (Maximilian Schwarzmüller) — mỗi bài giảng là một note, giữ nguyên thứ tự và
 số hiệu bài để đối chiếu.
 
-Cộng thêm đúng **một section tôi tự thêm**: [Section 0 — Nền tảng](/blog/k8s/nen-tang).
+Cộng thêm đúng **một section tôi tự thêm**: [Section 0 — Nền tảng](/blog/k8s/foundations).
 Khoá giả định bạn đã biết Docker và không chạm tới Linux; thiếu namespace và cgroup
 thì K8s mãi là ma thuật.
 

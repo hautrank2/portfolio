@@ -2,21 +2,21 @@
 title: "Kubernetes Networking"
 description: Ba service gọi nhau bằng tên. Ba cách nối, theo đúng thứ tự tiến hoá.
 order:
-  - { slug: du-an-va-muc-tieu, title: "227. Dự án khởi điểm & mục tiêu" }
-  - { slug: deployment-dau-tien, title: "228. Tạo Deployment đầu tiên" }
-  - { slug: nhin-lai-service, title: "229. Nhìn lại Service" }
-  - { slug: nhieu-container-mot-pod, title: "230. Nhiều container trong một Pod" }
-  - { slug: giao-tiep-noi-bo-pod, title: "231. Giao tiếp trong nội bộ Pod" }
-  - { slug: tao-nhieu-deployment, title: "232. Tạo nhiều Deployment" }
-  - { slug: pod-to-pod-ip-va-env, title: "233. Pod gọi Pod bằng IP & biến môi trường" }
-  - { slug: dns-cho-pod-to-pod, title: "234. Dùng DNS cho giao tiếp Pod-to-Pod" }
-  - { slug: cach-nao-tot-nhat, title: "235. Cách nào tốt nhất? Và một thử thách!" }
-  - { slug: goi-y-tasks-txt, title: "236. Gợi ý quan trọng: tạo file tasks.txt" }
-  - { slug: loi-giai-thu-thach, title: "237. Lời giải thử thách" }
-  - { slug: them-frontend, title: "238. Thêm frontend đã container hoá" }
-  - { slug: deploy-frontend, title: "239. Deploy frontend bằng Kubernetes" }
+  - { slug: project-and-goals, title: "227. Dự án khởi điểm & mục tiêu" }
+  - { slug: first-deployment, title: "228. Tạo Deployment đầu tiên" }
+  - { slug: services-revisited, title: "229. Nhìn lại Service" }
+  - { slug: multiple-containers-in-one-pod, title: "230. Nhiều container trong một Pod" }
+  - { slug: intra-pod-communication, title: "231. Giao tiếp trong nội bộ Pod" }
+  - { slug: creating-multiple-deployments, title: "232. Tạo nhiều Deployment" }
+  - { slug: pod-to-pod-with-ip-and-env, title: "233. Pod gọi Pod bằng IP & biến môi trường" }
+  - { slug: dns-for-pod-to-pod, title: "234. Dùng DNS cho giao tiếp Pod-to-Pod" }
+  - { slug: which-approach-is-best, title: "235. Cách nào tốt nhất? Và một thử thách!" }
+  - { slug: tasks-txt-hint, title: "236. Gợi ý quan trọng: tạo file tasks.txt" }
+  - { slug: challenge-solution, title: "237. Lời giải thử thách" }
+  - { slug: adding-a-frontend, title: "238. Thêm frontend đã container hoá" }
+  - { slug: deploying-the-frontend, title: "239. Deploy frontend bằng Kubernetes" }
   - { slug: reverse-proxy, title: "240. Dùng reverse proxy cho frontend" }
-  - { slug: tom-tat-module, title: "241. Tóm tắt module" }
+  - { slug: module-summary, title: "241. Tóm tắt module" }
   - ingress-vs-service
 ---
 
@@ -42,7 +42,7 @@ và mất sạch giá trị. **Tự nối ba service trước đã.**
 
 ## Nối ngược về Section 0
 
-Bài tập [`unshare --net`](/blog/k8s/nen-tang/linux/namespace-va-cgroup) đã cho bạn thấy
+Bài tập [`unshare --net`](/blog/k8s/foundations/linux/namespaces-and-cgroups) đã cho bạn thấy
 một network namespace trắng: chỉ có `lo`, và `lo` đang `DOWN`.
 
 Đó **chính xác** là trạng thái Pod trước khi CNI vào cấu hình. Mọi thứ section này nói
