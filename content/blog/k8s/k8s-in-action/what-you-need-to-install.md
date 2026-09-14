@@ -71,13 +71,13 @@ kubectl config view --minify
 với cluster nào. Cùng một lệnh `kubectl delete deployment` gõ nhầm context là xoá trên
 production. Thứ tự ưu tiên: cờ `--kubeconfig`, rồi biến `KUBECONFIG`, rồi `~/.kube/config`.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Kể được bốn thứ cần có, và cái nào k3s làm hộ
 - [ ] Giải thích được vì sao thiếu kubeconfig thì lỗi lại nhắc tới cổng 8080
 - [ ] Biết mình đang trỏ vào cluster nào mà không cần đoán
 
-## Câu hỏi còn mở
+## Open questions
 
 - Một kubeconfig chứa nhiều cluster thì chuyển qua lại bằng gì, và làm sao khỏi nhầm?
 - Chứng chỉ trong kubeconfig k3s hết hạn lúc nào?

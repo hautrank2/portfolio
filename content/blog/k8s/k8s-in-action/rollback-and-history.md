@@ -213,7 +213,7 @@ Nhớ `--overwrite`: thiếu nó thì lần annotate thứ hai báo lỗi thay v
 bình thường?
 
 ```bash
-kubectl set image deployment/first-app kub-first-app=khong-ton-tai:v9
+kubectl set image deployment/first-app kub-first-app=does-not-exist:v9
 ```
 
 ```bash
@@ -263,7 +263,7 @@ curl -s http://192.168.103.154:8080 | grep h1
 Phải thấy `-- phien ban 2` trở lại. Deployment đang ở `:2`, 3 replica, lịch sử có 4–5
 revision tuỳ bạn đã nghịch tới đâu. Note sau viết lại đúng trạng thái này thành YAML.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Nói được revision là bản chụp của **cái gì**, và nó sống ở đâu
 - [ ] Giải thích được vì sao `docker build` không tạo revision mới
@@ -273,7 +273,7 @@ revision tuỳ bạn đã nghịch tới đâu. Note sau viết lại đúng tr�
 - [ ] Giải thích được vì sao image sai không làm sập dịch vụ đang chạy
 - [ ] Biết lệnh nào phải có trong CI để không báo xanh giả
 
-## Câu hỏi còn mở
+## Open questions
 
 - `revisionHistoryLimit: 0` thì mất gì?
 - Rollback một Deployment có kéo ConfigMap và Secret về bản cũ không?

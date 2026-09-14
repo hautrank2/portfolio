@@ -423,7 +423,7 @@ Chuỗi thật sự xảy ra là: kubelet → CRI → containerd → runc → **
 cgroup** đúng như bạn vừa làm bằng tay. Toàn bộ K8s nằm ở tầng điều phối; việc thực thi
 vẫn là kernel Linux.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Kể được namespace nào **chia sẻ** trong một Pod và vì sao điều đó tạo ra `localhost`
 - [ ] Giải thích được vì sao Pod mới tạo chưa có mạng cho tới khi CNI vào
@@ -431,7 +431,7 @@ vẫn là kernel Linux.
 - [ ] Phân biệt được triệu chứng của thiếu CPU và thiếu RAM
 - [ ] Trả lời được vì sao không có namespace riêng cho `/home`, và cái gì thay thế nó
 
-## Câu hỏi còn mở
+## Open questions
 
 - `shareProcessNamespace: true` có tác dụng phụ gì về bảo mật?
 - User namespace trong K8s hiện dùng được tới đâu, giải quyết rủi ro nào?

@@ -75,7 +75,7 @@ Không có gì "tự chữa" một cách kỳ diệu ở đây. Chỉ là bạn 
 còn 2, nên controller tạo thêm một cái. Hiểu được vòng lặp này thì phần lớn hành vi
 của K8s trở nên đoán trước được.
 
-## Câu hỏi còn mở
+## Open questions
 
 - etcd bị mất thì cluster hỏng tới mức nào? Backup ra sao?
 - Vì sao lại cần số node control plane lẻ (3, 5) — liên quan gì tới quorum của Raft?

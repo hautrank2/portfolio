@@ -77,13 +77,13 @@ kubectl delete pod pod-tran --ignore-not-found && kubectl delete deployment pod-
 Gần như chỉ có hai: chạy một Pod tạm để soi (`kubectl run --rm -it`), và viết ví dụ
 trong tài liệu. Ngoài ra thì không.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Giải thích được vì sao Pod mọc lại mang tên khác
 - [ ] Nói được ai là chủ của một Pod, và tra được bằng lệnh nào
 - [ ] Nói được vì sao không được dựa vào tên hoặc IP của Pod
 
-## Câu hỏi còn mở
+## Open questions
 
 - DaemonSet và StatefulSet cũng sở hữu Pod — chúng khác Deployment chỗ nào?
 - Xoá ReplicaSet mà giữ Deployment thì chuyện gì xảy ra?

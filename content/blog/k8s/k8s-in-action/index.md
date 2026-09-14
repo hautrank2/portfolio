@@ -71,7 +71,7 @@ phải *"bấm nút nào trên máy Mac"*.
 ## Bài tập phá — không có trong khoá
 
 ```bash
-kubectl set image deploy/first-app first-app=khong-ton-tai:v9
+kubectl set image deploy/first-app first-app=does-not-exist:v9
 kubectl get pods
 kubectl describe deploy first-app
 ```

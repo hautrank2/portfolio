@@ -66,7 +66,7 @@ sudo cat /etc/rancher/k3s/k3s.yaml
 
 Copy vào `~/.kube/config`, sửa `server: https://127.0.0.1:6443` thành IP của VM.
 
-## Câu hỏi còn mở
+## Open questions
 
 - k3s lược bỏ những gì so với K8s đầy đủ? Có chỗ nào lược bỏ ảnh hưởng tới việc học không?
 - Khi nào nên chuyển từ single-node sang multi-node để học scheduling cho đúng?

@@ -108,14 +108,14 @@ sudo systemctl status k3s-agent && sudo k3s crictl ps
 `crictl` nói chuyện thẳng với containerd qua CRI — thấy đúng những gì kubelet thấy,
 không qua lớp Kubernetes nào.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Kể được ba thành phần trên node và việc của từng cái
 - [ ] Giải thích được vì sao node mất mạng mà Pod vẫn chạy
 - [ ] Nói được vì sao gỡ dockershim không làm hỏng image build bằng Docker
 - [ ] Nói được vì sao Service không trả về mã lỗi HTTP
 
-## Câu hỏi còn mở
+## Open questions
 
 - iptables và IPVS khác nhau ra sao khi cluster có vài nghìn Service?
 - Pod bị `Evicted` vì node hết đĩa — ai ra quyết định đó, kubelet hay control plane?

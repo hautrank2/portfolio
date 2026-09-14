@@ -70,11 +70,11 @@ socat TCP-LISTEN:9000,fork,reuseaddr TCP:localhost:8081 &
 #     └─ nghe cổng 9000
 ```
 
-**Đoán trước:** `curl localhost:9000/khong-ton-tai` — socat có biết path
-`/khong-ton-tai` không? Ai trả về 404?
+**Đoán trước:** `curl localhost:9000/does-not-exist` — socat có biết path
+`/does-not-exist` không? Ai trả về 404?
 
 ```bash
-curl -i localhost:9000/khong-ton-tai | head -3
+curl -i localhost:9000/does-not-exist | head -3
 #    └─ -i : in cả header phản hồi
 kill %1
 #    └─ tắt job nền số 1 (socat) khi xong
@@ -126,14 +126,14 @@ Dọn:
 docker rm -f web1 web2 lb && rm -rf /tmp/lb
 ```
 
-## Tự kiểm
+## Self-check
 
 - [ ] Nói được L4 nhìn thấy gì, L7 nhìn thấy gì — bằng ví dụ cụ thể
 - [ ] Giải thích được vì sao socat không thể định tuyến theo path
 - [ ] Ánh xạ đúng: Service → L4, Ingress → L7
 - [ ] Trả lời được: cân bằng tải cho Postgres thì dùng tầng nào? Vì sao?
 
-## Câu hỏi còn mở
+## Open questions
 
 - gRPC chạy trên HTTP/2 — cân bằng L4 cho gRPC gặp vấn đề gì với kết nối dài?
 - TLS passthrough (L4) vs TLS termination (L7) — Ingress chọn cái nào, khi nào?

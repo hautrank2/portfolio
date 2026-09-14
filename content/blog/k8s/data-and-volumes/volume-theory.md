@@ -85,14 +85,14 @@ Không có volume thì mỗi lần app crash là mất sạch dữ liệu, dù c
 volume thì qua được chuyện đó. Đấy đã là một khoảng cách rất lớn — chỉ là chưa đủ để gọi
 là "bền".
 
-## Tự kiểm
+## Self-check
 
 - [ ] Nói được volume của K8s gắn với **Pod**, không phải container
 - [ ] Chỉ ra đúng một dòng mà K8s và Docker giống nhau trong bảng đối chiếu
 - [ ] Kể được ba việc thường ngày làm Pod chết, kéo theo mất dữ liệu
 - [ ] Giải thích được vì sao volume "không bền" vẫn đáng dùng
 
-## Câu hỏi còn mở
+## Open questions
 
 - Volume kiểu `hostPath` để lại byte trên node sau khi Pod chết — vậy dữ liệu đó còn
   dùng lại được không, hay chỉ là rác?

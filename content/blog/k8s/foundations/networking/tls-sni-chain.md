@@ -151,14 +151,14 @@ docker rm -f tls && sudo sed -i '$d' /etc/hosts && rm -rf /tmp/tls
 Pod phía sau. App của bạn không phải đụng vào chứng chỉ — và cert-manager sau
 này chỉ là robot tự xin/gia hạn mấy cái Secret đó.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Kể được 4 nhịp của handshake và SNI nằm ở nhịp nào
 - [ ] Giải thích được vì sao máy bạn tin github.com dù chưa gặp bao giờ
 - [ ] Phân biệt được ba lỗi: sai tên / hết hạn / unknown authority
 - [ ] Nói được vì sao `--cacert` đúng còn `-k` là đầu hàng
 
-## Câu hỏi còn mở
+## Open questions
 
 - Let's Encrypt xác minh mình sở hữu domain bằng cách nào (HTTP-01, DNS-01)?
 - mTLS — server cũng đòi chứng chỉ của client — thêm gì vào handshake?

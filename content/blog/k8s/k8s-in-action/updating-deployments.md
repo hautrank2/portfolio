@@ -165,7 +165,7 @@ Quy tắc gọn: **mỗi lần build là một tag mới, bất biến.** `:1`, 
 digest. Cùng bài học ở
 [tag vs digest](/blog/k8s/foundations/container/tag-vs-digest).
 
-## Tự kiểm
+## Self-check
 
 - [ ] Lấy được tên container mà không cần đoán, và nói được nó sinh ra từ đâu
 - [ ] Giải thích được vì sao tổng số Pod tạm thời vượt `replicas`
@@ -173,7 +173,7 @@ digest. Cùng bài học ở
 - [ ] Giải thích được vì sao build code mới mà giữ tag cũ thì không có gì xảy ra
 - [ ] Nói được vì sao ReplicaSet cũ không bị xoá sau khi rollout xong
 
-## Câu hỏi còn mở
+## Open questions
 
 - `maxUnavailable: 0` thì cần thêm điều kiện gì để rollout không kẹt?
 - Rollout đang chạy dở mà bạn `set image` lần nữa thì sao?

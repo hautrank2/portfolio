@@ -132,14 +132,14 @@ readiness probe đúng, nếu không rollout kẹt vĩnh viễn vì không bao g
 tuyệt đối không được chạy cùng lúc — ví dụ bản mới migrate schema DB theo cách bản cũ
 không đọc nổi.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Nói được `requests` và `limits` do ai đọc, ở thời điểm nào
 - [ ] Giải thích được vì sao vượt CPU thì chậm còn vượt RAM thì chết
 - [ ] Biết hạng QoS của một Pod không khai gì, và hậu quả
 - [ ] Nói được vì sao `maxUnavailable: 0` bắt buộc phải đi kèm readiness probe
 
-## Câu hỏi còn mở
+## Open questions
 
 - `LimitRange` áp mặc định cho cả namespace — nó đè lên spec của bạn hay bị đè?
 - CPU limit gây bóp ngay cả khi node đang rảnh. Vậy có nên bỏ hẳn CPU limit không?

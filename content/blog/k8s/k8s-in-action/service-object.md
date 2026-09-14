@@ -42,7 +42,7 @@ kubectl get svc first-app
 ```
 
 ```bash
-kubectl run soi --rm -it --image=busybox:1.36 --restart=Never -- nslookup first-app
+kubectl run probe --rm -it --image=busybox:1.36 --restart=Never -- nslookup first-app
 ```
 
 **Kết quả:**
@@ -80,14 +80,14 @@ kube-proxy viết ra. Gói gửi tới nó bị DNAT ngay tại chỗ sang IP m�
 **Vì sao quan trọng:** rất nhiều giờ debug bị đốt vì `ping` một ClusterIP rồi kết luận
 "mạng hỏng". Với Service, công cụ đúng là `curl` hoặc `nc`, không phải `ping`.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Kể được bốn `type` và cái nào bao cái nào
 - [ ] Viết được tên DNS đầy đủ của một Service ở namespace khác
 - [ ] Giải thích được vì sao ClusterIP không xuất hiện trong `ip addr`
 - [ ] Biết vì sao `ping` ClusterIP không phải phép thử đúng
 
-## Câu hỏi còn mở
+## Open questions
 
 - Service `headless` (`clusterIP: None`) trả về gì khi nslookup, và ai cần nó?
 - Nhiều Pod trên nhiều node — kube-proxy chọn Pod nào, và có ưu tiên Pod cùng node không?

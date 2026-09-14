@@ -111,9 +111,9 @@ K8s hỗ trợ vài chục kiểu, nhưng thực tế bạn chỉ gặp lại ch
 | --- | --- | --- | --- | --- |
 | `emptyDir` | Thư mục của Pod trên node (hoặc RAM) | **Pod** | Thư mục tạm, cache, trao đổi giữa container cùng Pod | [6.6](/blog/k8s/data-and-volumes/emptydir) |
 | `hostPath` | Một đường dẫn có sẵn **trên node** | **Node** | Đọc file/thiết bị của node — log, socket. Lab một node | [6.7](/blog/k8s/data-and-volumes/hostpath) |
-| `persistentVolumeClaim` | Bất cứ đâu mà PV trỏ tới | **Độc lập với Pod** | Dữ liệu thật cần bền | 6.9 → 6.12 |
+| `persistentVolumeClaim` | Bất cứ đâu mà PV trỏ tới | **Độc lập với Pod** | Dữ liệu thật cần bền | [6.9](/blog/k8s/data-and-volumes/from-volumes-to-persistent-volumes) → [6.12](/blog/k8s/data-and-volumes/using-a-claim-in-a-pod) |
 | `csi` | Hệ thống lưu trữ ngoài, qua driver | Độc lập với cụm | Production, nhiều node | [6.8](/blog/k8s/data-and-volumes/csi-volume) |
-| `configMap` / `secret` | etcd — kubelet dựng thành file | Pod | Đưa cấu hình, chứng chỉ vào container | 6.15 |
+| `configMap` / `secret` | etcd — kubelet dựng thành file | Pod | Đưa cấu hình, chứng chỉ vào container | [6.15](/blog/k8s/data-and-volumes/environment-variables-and-configmap) |
 | `downwardAPI` | — | Pod | Đưa metadata của chính Pod vào file | — |
 
 Ba kiểu đầu là ba **mức bền** khác nhau, và section này đi đúng theo thứ tự đó — từ yếu
@@ -126,14 +126,14 @@ phải chiều giữ lại. Cùng cú pháp hai khối, mục đích ngược nh
 [Note sau](/blog/k8s/data-and-volumes/emptydir) dùng `emptyDir` thật và đo xem nó bền tới
 đâu.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Nói được `volumes` và `volumeMounts` nằm ở cấp nào, trả lời câu hỏi gì
 - [ ] Giải thích được vì sao K8s không gộp được thành một dòng như Docker
 - [ ] Biết hai khối nối nhau bằng gì
 - [ ] Nói được vì sao lệch tên volume thì bị chặn, còn lệch `targetPort` thì không
 
-## Câu hỏi còn mở
+## Open questions
 
 - Hai container cùng mount một volume vào hai `mountPath` khác nhau — có được không?
 - Mount đè lên một thư mục **đã có file** trong image thì mấy file đó đi đâu?

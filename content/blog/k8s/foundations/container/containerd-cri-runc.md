@@ -129,14 +129,14 @@ container giữ namespace) → **pull image** → tạo container. Bạn đang x
 | kubectl chết hẳn nhưng app vẫn chạy | apiserver, KHÔNG phải runtime | `sudo crictl ps` vẫn trả lời |
 | Container chết ngay khi start | lệnh trong config sai | `sudo crictl logs <id>` |
 
-## Tự kiểm
+## Self-check
 
 - [ ] Vẽ được chuỗi kubelet → CRI → containerd → runc → kernel, nói vai từng tầng
 - [ ] Giải thích được vì sao `ps` không thấy runc khi container đang chạy
 - [ ] Nói được vì sao image build bằng Docker không tự hiện ra trong k3s, và cách nạp
 - [ ] Dùng được `crictl` khi `kubectl` bất lực
 
-## Câu hỏi còn mở
+## Open questions
 
 - Shim v2 còn cho phép runtime khác cắm vào (gVisor, Kata) — cắm ở khớp nào?
 - `ctr` với `crictl` khác nhau gì, khi nào buộc phải dùng `ctr`?

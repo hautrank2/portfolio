@@ -181,7 +181,7 @@ kubectl apply -f deployment.yaml && kubectl get pods -l app=second-app
 Chú ý cặp dễ lẫn: `volumes` khai ở Pod, `volumeMounts` khai ở container. Một cái là *có
 những ổ đĩa nào*, cái kia là *container này gắn ổ nào vào đâu*.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Chỉ ra được ranh giới nơi Deployment kết thúc và Pod bắt đầu
 - [ ] Trả lời được "trường X đặt ở đâu" bằng cách hỏi nó thuộc object nào
@@ -189,7 +189,7 @@ những ổ đĩa nào*, cái kia là *container này gắn ổ nào vào đâu*
 - [ ] Giải thích được vì sao Pod đủ nhãn thì bị Deployment nhận nuôi rồi xoá bớt
 - [ ] Nói được hai container chung Pod thì chung những gì
 
-## Câu hỏi còn mở
+## Open questions
 
 - `initContainers` chạy xong mới tới `containers` — vậy probe áp cho cái nào?
 - Hai container trong một Pod cùng khai `containerPort: 8080` thì sao?

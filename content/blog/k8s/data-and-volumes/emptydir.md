@@ -42,6 +42,14 @@ Ghi một dòng để lát nữa có cái mà đo:
 curl -X POST -H 'Content-Type: application/json' -d '{"text":"dong dau tien"}' http://192.168.103.154:3000/story && curl http://192.168.103.154:3000/story
 ```
 
+> **Phải POST trước, đừng GET trước.** Volume vừa gắn là một thư mục **rỗng**, đè lên
+> `story/text.txt` mà image mang sẵn — file đó bị che đi. Mà `fs.readFile` không tạo file,
+> nên GET đầu tiên trả `500 Failed to open file.` chứ không phải chuỗi rỗng. `fs.appendFile`
+> của POST thì tự tạo, nên POST một lần là mọi thứ vào guồng.
+>
+> Đây là hệ quả trực tiếp của việc mount đè: từ giờ container **không bao giờ** còn thấy
+> file gốc trong image nữa.
+
 ## Bài tập 1 — Giết container, Pod vẫn sống
 
 Đây là dòng đầu trong bảng giấy ở
@@ -135,14 +143,14 @@ app này — nó chỉ là bậc thang đầu tiên.
 Nhanh hơn hẳn, nhưng ăn vào bộ nhớ của node và mất khi node reboot — hợp cho cache nóng,
 không hợp cho thứ gì lớn.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Nói được `emptyDir` sinh ra lúc nào và chết lúc nào
 - [ ] Giải thích được vì sao container restart không làm mất dữ liệu
 - [ ] Nói được vì sao rollout đổi image lại làm mất
 - [ ] Kể được ba trường hợp `emptyDir` là lựa chọn đúng
 
-## Câu hỏi còn mở
+## Open questions
 
 - `mountPath: /app/story` đè lên thư mục đã có trong image — file `text.txt` gốc đi đâu?
 - Scale lên 3 replica thì ba Pod có ba `emptyDir` riêng hay dùng chung?

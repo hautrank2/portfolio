@@ -56,7 +56,7 @@ Cùng một process, hai góc nhìn. Đó chính là namespace đang làm việc
 Điểm cuối là lý do tồn tại của `SecurityContext` và Pod Security Admission trong K8s —
 những thứ sẽ gặp ở phần sau.
 
-## Câu hỏi còn mở
+## Open questions
 
 - gVisor và Kata Containers thu hẹp khoảng cách bảo mật này bằng cách nào?
 - User namespace trong K8s hiện đã dùng được ở mức nào?

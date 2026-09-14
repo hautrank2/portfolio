@@ -115,14 +115,14 @@ systemctl status k3s | head -5
 Đây đúng là hành vi mà `restartPolicy: Always` mang lại cho container — chỉ khác là ở
 đây systemd đóng vai kubelet.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Đọc được `systemctl cat k3s` và chỉ ra lệnh thật đang chạy
 - [ ] Nói được vì sao `crictl` còn dùng được khi `kubectl` đã chết
 - [ ] Giải thích được vì sao apiserver sập mà app vẫn phục vụ traffic
 - [ ] Lọc được log lỗi trong 10 phút gần nhất của một unit
 
-## Câu hỏi còn mở
+## Open questions
 
 - k3s gộp apiserver, scheduler, controller-manager, kubelet vào **một** process. Cluster
   chuẩn tách riêng từng cái — việc gộp này giấu mất điều gì đáng học không?

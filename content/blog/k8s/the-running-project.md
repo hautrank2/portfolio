@@ -63,7 +63,7 @@ Tôi nghiêng về **tự viết**, vì sau này khi bổ sung `readinessProbe` 
 dạy — thì cần sửa chính cái endpoint đó. Sửa code mình viết thì hiểu hơn sửa code tải
 về.
 
-## Câu hỏi còn mở
+## Open questions
 
 - Có nên thêm database ở cuối để chạm tới StatefulSet không, hay để thành track riêng?
 - File trên volume vs database — bài học persistence khác nhau thật sự ở chỗ nào?

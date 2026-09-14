@@ -122,14 +122,14 @@ Dọn:
 docker rm -f echo rp && rm -rf /tmp/rp
 ```
 
-## Tự kiểm
+## Self-check
 
 - [ ] Vẽ được sơ đồ forward proxy vs reverse proxy, chỉ ra ai bị "che"
 - [ ] Giải thích được vì sao backend sau proxy không thấy IP thật, và cách lấy lại
 - [ ] Gặp 502 nói được ngay ai trả mã đó và nghĩa là gì
 - [ ] Nói được Ingress controller là gì trong một câu dùng từ "reverse proxy"
 
-## Câu hỏi còn mở
+## Open questions
 
 - `X-Forwarded-For` giả mạo được — chuỗi tin cậy nhiều tầng proxy xử lý sao?
 - Ingress-nginx sinh file cấu hình nginx thật ở đâu, xem được không?

@@ -49,7 +49,7 @@ Tạo Ingress xong mà không có gì xảy ra. Lý do: `Ingress` chỉ là **b�
 Phải có một **ingress controller** đang chạy trong cluster thì mới có thứ đọc bản
 khai đó và thực sự cấu hình proxy. Cluster trống thì tạo bao nhiêu Ingress cũng vô ích.
 
-## Câu hỏi còn mở
+## Open questions
 
 - Gateway API giải quyết điều gì mà Ingress làm chưa tốt?
 - `pathType: Prefix` và `ImplementationSpecific` khác nhau ra sao giữa các controller?

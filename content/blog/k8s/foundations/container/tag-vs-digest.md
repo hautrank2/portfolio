@@ -127,14 +127,14 @@ nếu không biết cơ chế này.
 2. **Ghim digest trong manifest**: `image: app@sha256:...` — máy móc đảm bảo,
    thường do CI/CD hoặc công cụ như Flux tự điền.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Nói được tag và digest khác nhau ở chỗ nào bằng một câu mỗi cái
 - [ ] Tự tái hiện được "cùng tag khác ruột" bằng registry local
 - [ ] Giải thích được vì sao `:latest` + `IfNotPresent` là cặp đôi nguy hiểm
 - [ ] Kể được hai chiến lược chống lệch version, và team nhỏ nên dùng cái nào
 
-## Câu hỏi còn mở
+## Open questions
 
 - Cosign/ký image liên hệ gì với digest?
 - `kubectl set image` ghi tag hay digest vào spec, và nghĩa là gì khi rollback?

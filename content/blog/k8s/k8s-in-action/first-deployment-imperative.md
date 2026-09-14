@@ -131,11 +131,11 @@ docker tag hautrank2/kub-first-app:1 hautrank2/kub-first-app:latest && docker sa
 ```
 
 ```bash
-kubectl create deployment thu-latest --image=hautrank2/kub-first-app:latest
+kubectl create deployment try-latest --image=hautrank2/kub-first-app:latest
 ```
 
 ```bash
-kubectl get pods -l app=thu-latest
+kubectl get pods -l app=try-latest
 ```
 
 **Kết quả:** `ImagePullBackOff` — dù image có sẵn ngay trên chính node đó.
@@ -146,7 +146,7 @@ kubectl get pods -l app=thu-latest
 | `:latest`, hoặc không tag | `Always` | Luôn đi hỏi registry, có sẵn cũng kệ |
 
 ```bash
-kubectl delete deployment thu-latest
+kubectl delete deployment try-latest
 ```
 
 **Vì sao quan trọng:** đây là lỗi kinh điển của mọi lab K8s chạy local, và triệu chứng
@@ -206,7 +206,7 @@ kubectl get pods -w
 Rồi ở terminal đầu:
 
 ```bash
-kubectl create deployment tam --image=hautrank2/kub-first-app:1
+kubectl create deployment temp --image=hautrank2/kub-first-app:1
 ```
 
 **Kết quả:** `Pending` → `ContainerCreating` → `Running`.
@@ -224,7 +224,7 @@ ngay phải đi hỏi ai — [note sau](/blog/k8s/k8s-in-action/kubectl-behind-t
 vẽ đủ bốn chặng.
 
 ```bash
-kubectl delete deployment tam
+kubectl delete deployment temp
 ```
 
 ## Bài tập 5 — Gọi thử app, rồi giết nó
@@ -278,7 +278,7 @@ nguyên nhân nằm nguyên văn ở đó, không cần đoán.
 
 Nhớ là Events chỉ giữ khoảng một giờ. Pod hỏng từ hôm qua thì mục này rỗng.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Giải thích được vì sao build xong trên máy mình mà node vẫn `ImagePullBackOff`
 - [ ] Kể được hai cách đưa image tới node, và vì sao production chọn registry
@@ -287,7 +287,7 @@ Nhớ là Events chỉ giữ khoảng một giờ. Pod hỏng từ hôm qua thì
 - [ ] Giải thích được chuỗi hash trong tên ReplicaSet đến từ đâu
 - [ ] Phản xạ đầu tiên khi Pod không lên là `describe`, không phải `logs`
 
-## Câu hỏi còn mở
+## Open questions
 
 - Registry riêng có xác thực thì khai báo ở đâu? (gợi ý: `imagePullSecrets`)
 - `Running` mà app chưa phục vụ được thì cột nào cho biết? (gợi ý: `READY 0/1`)

@@ -86,7 +86,7 @@ Cột `IP` là địa chỉ nội bộ cluster. Thử gọi nó **từ trong clu
 tạm (thay IP của bạn vào):
 
 ```bash
-kubectl run soi --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- http://<IP-vua-thay>
+kubectl run probe --rm -it --image=busybox:1.36 --restart=Never -- wget -qO- http://<ip-just-seen>
 ```
 
 **Kết quả:** trang chào của nginx hiện ra — IP dùng được, nhưng chỉ từ bên trong.
@@ -116,14 +116,14 @@ Ephemeral nghĩa là Pod chết là chết thật — tự nó không ai hồi s
 khác đứng ra chịu trách nhiệm tạo Pod thay thế. Đó là chuyện của
 [Object Deployment](/blog/k8s/k8s-in-action/deployment-object), note ngay sau.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Giải thích được "đơn vị nhỏ nhất K8s tương tác" nghĩa là gì với container lẻ
 - [ ] Kể được ba đặc điểm của Pod, không cần nhìn lại note
 - [ ] Phân biệt được IP cluster (Pod-với-Pod) và `localhost` (trong cùng Pod)
 - [ ] Nói được "ephemeral" kéo theo hệ quả gì với IP và dữ liệu trong Pod
 
-## Câu hỏi còn mở
+## Open questions
 
 - Khi nào một Pod *thật sự* nên có hai container (sidecar), thay vì tách hai Pod?
 - Container chính restart thì ai giữ network namespace để IP của Pod không đổi?

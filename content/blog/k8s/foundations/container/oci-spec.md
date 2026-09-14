@@ -124,14 +124,14 @@ Trong Pod spec bạn sẽ viết `resources.limits`, `securityContext.runAsUser`
 rồi đưa cho runc. K8s là người soạn hợp đồng; OCI runtime là người thi hành.
 Chuỗi đầy đủ nằm ở [bài containerd–CRI–runc](/blog/k8s/foundations/container/containerd-cri-runc).
 
-## Tự kiểm
+## Self-check
 
 - [ ] Kể được ba spec của OCI và mỗi cái trả lời câu hỏi gì
 - [ ] Giải thích được vì sao image Docker chạy trên k3s không cần Docker
 - [ ] Mô tả được image sau khi `docker save`: gồm những file gì
 - [ ] Chỉ ra được 3 trường trong config.json ứng với 3 bài đã học ở Section 0
 
-## Câu hỏi còn mở
+## Open questions
 
 - Podman "daemonless" khác kiến trúc Docker chỗ nào, ưu ở đâu?
 - gVisor và Kata tuân runtime-spec nhưng không dùng namespace thuần — thế nào?

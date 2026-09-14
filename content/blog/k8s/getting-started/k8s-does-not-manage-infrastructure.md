@@ -87,13 +87,13 @@ không bao giờ tìm thấy nguyên nhân — vì nguyên nhân **không nằm 
 giáo trình này. K8s không xoá đi nhu cầu biết Linux và biết mạng; nó **giả định** bạn
 đã biết.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Nói được ranh giới bằng một câu, không cần liệt kê
 - [ ] Giải thích được vì sao `EXTERNAL-IP` treo `<pending>` trên cluster bare metal
 - [ ] Chỉ ra được ai thật sự tạo đĩa khi bạn khai một PVC
 
-## Câu hỏi còn mở
+## Open questions
 
 - Managed cluster (EKS/GKE) đẩy ranh giới này về phía nào, và bạn mất quyền gì đổi lại?
 - `kubectl delete node` rồi node tự đăng ký lại — vậy có cách nào đuổi hẳn một node không?

@@ -108,14 +108,14 @@ Ba quy tắc rút ra:
    `startupProbe`.
 3. Thứ phụ thuộc bên ngoài thuộc về **readiness**, không phải liveness.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Phân biệt được liveness và readiness bằng hậu quả khi fail
 - [ ] Nói được vì sao kiểm DB trong liveness là ý tồi
 - [ ] Tính được thời gian tới lúc restart từ `periodSeconds` và `failureThreshold`
 - [ ] Kể được một tình huống Docker không bắt được mà probe bắt được
 
-## Câu hỏi còn mở
+## Open questions
 
 - Không khai `readinessProbe` thì Pod được coi là ready lúc nào?
 - Rolling update dựa vào readiness để biết Pod mới đã ổn — vậy thiếu nó thì `rollout status` có nói dối không?

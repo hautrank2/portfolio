@@ -142,7 +142,7 @@ Dựng lại rồi đi tiếp:
 kubectl apply -f k8s/
 ```
 
-## Tự kiểm
+## Self-check
 
 - [ ] Biết `---` là cú pháp của YAML chứ không phải của K8s
 - [ ] Giải thích được vì sao thứ tự object thường không quan trọng, và hai ngoại lệ
@@ -150,7 +150,7 @@ kubectl apply -f k8s/
 - [ ] Chọn được cách tổ chức file và nói được lý do
 - [ ] Nói được vì sao object tạo ngoài file lại là nợ kỹ thuật
 
-## Câu hỏi còn mở
+## Open questions
 
 - Kustomize giải bài toán này thế nào so với xếp thư mục bằng tay?
 - `kubectl apply -f https://...` được — rủi ro ở đâu?

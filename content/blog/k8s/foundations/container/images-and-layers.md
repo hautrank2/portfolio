@@ -133,14 +133,14 @@ thế Pod thứ hai cùng image trên cùng node khởi động gần như tức
 image gọn từng layer quan trọng thật sự khi cluster scale: 50 node × 500MB
 thừa = 25GB băng thông mỗi lần rollout.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Kể được chỉ thị nào sinh layer, chỉ thị nào chỉ sửa config
 - [ ] Giải thích được cache build hoạt động thế nào và vỡ ở đâu
 - [ ] Chứng minh được (bằng lệnh) hai image chia sẻ layer chung
 - [ ] Nói được vì sao `RUN rm` không làm image nhỏ đi — bằng từ "whiteout"
 
-## Câu hỏi còn mở
+## Open questions
 
 - `docker build --squash` và multi-stage khác nhau chỗ nào khi cần image gọn?
 - Giới hạn số layer của một image là bao nhiêu, có còn quan trọng không?

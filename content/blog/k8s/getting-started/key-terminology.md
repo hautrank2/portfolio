@@ -114,13 +114,13 @@ khai rằng nó nên tồn tại**. Bỏ object đó đi thì không có gì m�
 vòng lặp reconcile ở [Cluster là gì](/blog/k8s/getting-started/what-is-a-cluster), nhìn từ
 hướng ngược lại.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Phân biệt được cả tám cặp ở trên mà không cần nhìn lại
 - [ ] Trả lời trôi câu hỏi cuối section, có nhắc `ownerReferences`
 - [ ] Nói được vì sao tạo Ingress mà chưa cài controller thì im lặng không lỗi
 
-## Câu hỏi còn mở
+## Open questions
 
 - `kubectl delete deployment --cascade=orphan` để lại gì?
 - CRD cho phép tự định nghĩa resource mới — vậy controller cho nó ai viết?

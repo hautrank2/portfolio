@@ -12,7 +12,7 @@ order:
 Section ngắn nhất của khoá, **15 phút**, và cũng dễ bị bỏ qua nhất. Nhưng nó trả lời đúng câu
 hỏi xuất hiện sau khi học xong: **giờ thì sao?**
 
-## Tự kiểm toàn tuyến
+## Self-check toàn tuyến
 
 Không phải "đã xem hết video", mà là trả lời được sáu câu này không tra tài liệu:
 

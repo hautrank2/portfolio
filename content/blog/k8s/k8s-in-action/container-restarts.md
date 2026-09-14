@@ -172,7 +172,7 @@ vừa thấy.
 
 Đó chính là bài toán mà [note sau](/blog/k8s/k8s-in-action/scaling) giải.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Nói được ai restart container, và theo trường nào trong spec
 - [ ] Giải thích được vì sao tên Pod và `AGE` không đổi sau khi container chết
@@ -180,7 +180,7 @@ vừa thấy.
 - [ ] Nhớ dãy backoff và mức chặn trên
 - [ ] Phản xạ dùng `logs --previous` khi gặp `CrashLoopBackOff`
 
-## Câu hỏi còn mở
+## Open questions
 
 - `restartPolicy: Never` trong Deployment thì sao? (gợi ý: apply thử đi)
 - Container bị restart thì file nó vừa ghi ra có còn không?

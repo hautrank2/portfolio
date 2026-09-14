@@ -146,10 +146,10 @@ hoá đơn hàng tháng bạn trả cho EKS, GKE.
 Đây là bài kiểm tra thật. **Không nhìn note, không copy file cũ.**
 
 ```bash
-kubectl delete namespace kiem-tra --ignore-not-found && kubectl create namespace kiem-tra
+kubectl delete namespace exam --ignore-not-found && kubectl create namespace exam
 ```
 
-Trong một thư mục mới, viết tay ba file rồi `kubectl apply -f . -n kiem-tra`, sao cho
+Trong một thư mục mới, viết tay ba file rồi `kubectl apply -f . -n exam`, sao cho
 đạt đủ **bảy** điều kiện:
 
 1. Một Deployment tên `web`, **3 replica**, image `nginx:1.27-alpine`
@@ -163,15 +163,15 @@ Trong một thư mục mới, viết tay ba file rồi `kubectl apply -f . -n ki
 Tự chấm:
 
 ```bash
-kubectl get all -n kiem-tra
+kubectl get all -n exam
 ```
 
 ```bash
-kubectl get endpointslice -n kiem-tra -o jsonpath='{.items[0].endpoints[*].addresses}{"\n"}'
+kubectl get endpointslice -n exam -o jsonpath='{.items[0].endpoints[*].addresses}{"\n"}'
 ```
 
 ```bash
-PORT=$(kubectl get svc -n kiem-tra -o jsonpath='{.items[0].spec.ports[0].nodePort}') && for i in $(seq 5); do curl -s -o /dev/null -w '%{http_code} ' localhost:$PORT; done; echo
+PORT=$(kubectl get svc -n exam -o jsonpath='{.items[0].spec.ports[0].nodePort}') && for i in $(seq 5); do curl -s -o /dev/null -w '%{http_code} ' localhost:$PORT; done; echo
 ```
 
 Ba dòng phải ra: 3 Pod `Running`, 3 địa chỉ endpoint, và năm mã `200`.
@@ -183,7 +183,7 @@ không khớp tên cổng đã khai (K8s **không** bắt được, chỉ là kh
 Dọn:
 
 ```bash
-kubectl delete namespace kiem-tra
+kubectl delete namespace exam
 ```
 
 ## Vượt chặng khi
@@ -204,14 +204,14 @@ nào là qua.
 | Service không định tuyến được theo path | Section 4 — Networking |
 | Cụm chỉ có một node, không LoadBalancer thật | Section 5 — Deploy lên cloud |
 
-## Tự kiểm
+## Self-check
 
 - [ ] Vẽ được ranh giới hai cột, và xếp đúng ba triệu chứng đã gặp vào cột phải
 - [ ] Làm xong bài tập cuối, không mở note nào
 - [ ] Thuộc ba bảng chẩn đoán, hoặc biết chúng nằm ở đâu
 - [ ] Giải thích được cả năm điều ở bảng "nếu chỉ được nhớ năm"
 
-## Câu hỏi còn mở
+## Open questions
 
 - Ba file YAML này lặp lại y hệt cho dev/staging/prod. Kustomize hay Helm giải ra sao?
 - Bao nhiêu thứ trong module này thì Operator tự làm được, và lúc nào đáng viết một cái?

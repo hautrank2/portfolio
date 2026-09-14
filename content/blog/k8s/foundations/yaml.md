@@ -108,7 +108,7 @@ kubectl apply -f manifest.yaml --dry-run=server
 `--dry-run=server` gửi lên apiserver để validate thật (kể cả admission) nhưng không
 ghi vào etcd. Tốt hơn `--dry-run=client` vì client chỉ kiểm tra cú pháp.
 
-## Câu hỏi còn mở
+## Open questions
 
 - Vì sao K8s chọn YAML mà không phải JSON hay HCL? (apiserver thật ra nhận cả JSON)
 - `kubectl apply` và `kubectl create` khác nhau ở chỗ nào ngoài chuyện idempotent?

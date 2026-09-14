@@ -95,14 +95,14 @@ kubectl diff -f /tmp/thu.yaml
 
 Nên thành phản xạ: `diff` trước, `apply` sau.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Giải thích được idempotent bằng đúng ví dụ `create` vs `apply`
 - [ ] Kể được kịch bản `scale` bằng tay bị `apply` xoá mất
 - [ ] Nói được vì sao "hai nguồn sự thật" là gốc của vấn đề
 - [ ] Dùng `kubectl diff` trước khi apply
 
-## Câu hỏi còn mở
+## Open questions
 
 - `kubectl edit` thuộc lối nào?
 - Trường do controller tự điền (như `clusterIP`) mà bạn khai khác đi thì sao?

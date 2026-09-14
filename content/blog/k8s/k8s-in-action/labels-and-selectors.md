@@ -173,7 +173,7 @@ labels:
 Tiền tố có dấu chấm là **không bắt buộc**, chỉ là quy ước để tránh đụng tên giữa các
 công cụ. Trong lab thì `app` + `tier` là đủ.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Nói được vì sao K8s không có khoá ngoại giữa các object
 - [ ] Phân biệt được `-l` và `-L`
@@ -181,7 +181,7 @@ công cụ. Trong lab thì `app` + `tier` là đủ.
 - [ ] Phân biệt được nhãn của Deployment với nhãn trong `template`
 - [ ] Dùng được mẹo đổi nhãn để tách một Pod lỗi ra khỏi Service
 
-## Câu hỏi còn mở
+## Open questions
 
 - Annotation cũng là key-value — vì sao selector lại không đọc được nó?
 - Xoá hẳn nhãn `tier` khỏi một Pod (chứ không đổi giá trị) thì sao?

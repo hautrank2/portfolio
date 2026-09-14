@@ -157,14 +157,14 @@ cho stage 2; NestJS build ra `dist/` chỉ cần `node_modules` production; .NET
 có `dotnet publish` + image `runtime` (không cần `sdk`). Cùng một khuôn
 công-xưởng/trưng-bày cho cả ba.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Đọc một Dockerfile chỉ ra được chỗ nào phá cache
 - [ ] Giải thích được vì sao cache giúp nhanh mà không giúp nhỏ, multi-stage thì ngược lại
 - [ ] Viết được Dockerfile multi-stage cho một app Node từ trí nhớ
 - [ ] Nói được image nhỏ ảnh hưởng gì tới rollout trên cluster nhiều node
 
-## Câu hỏi còn mở
+## Open questions
 
 - `.dockerignore` can thiệp vào cache ở bước nào? Thiếu nó mất gì?
 - `COPY --link` và cache mount (`RUN --mount=type=cache`) của BuildKit thêm gì?

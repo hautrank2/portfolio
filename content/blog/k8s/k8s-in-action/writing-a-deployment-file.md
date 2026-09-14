@@ -159,7 +159,7 @@ Nên nhớ: **file của bạn là tập con**, không phải bản sao của ob
 `get -o yaml` rồi lưu lại làm file nguồn — bạn sẽ mang theo cả `status`, `resourceVersion`
 và `uid`, những thứ không thuộc về bạn và sẽ gây lỗi khi apply sang cluster khác.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Viết được Deployment YAML từ đầu, không nhìn
 - [ ] Kể được bốn trường bắt buộc của mọi object, và câu hỏi mỗi cái trả lời
@@ -167,7 +167,7 @@ và `uid`, những thứ không thuộc về bạn và sẽ gây lỗi khi apply
 - [ ] Nói được vì sao image từ registry lành hơn image import tay
 - [ ] Phân biệt được lỗi K8s bắt được lúc apply và lỗi nó không thể bắt
 
-## Câu hỏi còn mở
+## Open questions
 
 - Bỏ hẳn `selector` đi thì sao — có mặc định không?
 - Vì sao `apiVersion` của Deployment là `apps/v1` mà Pod chỉ là `v1`?

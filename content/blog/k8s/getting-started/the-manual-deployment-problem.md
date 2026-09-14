@@ -66,13 +66,13 @@ những câu hỏi không có lời giải bằng `docker run`:
 Đây mới là bài toán Kubernetes sinh ra để giải. Không phải *"chạy container"* — Docker
 làm việc đó rồi — mà là **điều phối container trên nhiều máy**.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Kể được ít nhất bốn việc bạn phải tự làm khi deploy thủ công
 - [ ] Giải thích được vì sao `--restart=always` chưa đủ
 - [ ] Nói được vì sao bài toán chỉ thật sự khó khi có nhiều hơn một máy
 
-## Câu hỏi còn mở
+## Open questions
 
 - Docker Compose giải quyết được tới đâu trong danh sách trên?
 - Ở quy mô nào thì tự viết script vẫn rẻ hơn dựng K8s?

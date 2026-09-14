@@ -152,7 +152,7 @@ Nó sửa thẳng vào trạng thái sống. Lần `kubectl apply` tiếp theo t
 
 Dùng `kubectl scale` để **thử**, sửa file YAML để **giữ**.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Nói được chuyện gì thật sự xảy ra khi `kubectl scale`
 - [ ] Giải thích được vì sao chỉ một Pod chết khi bấm `/error`
@@ -162,7 +162,7 @@ Dùng `kubectl scale` để **thử**, sửa file YAML để **giữ**.
 - [ ] Nói được `--replicas=0` khác `kubectl delete` chỗ nào
 - [ ] Giải thích được vì sao thu về 1 lại giữ Pod trẻ mà xoá Pod già
 
-## Câu hỏi còn mở
+## Open questions
 
 - Ba Pod nằm cùng một node — node đó chết thì scaling còn cứu được gì?
 - HPA tự chỉnh `replicas`, vậy nó có xung đột với `apply` từ file không?

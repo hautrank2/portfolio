@@ -166,7 +166,7 @@ Và vì selector bất biến, chọn sai ở đây là chọn sai vĩnh viễn.
 `app.kubernetes.io/*` ở note 5.17 có tận hai trường cho việc định danh: `name` cho *loại
 app*, `instance` cho *lần triển khai cụ thể*.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Viết được `matchExpressions` với bốn toán tử
 - [ ] Biết `matchExpressions` không dùng được cho Service, và vì sao
@@ -174,7 +174,7 @@ app*, `instance` cho *lần triển khai cụ thể*.
 - [ ] Phân biệt được nhãn định danh và nhãn mô tả
 - [ ] Nhận ra triệu chứng "mọi thứ xanh, nội dung sai" là lỗi selector quá rộng
 
-## Câu hỏi còn mở
+## Open questions
 
 - `selector` của Service không bất biến — vì sao nó được phép mà Deployment thì không?
 - Đổi nhãn trong `template.metadata.labels` mà giữ nguyên selector thì sao?

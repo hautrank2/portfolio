@@ -72,11 +72,11 @@ DNS của máy hỏng. `kubectl` không bao giờ nói cho bạn mấy thứ đ�
 
 Nguyên tắc rút ra: **lỗi nào cũng phải hỏi "tầng nào" trước khi hỏi "object nào"**.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Kể được năm thứ phải có trước khi `kubectl` chạy được câu lệnh đầu tiên
 - [ ] Giải thích được vì sao tắt k3s thì lỗi là `connection refused` chứ không phải "không thấy node"
 
-## Câu hỏi còn mở
+## Open questions
 
 - Trên EKS thì ai giữ tiến trình control plane, và bạn còn `systemctl status` được gì?

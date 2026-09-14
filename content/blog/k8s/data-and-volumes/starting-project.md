@@ -158,14 +158,14 @@ docker compose down -v
 Các note sau dựng lại app này **trong cluster**, cũng ở cổng 3000. Để compose chạy song
 song thì hai bên tranh cổng, và tệ hơn là bạn dễ nhầm mình đang gọi vào cái nào.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Nói được vì sao `docker compose down` không làm mất dữ liệu
 - [ ] Biết cờ nào mới thật sự xoá volume
 - [ ] Chỉ ra được dữ liệu đang nằm ở đâu, nếu không phải trong container
 - [ ] Đặt được ba câu hỏi ở bảng trên trước khi đọc tiếp
 
-## Câu hỏi còn mở
+## Open questions
 
 - Hai container cùng gắn một named volume thì ghi đồng thời có sao không?
 - Volume đó nằm ở chỗ nào trên đĩa máy thật? (gợi ý: `docker volume inspect`)

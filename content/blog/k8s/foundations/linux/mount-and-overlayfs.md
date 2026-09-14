@@ -141,14 +141,14 @@ sudo umount /tmp/dst
 cũng đi qua cơ chế tương tự — đó là lý do sửa ConfigMap thì file trong container tự
 đổi theo (sau một độ trễ), còn nạp qua `env` thì không.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Chỉ ra được `lowerdir` / `upperdir` tương ứng với cái gì trong một container
 - [ ] Giải thích được vì sao `RUN rm bigfile` không làm image nhỏ đi
 - [ ] Nói được lúc nào lớp ghi của container mất, lúc nào không
 - [ ] Phân biệt được bind mount và copy
 
-## Câu hỏi còn mở
+## Open questions
 
 - containerd dùng snapshotter nào mặc định, và `overlayfs` khác `native` ra sao?
 - Vì sao image layer được định danh bằng digest của **nội dung** chứ không phải tên?

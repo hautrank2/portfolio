@@ -101,14 +101,14 @@ Ghép **lỏng** kiểu này là lý do bạn có thể thêm một Service mớ
 mà không phải sửa Deployment. Và cũng là lý do gõ sai một chữ trong label thì mọi thứ
 vẫn `Running`, chỉ là Service rỗng không — không có lỗi nào báo cho bạn cả.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Giải thích được vì sao đơn vị nhỏ nhất là Pod chứ không phải container
 - [ ] Kể được Deployment / ReplicaSet / Pod mỗi cái lo gì
 - [ ] Nói được chuyện gì xảy ra với ReplicaSet cũ sau một lần rolling update
 - [ ] Nói được vì sao Service không định tuyến được theo path
 
-## Câu hỏi còn mở
+## Open questions
 
 - StatefulSet khác Deployment ở đâu, và vì sao DB cần nó?
 - Service tìm ra Pod qua label — vậy ai ghi danh sách endpoint, và ghi lúc nào?

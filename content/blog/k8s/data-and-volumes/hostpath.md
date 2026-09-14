@@ -147,9 +147,9 @@ Nó không vô dụng, chỉ là không dùng để **lưu dữ liệu của app
 
 Hai cột đầu hỏng ở hai chỗ khác nhau, và cả hai đều hỏng vì cùng một lý do gốc: **dữ liệu
 bị buộc vào một thứ có thể biến mất**. Cột thứ ba cắt hẳn sợi dây đó ra — và đó là nội
-dung của note 6.9.
+dung của [note 6.9](/blog/k8s/data-and-volumes/from-volumes-to-persistent-volumes).
 
-## Tự kiểm
+## Self-check
 
 - [ ] Nói được `hostPath` hơn `emptyDir` ở chỗ nào, và hỏng ở chỗ nào
 - [ ] Giải thích được vì sao ba replica dùng chung file trên cụm một node
@@ -157,7 +157,7 @@ dung của note 6.9.
 - [ ] Kể được một lý do bảo mật để cấm `hostPath` ở production
 - [ ] Biết vì sao nên khai `type` thay vì bỏ trống
 
-## Câu hỏi còn mở
+## Open questions
 
 - Nếu `hostPath` nguy hiểm vậy, vì sao K8s vẫn giữ nó?
 - Làm sao ép Pod luôn rơi đúng một node, để `hostPath` dùng được thật? (gợi ý:

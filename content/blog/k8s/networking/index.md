@@ -2,22 +2,22 @@
 title: "Kubernetes Networking"
 description: Ba service gọi nhau bằng tên. Ba cách nối, theo đúng thứ tự tiến hoá.
 order:
-  - { slug: project-and-goals, title: "227. Dự án khởi điểm & mục tiêu" }
-  - { slug: first-deployment, title: "228. Tạo Deployment đầu tiên" }
-  - { slug: services-revisited, title: "229. Nhìn lại Service" }
-  - { slug: multiple-containers-in-one-pod, title: "230. Nhiều container trong một Pod" }
-  - { slug: intra-pod-communication, title: "231. Giao tiếp trong nội bộ Pod" }
-  - { slug: creating-multiple-deployments, title: "232. Tạo nhiều Deployment" }
-  - { slug: pod-to-pod-with-ip-and-env, title: "233. Pod gọi Pod bằng IP & biến môi trường" }
-  - { slug: dns-for-pod-to-pod, title: "234. Dùng DNS cho giao tiếp Pod-to-Pod" }
-  - { slug: which-approach-is-best, title: "235. Cách nào tốt nhất? Và một thử thách!" }
-  - { slug: tasks-txt-hint, title: "236. Gợi ý quan trọng: tạo file tasks.txt" }
-  - { slug: challenge-solution, title: "237. Lời giải thử thách" }
-  - { slug: adding-a-frontend, title: "238. Thêm frontend đã container hoá" }
-  - { slug: deploying-the-frontend, title: "239. Deploy frontend bằng Kubernetes" }
-  - { slug: reverse-proxy, title: "240. Dùng reverse proxy cho frontend" }
-  - { slug: module-summary, title: "241. Tóm tắt module" }
-  - ingress-vs-service
+  - { slug: project-and-goals, title: "7.1 Dự án khởi điểm & mục tiêu" }
+  - { slug: first-deployment, title: "7.2 Tạo Deployment đầu tiên" }
+  - { slug: services-revisited, title: "7.3 Nhìn lại Service" }
+  - { slug: multiple-containers-in-one-pod, title: "7.4 Nhiều container trong một Pod" }
+  - { slug: intra-pod-communication, title: "7.5 Giao tiếp trong nội bộ Pod" }
+  - { slug: creating-multiple-deployments, title: "7.6 Tạo nhiều Deployment" }
+  - { slug: pod-to-pod-with-ip-and-env, title: "7.7 Pod gọi Pod bằng IP & biến môi trường" }
+  - { slug: dns-for-pod-to-pod, title: "7.8 Dùng DNS cho giao tiếp Pod-to-Pod" }
+  - { slug: which-approach-is-best, title: "7.9 Cách nào tốt nhất? Và một thử thách!" }
+  - { slug: tasks-txt-hint, title: "7.10 Gợi ý quan trọng: tạo file tasks.txt" }
+  - { slug: challenge-solution, title: "7.11 Lời giải thử thách" }
+  - { slug: adding-a-frontend, title: "7.12 Thêm frontend đã container hoá" }
+  - { slug: deploying-the-frontend, title: "7.13 Deploy frontend bằng Kubernetes" }
+  - { slug: reverse-proxy, title: "7.14 Dùng reverse proxy cho frontend" }
+  - { slug: module-summary, title: "7.15 Tóm tắt module" }
+  - { slug: ingress-vs-service, title: "7.16 Ingress khác Service ở đâu" }
 ---
 
 ## Phần hay nhất: ba cách nối, theo đúng thứ tự tiến hoá

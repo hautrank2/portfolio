@@ -81,14 +81,14 @@ dặc — dung lượng RAM, số CPU, phiên bản kernel, danh sách điều k
 Đúng như dự đoán được từ bảng trên: Node là thứ **bạn không mong muốn gì cả**, chỉ có
 kubelet báo cáo về. Ngược hẳn với Deployment, nơi `spec` là tất cả những gì bạn viết.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Kể được bốn trường có mặt trong mọi object
 - [ ] Nói được ai viết `spec`, ai viết `status`, và vì sao đừng sửa `status`
 - [ ] Phân biệt được resource và object
 - [ ] Biết tra `apiVersion` đúng cho một loại object mà không cần Google
 
-## Câu hỏi còn mở
+## Open questions
 
 - CRD thêm resource mới vào `api-resources` — vậy ai viết `status` cho chúng?
 - Có object nào không có `status` không?

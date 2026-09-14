@@ -118,14 +118,14 @@ Không phải cluster của bạn hỏng — đó là một bản đóng gói kh
 sudo systemctl status k3s
 ```
 
-## Tự kiểm
+## Self-check
 
 - [ ] Kể được bốn thành phần và việc của từng cái
 - [ ] Kể lại được bảy bước của một `kubectl apply`
 - [ ] Giải thích được vì sao 4 node control plane vô ích so với 3
 - [ ] Nói được cái gì còn, cái gì mất khi control plane chết
 
-## Câu hỏi còn mở
+## Open questions
 
 - Backup và restore etcd làm thế nào, và restore xong thì Pod đang chạy ra sao?
 - Managed cluster giấu control plane đi — vậy debug được tới đâu khi nó có vấn đề?

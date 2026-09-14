@@ -255,7 +255,7 @@ từ 8080 sang 3000 thì chỉ sửa `deployment.yaml`, Service giữ nguyên.
 chỉ khai đúng **một chỗ**, ở nơi biết rõ sự thật nhất — chính cái container đó. Và đây
 cũng là lúc `containerPort` hết vô dụng: nó trở thành chỗ để đặt cái tên.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Viết được Service YAML từ đầu, nhớ đúng `v1` và selector phẳng
 - [ ] Nói được ba con số cổng, ai nghe cái nào, cái nào bắt buộc đúng
@@ -264,7 +264,7 @@ cũng là lúc `containerPort` hết vô dụng: nó trở thành chỗ để đ
 - [ ] Phân biệt được bốn triệu chứng ở bảng trên chỉ bằng `get endpointslice`
 - [ ] Giải thích được vì sao selector Service rộng hơn Deployment là nguy hiểm
 
-## Câu hỏi còn mở
+## Open questions
 
 - Một Service khai nhiều cổng thì `name` của từng cổng có bắt buộc không?
 - ServiceLB của k3s dùng `hostPort` — vậy cluster nhiều node thì IP nào được trả về?

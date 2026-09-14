@@ -266,7 +266,7 @@ Có endpoint mà không gọi được → gần như chắc chắn sai `targetP
 nào → sai `selector`, chuyện của
 [note về label](/blog/k8s/k8s-in-action/labels-and-selectors).
 
-## Tự kiểm
+## Self-check
 
 - [ ] Kể được bốn `type`, cái nào bao cái nào, và cái nào đứng riêng
 - [ ] Nói được ai điền `EXTERNAL-IP` trên k3s, và vì sao cụm trần thì để trống vĩnh viễn
@@ -275,7 +275,7 @@ nào → sai `selector`, chuyện của
 - [ ] Giải thích được vì sao sai `targetPort` lại không sinh ra lỗi nào
 - [ ] Phân biệt được triệu chứng "sai targetPort" và "sai selector"
 
-## Câu hỏi còn mở
+## Open questions
 
 - Mỗi Service `LoadBalancer` là một LB tính tiền riêng trên cloud. Vậy 30 service thì làm
   sao? (gợi ý: [Ingress](/blog/k8s/networking/ingress-vs-service))

@@ -68,14 +68,14 @@ tắt `k8s` vì giữa `k` và `s` có đúng 8 chữ cái.
 Họ **điều khiển thứ đã có sẵn** — và đó chính xác là ranh giới mà
 [bài sau](/blog/k8s/getting-started/k8s-does-not-manage-infrastructure) sẽ nói bằng chữ in hoa.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Ứng được mỗi vấn đề ở [Vấn đề của deploy thủ công](/blog/k8s/getting-started/the-manual-deployment-problem)
       với một cơ chế cụ thể của K8s
 - [ ] Giải thích được vì sao "Kubernetes là một bộ API" chứ không phải một phần mềm
 - [ ] Kể được ít nhất hai tình huống mà **không** nên dùng K8s
 
-## Câu hỏi còn mở
+## Open questions
 
 - Liveness probe và readiness probe khác nhau chỗ nào khi cùng fail?
 - Nếu API là thứ chung, các bản cài khác nhau ở đâu — và khác đó có làm YAML lệch nhau không?

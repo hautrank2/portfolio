@@ -7,7 +7,7 @@ updated: 2026-09-11
 tags: [k8s, volume, csi, storage]
 ---
 
-> Note khái niệm, không có YAML nào để apply. Nhưng nó giải thích vì sao 6.9 trở đi
+> Note khái niệm, không có YAML nào để apply. Nhưng nó giải thích vì sao [6.9 trở đi](/blog/k8s/data-and-volumes/from-volumes-to-persistent-volumes)
 > trông khác hẳn hai note vừa rồi.
 
 `emptyDir` và `hostPath` đều tự K8s làm được, vì chúng chỉ là **thư mục trên node**. Còn
@@ -117,9 +117,9 @@ Cột cuối là cột hay làm người ta vấp. Đĩa khối (`EBS`, `PD`) ch
 tại một thời điểm** — nên `replicas: 3` với một PVC kiểu đó là hỏng, đúng kiểu hỏng mà
 app `story` của bạn sẽ gặp. Muốn nhiều Pod cùng ghi thì phải là hệ thống file chia sẻ.
 
-Chi tiết ở note 6.11, phần `accessModes`.
+Chi tiết ở [note 6.11](/blog/k8s/data-and-volumes/persistent-volume-claim), phần `accessModes`.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Nói được CSI giải quyết vấn đề gì của cách "in-tree" cũ
 - [ ] Giải thích được vì sao bạn hiếm khi viết `csi:` trong YAML
@@ -127,7 +127,7 @@ Chi tiết ở note 6.11, phần `accessModes`.
 - [ ] Nói được vì sao "có StorageClass" chưa chắc là "dữ liệu đã bền"
 - [ ] Biết loại lưu trữ nào cho nhiều Pod ghi cùng lúc, loại nào không
 
-## Câu hỏi còn mở
+## Open questions
 
 - Driver CSI chạy như Pod — vậy nó mount volume cho chính nó kiểu gì?
 - Nếu driver bị gỡ trong khi vẫn còn PV đang dùng thì chuyện gì xảy ra?

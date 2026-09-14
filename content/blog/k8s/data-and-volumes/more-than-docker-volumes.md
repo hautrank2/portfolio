@@ -121,7 +121,7 @@ Và đây là chỗ dễ vấp nhất, nói trước để khỏi bất ngờ �
 
 Bốn note sau lần lượt là bốn câu trả lời đó, theo đúng thứ tự từ yếu tới mạnh.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Định nghĩa được state trong một câu, và nói được vế nào là vế quan trọng
 - [ ] Phân biệt hai loại state, và vì sao chúng cần mức bền khác nhau
@@ -129,7 +129,7 @@ Bốn note sau lần lượt là bốn câu trả lời đó, theo đúng thứ 
 - [ ] Nói được vì sao `docker diff` không thấy file nằm trong volume
 - [ ] Kể được ba câu hỏi mà Docker không phải trả lời còn K8s thì phải
 
-## Câu hỏi còn mở
+## Open questions
 
 - Cache là state loại hai — vậy có bao giờ đáng gắn volume cho nó không?
 - Nếu volume khai ở mức Pod, hai container trong cùng Pod dùng chung được không?

@@ -143,14 +143,14 @@ có nhiệm vụ `wait()` để dọn. Nhưng `sh` làm PID 1 trong container th
 và là lý do K8s có `shareProcessNamespace` — khi bật, K8s chèn một pause container làm
 PID 1 biết dọn xác cho cả Pod.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Giải thích được vì sao `sh -c 'sleep 1000'` không chết khi nhận `SIGTERM`
 - [ ] Tính nhẩm được exit code khi biết signal, và ngược lại
 - [ ] Viết được entrypoint script tắt êm, và nói được vì sao cần `& wait`
 - [ ] Phân biệt được `SIGTERM` và `SIGKILL` **về mặt ai kiểm soát được**
 
-## Câu hỏi còn mở
+## Open questions
 
 - `preStop` hook của K8s chạy **trước** `SIGTERM` — dùng nó để làm gì mà `SIGTERM`
   không làm được?

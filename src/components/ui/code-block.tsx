@@ -60,20 +60,26 @@ const CodeBlock = ({
   }[state];
 
   return (
-    <div data-slot="code-block" className="group relative">
-      <div className="pointer-events-none absolute right-3 top-3 flex items-center gap-2">
-        {language && (
-          <span className="rounded-md bg-foreground/5 px-2 py-1 font-mono text-[0.65rem] uppercase tracking-wider text-foreground/40">
-            {language}
-          </span>
-        )}
+    <div
+      data-slot="code-block"
+      className="group overflow-hidden rounded-lg border border-border/60 bg-card/70"
+    >
+      {/*
+       * The chrome sits in its own row rather than floating over the code. An
+       * overlay cannot work here: the code scrolls horizontally, so a long line
+       * slides underneath the badge no matter how much padding it is given.
+       */}
+      <div className="flex items-center justify-between gap-2 border-b border-border/60 px-4 py-1">
+        <span className="font-mono text-[0.65rem] uppercase tracking-wider text-foreground/40">
+          {language}
+        </span>
         <button
           type="button"
           onClick={copy}
           aria-label={feedback.label}
           title={feedback.label}
           className={cn(
-            "pointer-events-auto grid size-7 place-items-center rounded-md border border-border/60 bg-card/80 text-foreground/50 backdrop-blur transition hover:border-primary/50 hover:text-primary focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring group-hover:opacity-100",
+            "-mr-1 grid size-6 shrink-0 place-items-center rounded-md text-foreground/50 transition hover:text-primary focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring group-hover:opacity-100",
             state === "idle" ? "opacity-0" : "opacity-100"
           )}
         >
@@ -89,7 +95,7 @@ const CodeBlock = ({
           // padding-right is dropped from its scrollable area, so a long line
           // would end flush against the border once scrolled. `min-w-max` makes
           // the grid size to its widest line so that padding lands after it.
-          "overflow-x-auto rounded-lg border border-border/60 bg-card/70 py-4 text-sm leading-relaxed",
+          "overflow-x-auto py-4 text-sm leading-relaxed",
           "[&>code]:grid [&>code]:min-w-max [&>code]:px-5",
           className
         )}

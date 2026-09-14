@@ -151,14 +151,14 @@ Giữ `replicas: 1` cho tới khi có chỗ chứa dùng chung. Đó là chuyệ
 Giữ nguyên `story-deployment` và `story-service` — hai note sau gắn volume thẳng vào
 đúng file `deployment.yaml` này.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Viết được cả hai file từ đầu, không copy
 - [ ] Chỉ ra ba chỗ ghi số `3000` và nói con nào bắt buộc phải đúng
 - [ ] Giải thích được vì sao xoá Pod lại mất dữ liệu còn `docker compose down` thì không
 - [ ] Nói được vì sao `replicas: 3` làm hỏng app này theo cách không báo lỗi
 
-## Câu hỏi còn mở
+## Open questions
 
 - Rollout đổi image cũng thay Pod — vậy mỗi lần deploy bản mới là mất sạch dữ liệu?
 - Nếu chỉ container bên trong crash mà Pod vẫn sống, dữ liệu có mất không?

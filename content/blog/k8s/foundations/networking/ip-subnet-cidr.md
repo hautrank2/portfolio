@@ -156,14 +156,14 @@ kubectl get node -o jsonpath='{.items[0].spec.podCIDR}'
 #                 └─ móc đúng một field trong object node
 ```
 
-## Tự kiểm
+## Self-check
 
 - [ ] Nhẩm được `/16` và `/24` chứa bao nhiêu địa chỉ, không cần máy tính
 - [ ] Chỉ ra được trên VM của mình: IP nào của VirtualBox, IP nào của k3s
 - [ ] Nhìn `10.43.0.10` nói ngay được đó là Pod hay Service
 - [ ] Giải thích được vì sao node có giới hạn số Pod
 
-## Câu hỏi còn mở
+## Open questions
 
 - Vì sao k3s chọn mặc định `10.42`/`10.43` mà không phải `192.168`?
 - Khi cluster có nhiều node, ai quyết định node nào nhận dải `/24` nào?

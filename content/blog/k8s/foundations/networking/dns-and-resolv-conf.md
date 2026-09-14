@@ -130,14 +130,14 @@ Ba dòng, ba phát hiện:
 `<service>.<namespace>.svc.cluster.local`. Cùng namespace thì gọi tên cụt,
 khác namespace thì `users-api.backend` — search domain lo phần còn lại.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Kể được thứ tự tra tên: nsswitch → hosts → resolv.conf → DNS server
 - [ ] Giải thích được search domain nối đuôi thế nào, và `ndots` can thiệp ở đâu
 - [ ] Đọc được resolv.conf của một Pod và chỉ ra `10.43.0.10` là ai
 - [ ] Viết được tên đầy đủ của Service `web` trong namespace `shop`
 
-## Câu hỏi còn mở
+## Open questions
 
 - `ndots:5` gây bao nhiêu query thừa khi Pod gọi API bên ngoài? Cách giảm?
 - CoreDNS làm gì khi được hỏi một tên không thuộc `cluster.local`?

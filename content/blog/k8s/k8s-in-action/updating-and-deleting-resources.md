@@ -160,7 +160,7 @@ Dựng lại để đi tiếp:
 kubectl apply -f deployment.yaml -f service.yaml
 ```
 
-## Tự kiểm
+## Self-check
 
 - [ ] Biết `kubectl diff` tính ở đâu và vì sao điều đó quan trọng
 - [ ] Giải thích được vì sao `apply` kéo `replicas` về mà không xoá nhãn thêm tay
@@ -168,7 +168,7 @@ kubectl apply -f deployment.yaml -f service.yaml
 - [ ] Có phản xạ `--dry-run=client` trước khi xoá hàng loạt
 - [ ] Giải thích được vì sao Pod ở `Terminating` đúng 30 giây, và ai chịu trách nhiệm
 
-## Câu hỏi còn mở
+## Open questions
 
 - `--grace-period=0 --force` xoá ngay — mất gì khi làm vậy?
 - Object bị kẹt `Terminating` mãi thường vì `finalizers`. Đó là gì?

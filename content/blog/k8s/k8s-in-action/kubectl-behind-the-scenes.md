@@ -202,7 +202,7 @@ mà không biết đang ở dòng nào thì mọi lỗi trông đều giống nh
   giữ mở, api-server đẩy sự kiện xuống. Đúng cơ chế mà scheduler và kubelet đang dùng để
   biết có việc mới.
 
-## Tự kiểm
+## Self-check
 
 - [ ] Vẽ lại được bốn chặng và nói ai làm gì ở mỗi chặng
 - [ ] Giải thích được vì sao sai tên image lại không bị bắt ngay lúc gõ lệnh
@@ -210,7 +210,7 @@ mà không biết đang ở dòng nào thì mọi lỗi trông đều giống nh
 - [ ] Dùng cột `From` trong Events để biết ai đang xử lý Pod
 - [ ] Nói được `-w` hoạt động bằng cơ chế gì
 
-## Câu hỏi còn mở
+## Open questions
 
 - Scheduler "chọn node tốt nhất" dựa trên điểm số nào? (gợi ý: filter rồi score)
 - Nếu mọi client đều dùng chung API, vì sao vẫn cần client library (client-go)?
