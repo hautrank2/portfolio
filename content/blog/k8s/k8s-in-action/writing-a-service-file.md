@@ -10,7 +10,7 @@ tags: [k8s, yaml, service, k3s]
 > **Nối tiếp [note 5.17](/blog/k8s/k8s-in-action/labels-and-selectors).** Đang có
 > `second-app-deployment` 1 replica và Pod trần `ke-la` — Pod này sắp có vai diễn.
 
-Nốt nửa còn lại: phơi app ra bằng file, không dùng `kubectl expose`.
+Nốt nửa còn lại: expose app bằng file, không dùng `kubectl expose`.
 
 ## File
 

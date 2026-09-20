@@ -41,7 +41,9 @@ function Header() {
         </span>
       </Link>
 
-      <div className="flex items-center gap-2">
+      {/* `min-w-0` lets the nav shrink and scroll instead of pushing the theme
+          toggle off a phone screen. */}
+      <div className="flex min-w-0 items-center gap-2">
         <Nav />
         <ThemeToggle />
       </div>

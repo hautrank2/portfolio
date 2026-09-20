@@ -100,9 +100,10 @@ curl -H "Authorization: Bearer $TOKEN" http://localhost:8000/tasks
 
 Ba service, hai lần gọi chéo, không dòng cấu hình mạng nào.
 
-> `POST /tasks` báo `Storing the task failed.` là do thư mục `tasks` chưa tồn tại trong
-> image. [Note 7.10](/blog/k8s/networking/tasks-txt-hint) xử lý chuyện đó — tạm thời bỏ
-> qua, phần đang quan tâm là `users → auth` đã chạy.
+> `POST /tasks` chạy được vì source có sẵn `tasks-api/tasks/tasks.txt`. `tasks-app.js` ghi
+> vào `__dirname + TASKS_FOLDER + '/tasks.txt'`, mà `fs.appendFile` tạo được file nhưng
+> **không tạo được thư mục cha** — xoá thư mục đó đi là nhận ngay
+> `Storing the task failed.`
 
 Dọn trước khi sang K8s, để khỏi tranh cổng:
 

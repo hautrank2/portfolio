@@ -54,7 +54,7 @@ nguyên thuộc về **Pod**, container chỉ là người dùng chung.
 ## 3. Có IP nội bộ cluster theo mặc định
 
 Mỗi Pod sinh ra được phát **một IP riêng, nội bộ cluster**: các Pod khác trong cluster
-gọi tới được, còn thế giới bên ngoài thì **không** — muốn phơi ra ngoài phải qua
+gọi tới được, còn thế giới bên ngoài thì **không** — muốn expose ra ngoài cluster phải qua
 [Service](/blog/k8s/k8s-in-action/service-object), chuyện của vài note sau.
 
 Đi kèm là một chi tiết dễ nhầm nếu đọc nhanh: **các container *bên trong cùng

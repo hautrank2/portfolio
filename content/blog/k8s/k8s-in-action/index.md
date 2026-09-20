@@ -47,7 +47,7 @@ Học YAML trước khi thấy nó làm được gì là cách nhanh nhất đ�
 
 Toàn bộ 23 note dùng **một** app duy nhất. Nó ra đời ở
 [Deployment đầu tiên](/blog/k8s/k8s-in-action/first-deployment-imperative) bằng một
-lệnh, rồi lần lượt được phơi ra, scale, cập nhật, rollback, viết lại thành YAML và gắn
+lệnh, rồi lần lượt được expose, scale, cập nhật, rollback, viết lại thành YAML và gắn
 probe — cho tới note tóm tắt.
 
 **Đừng xoá nó giữa chừng.** Mỗi bài tập nối tiếp trạng thái bài trước, không dựng lại từ

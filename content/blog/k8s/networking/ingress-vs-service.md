@@ -13,7 +13,7 @@ Thật ra chúng nằm ở hai tầng khác nhau và **dùng chung với nhau**.
 ## Service — tầng 4
 
 Service chỉ biết IP và port. Nó không đọc được HTTP, nên không phân biệt được
-`/api` với `/admin`. Muốn phơi ra ngoài thì mỗi Service cần một `LoadBalancer`
+`/api` với `/admin`. Muốn expose ra ngoài cluster thì mỗi Service cần một `LoadBalancer`
 riêng — trên cloud nghĩa là mỗi cái một hoá đơn.
 
 ## Ingress — tầng 7

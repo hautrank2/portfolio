@@ -7,7 +7,7 @@ updated: 2026-08-25
 tags: [k8s, mindset, yaml]
 ---
 
-Tới đây bạn đã dựng, phơi, scale, cập nhật và rollback `first-app` mà chưa viết dòng YAML
+Tới đây bạn đã dựng, expose, scale, cập nhật và rollback `first-app` mà chưa viết dòng YAML
 nào. Module sẽ làm lại **toàn bộ** bằng file. Note này giải thích vì sao đáng làm lại.
 
 ## Hai lối

@@ -1,6 +1,6 @@
 ---
 title: "7.3 Nhìn lại Service"
-description: users-service đang phơi app ra ngoài. Nhưng việc chính của Service là nối service với service — và đó là thứ users đang thiếu.
+description: users-service đang expose app ra ngoài cluster. Nhưng việc chính của Service là nối service với service — và đó là thứ users đang thiếu.
 status: growing
 created: 2026-09-14
 updated: 2026-09-17
@@ -11,7 +11,7 @@ tags: [k8s, service, clusterip, network]
 > đang chạy, `POST /signup` đang trả 500 vì `ENOTFOUND auth`.
 
 [Note 5.8](/blog/k8s/k8s-in-action/service-object) giới thiệu Service, nhưng cả module đó
-chỉ dùng nó để **phơi app ra ngoài** — `LoadBalancer`, `EXTERNAL-IP`, gọi từ máy mình.
+chỉ dùng nó để **expose app ra ngoài cluster** — `LoadBalancer`, `EXTERNAL-IP`, gọi từ máy mình.
 
 `users-service` ở 7.2 cũng vậy. Đó là công dụng phụ. Việc chính của Service là **cho các
 thành phần trong cụm tìm thấy nhau** — đúng thứ `users` đang cần để gọi `auth`.
@@ -113,7 +113,7 @@ tên đó phân giải được vì cụm tạo sẵn bản ghi DNS cho mọi Se
 | --- | --- |
 | **ClusterIP** | **Service gọi service** — mặc định, và là phần lớn Service trong một cụm thật |
 | `NodePort` | Lab, demo nhanh |
-| `LoadBalancer` | Thứ cần phơi ra ngoài — trong dự án này là `users` và `tasks` |
+| `LoadBalancer` | Thứ cần expose ra ngoài cluster — trong dự án này là `users` và `tasks` |
 | `ExternalName` | Bí danh DNS trỏ ra dịch vụ ngoài cụm |
 
 Nhìn lại sơ đồ đích ở 7.2: `auth` **không có mũi tên từ ngoài vào**. Nếu `auth` có

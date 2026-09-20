@@ -190,7 +190,7 @@ kubectl get deploy first-app -o jsonpath='{.spec.template.spec.containers[*].nam
 
 Nhớ lấy — [note cập nhật](/blog/k8s/k8s-in-action/updating-deployments) cần đúng tên này.
 
-`--port=8080` chỉ ghi `containerPort` vào spec. Nó **không** mở cổng nào ra ngoài; phơi
+`--port=8080` chỉ ghi `containerPort` vào spec. Nó **không** mở cổng nào ra ngoài; expose
 app là việc của [Service](/blog/k8s/k8s-in-action/service-object).
 
 ## Bài tập 4 — Nhìn Pod đi qua các trạng thái
@@ -231,7 +231,7 @@ kubectl delete deployment temp
 
 **Đoán trước:** Pod `Running` rồi. Từ máy bạn `curl` thẳng vào được chưa?
 
-Chưa — chưa có gì phơi nó ra. Đường tạm là `port-forward`:
+Chưa — chưa có gì expose nó ra ngoài. Đường tạm là `port-forward`:
 
 ```bash
 kubectl port-forward deploy/first-app 8080:8080
@@ -264,7 +264,7 @@ sáng**. Đó là toàn bộ luận điểm của note khởi động lại cont
 trước.
 
 `port-forward` chỉ là ống nối tới **một** Pod, sống cùng phiên terminal. Không phải cách
-phơi app.
+expose app.
 
 ## Khi Pod không lên
 

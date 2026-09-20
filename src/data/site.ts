@@ -84,5 +84,6 @@ export const navData: NavItemModel[] = [
   { title: "Home", href: "/" },
   { title: "Blog", href: "/blog" },
   { title: "Showcase", href: "/showcase" },
+  { title: "Công thức", href: "/recipes" },
   { title: "About", href: "/about" },
 ];

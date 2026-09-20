@@ -10,14 +10,13 @@ order:
   - { slug: creating-multiple-deployments, title: "7.6 Tạo nhiều Deployment" }
   - { slug: pod-to-pod-with-ip-and-env, title: "7.7 Pod gọi Pod bằng IP & biến môi trường" }
   - { slug: dns-for-pod-to-pod, title: "7.8 Dùng DNS cho giao tiếp Pod-to-Pod" }
-  - { slug: which-approach-is-best, title: "7.9 Cách nào tốt nhất? Và một thử thách!" }
-  - { slug: tasks-txt-hint, title: "7.10 Gợi ý quan trọng: tạo file tasks.txt" }
-  - { slug: challenge-solution, title: "7.11 Lời giải thử thách" }
-  - { slug: adding-a-frontend, title: "7.12 Thêm frontend đã container hoá" }
-  - { slug: deploying-the-frontend, title: "7.13 Deploy frontend bằng Kubernetes" }
-  - { slug: reverse-proxy, title: "7.14 Dùng reverse proxy cho frontend" }
-  - { slug: module-summary, title: "7.15 Tóm tắt module" }
-  - { slug: ingress-vs-service, title: "7.16 Ingress khác Service ở đâu" }
+  - { slug: which-approach-is-best, title: "7.9 Cách nào tốt nhất?" }
+  - { slug: challenge-solution, title: "7.10 Thử thách: nối nốt tasks-api" }
+  - { slug: adding-a-frontend, title: "7.11 Thêm frontend đã container hoá" }
+  - { slug: deploying-the-frontend, title: "7.12 Deploy frontend bằng Kubernetes" }
+  - { slug: reverse-proxy, title: "7.13 Dùng reverse proxy cho frontend" }
+  - { slug: module-summary, title: "7.14 Tóm tắt module" }
+  - { slug: ingress-vs-service, title: "7.15 Ingress khác Service ở đâu" }
 ---
 
 ## Phần hay nhất: ba cách nối, theo đúng thứ tự tiến hoá
@@ -35,10 +34,12 @@ trước gãy ở đâu:
 
 ## Thử thách — làm trước khi xem lời giải
 
-Bài **235** đưa đề, bài **237** chữa. Ở giữa là bài **236** — một gợi ý ngắn.
+Note [7.10](/blog/k8s/networking/challenge-solution) có đề ở nửa trên và lời giải ở nửa
+dưới, ngăn nhau bằng một vạch dừng.
 
-Tôi tách thành ba note riêng có chủ ý: gộp lại một chỗ thì bạn sẽ đọc lời giải trước,
-và mất sạch giá trị. **Tự nối ba service trước đã.**
+Phần đáng giá không nằm ở YAML mà ở ba quyết định trước khi gõ YAML: `tasks` chung Pod
+với `auth` hay không, `type` nào cho từng Service, và `tasks` gọi `auth` bằng địa chỉ gì.
+Cuộn thẳng xuống lời giải là mất đúng phần đó. **Tự nối ba service trước đã.**
 
 ## Nối ngược về Section 0
 
@@ -50,7 +51,7 @@ một network namespace trắng: chỉ có `lo`, và `lo` đang `DOWN`.
 
 ## Một chỗ khoá không dạy: Ingress
 
-Khoá giải quyết việc phơi ra ngoài bằng **reverse proxy nginx tự dựng** (bài 240) —
+Khoá giải quyết việc expose ra ngoài cluster bằng **reverse proxy nginx tự dựng** (bài 240) —
 cách này chạy được, nhưng không phải cách K8s làm.
 
 Khoá **không hề nhắc tới Ingress hay Ingress controller**, dù đó là thứ mọi cluster

@@ -78,7 +78,7 @@ Phải ra `<h1>Hello from this NodeJS app!</h1>`. `1/1 Running` **không** đủ
 app đang phục vụ — một container chạy nginx nghe cổng 80 cũng `1/1 Running` y hệt, và
 mọi thứ phía sau sẽ hỏng trong im lặng. Gọi được từ trong Pod rồi mới leo ra ngoài.
 
-Xoá Service ClusterIP của note trước rồi phơi lại bằng `LoadBalancer`:
+Xoá Service ClusterIP của note trước rồi expose lại bằng `LoadBalancer`:
 
 ```bash
 kubectl delete svc first-app --ignore-not-found

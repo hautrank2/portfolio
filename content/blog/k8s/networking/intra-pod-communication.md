@@ -221,17 +221,6 @@ Lối ra: cho `auth` một Pod riêng, và hai Pod gọi nhau qua mạng cụm �
 
 Giữ nguyên `users-deployment` và `users-service`.
 
-## Checkpoint
-
-So với source khởi điểm ở 7.1, tới đây bạn đã đổi đúng bốn chỗ:
-
-| File | Thay đổi |
-| --- | --- |
-| `users-api/users-app.js` | Hai lời gọi `auth` đọc `process.env.AUTH_ADDRESS` |
-| `docker-compose.yaml` | `users` có `AUTH_ADDRESS: auth` |
-| `kubernetes/users-deployment.yaml` | Thêm container `auth`; `users` dùng image `:2` và `AUTH_ADDRESS=localhost` |
-| `kubernetes/users-service.yaml` | Không đổi, chỉ chuyển thư mục |
-
 ## Self-check
 
 - [ ] Giải thích được vì sao `localhost` bắc cầu giữa hai container cùng Pod
