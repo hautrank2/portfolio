@@ -244,8 +244,7 @@ Cái bạn vừa dựng bằng tay — một điểm vào duy nhất, định tu
 việc của **Ingress**. Khác biệt: Ingress làm ở **tầng cụm**, dùng chung cho mọi app, và
 khai bằng YAML chứ không phải build vào image.
 
-Khoá không dạy Ingress. Note [7.15](/blog/k8s/networking/ingress-vs-service) là phần tôi
-tự thêm, và nó bắt đầu từ đúng chỗ note này dừng lại.
+Khoá không dạy Ingress, và note này cũng chỉ dừng ở chỗ chỉ tên nó ra.
 
 ## Self-check
 

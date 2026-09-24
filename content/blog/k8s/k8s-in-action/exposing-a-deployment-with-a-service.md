@@ -278,7 +278,7 @@ nào → sai `selector`, chuyện của
 ## Open questions
 
 - Mỗi Service `LoadBalancer` là một LB tính tiền riêng trên cloud. Vậy 30 service thì làm
-  sao? (gợi ý: [Ingress](/blog/k8s/networking/ingress-vs-service))
+  sao? (gợi ý: Ingress)
 - ServiceLB chiếm `hostPort` trên node — hai Service cùng đòi cổng 8080 thì ai thắng?
 - `targetPort` khai bằng **tên** thay vì số thì lợi gì?
 - NodePort mở trên mọi node — vậy chặn bớt bằng gì khi không muốn thế?

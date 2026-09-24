@@ -16,7 +16,6 @@ order:
   - { slug: deploying-the-frontend, title: "7.12 Deploy frontend bằng Kubernetes" }
   - { slug: reverse-proxy, title: "7.13 Dùng reverse proxy cho frontend" }
   - { slug: module-summary, title: "7.14 Tóm tắt module" }
-  - { slug: ingress-vs-service, title: "7.15 Ingress khác Service ở đâu" }
 ---
 
 ## Phần hay nhất: ba cách nối, theo đúng thứ tự tiến hoá
@@ -55,8 +54,8 @@ Khoá giải quyết việc expose ra ngoài cluster bằng **reverse proxy ngin
 cách này chạy được, nhưng không phải cách K8s làm.
 
 Khoá **không hề nhắc tới Ingress hay Ingress controller**, dù đó là thứ mọi cluster
-thật đều dùng. Note *Ingress khác Service ở đâu* nằm cuối danh sách là phần tôi tự
-thêm, ngoài khoá.
+thật đều dùng. Section này cũng chỉ dừng ở chỗ chỉ tên nó ra, ở
+[7.13](/blog/k8s/networking/reverse-proxy).
 
 ## Đối chiếu khoá học
 
