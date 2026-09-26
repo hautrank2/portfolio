@@ -2,20 +2,20 @@
 title: "Deploy lên cloud (AWS EKS)"
 description: Từ cluster một node sang cluster thật. Đọc theo khoá, thực hành trên k3d.
 order:
-  - { slug: deployment-options, title: "244. Các lựa chọn deploy & các bước" }
-  - { slug: eks-vs-ecs, title: "245. AWS EKS vs AWS ECS" }
-  - { slug: preparing-the-project, title: "246. Chuẩn bị dự án" }
-  - { slug: eks-cost-notes, title: "247. Ghi chú về chi phí AWS EKS" }
-  - { slug: a-tour-of-aws, title: "248. Dạo quanh AWS" }
-  - { slug: creating-a-cluster-with-eks, title: "249. Tạo & cấu hình cluster với EKS" }
-  - { slug: adding-worker-nodes, title: "250. Thêm Worker Node" }
-  - { slug: applying-config-to-the-cluster, title: "251. Áp cấu hình Kubernetes lên cluster" }
-  - { slug: getting-started-with-volumes, title: "252. Bắt đầu với Volume" }
-  - { slug: adding-efs-as-a-volume, title: "253. Thêm EFS làm Volume (kiểu CSI)" }
-  - { slug: persistent-volume-for-efs, title: "254. Tạo Persistent Volume cho EFS" }
-  - { slug: using-the-efs-volume, title: "255. Dùng EFS Volume" }
-  - { slug: a-challenge, title: "256. Một thử thách!" }
-  - { slug: challenge-solution, title: "257. Lời giải thử thách" }
+  - { slug: deployment-options, title: "8.1 Các lựa chọn deploy & các bước" }
+  - { slug: eks-vs-ecs, title: "8.2 AWS EKS vs AWS ECS" }
+  - { slug: preparing-the-project, title: "8.3 Chuẩn bị dự án" }
+  - { slug: eks-cost-notes, title: "8.4 Ghi chú về chi phí AWS EKS" }
+  - { slug: a-tour-of-aws, title: "8.5 Dạo quanh AWS" }
+  - { slug: creating-a-cluster-with-eks, title: "8.6 Tạo & cấu hình cluster với EKS" }
+  - { slug: adding-worker-nodes, title: "8.7 Thêm Worker Node" }
+  - { slug: applying-config-to-the-cluster, title: "8.8 Áp cấu hình Kubernetes lên cluster" }
+  - { slug: getting-started-with-volumes, title: "8.9 Bắt đầu với Volume" }
+  - { slug: adding-efs-as-a-volume, title: "8.10 Thêm EFS làm Volume (kiểu CSI)" }
+  - { slug: persistent-volume-for-efs, title: "8.11 Tạo Persistent Volume cho EFS" }
+  - { slug: using-the-efs-volume, title: "8.12 Dùng EFS Volume" }
+  - { slug: a-challenge, title: "8.13 Một thử thách!" }
+  - { slug: challenge-solution, title: "8.14 Lời giải thử thách" }
 ---
 
 ## Đọc theo khoá, thực hành trên k3d
