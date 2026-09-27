@@ -8,7 +8,7 @@ function Footer() {
   return (
     <footer
       id="contact"
-      className="relative mt-24 border-t border-border/60 bg-primary/5"
+      className="relative mt-24 border-t border-border/60 bg-primary/5 print:hidden"
     >
       <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-8 lg:px-16">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">

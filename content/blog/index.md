@@ -3,7 +3,7 @@ title: Blog
 description: Note trong lúc học. Viết rời từng mẩu, rồi ghép dần thành roadmap.
 order:
   - k8s
-  - threejs
+  # - threejs  # tạm ẩn, xem draft trong content/blog/threejs/index.md
 ---
 
 Đây là chỗ tôi ghi lại những gì đang học — thường là những mẩu rời rạc viết ngay lúc

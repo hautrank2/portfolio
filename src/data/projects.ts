@@ -8,6 +8,9 @@ export const projectData: ProjectModel[] = [
     desc: "A website to display weather informations.",
     imgUrl: "/img/home/weather-forecase.png",
     featured: true,
+    learning: true,
+    start: "2025-02",
+    end: "2025-02",
     technologies: [technologyData.angular],
     links: [
       {
@@ -29,6 +32,9 @@ export const projectData: ProjectModel[] = [
     desc: "This is where I talk about my idol Kevin De Bruyne.",
     imgUrl: "/img/home/kevin-de-bruyne.png",
     featured: true,
+    learning: true,
+    start: "2025-04",
+    end: "2025-04",
     technologies: [technologyData.next],
     links: [
       {
@@ -48,13 +54,21 @@ export const projectData: ProjectModel[] = [
     title: "OpsDesk",
     desc: "This is software for managing assets and tickets",
     featured: true,
+    learning: true,
+    start: "2026-02",
+    end: "2026-08",
     imgUrl: "/img/ops-desk-page.png",
-    technologies: [technologyData.next],
+    technologies: [technologyData.next, technologyData.nest],
     links: [
       {
-        title: "GitHub",
+        title: "GitFe",
         kind: "github",
-        url: "https://github.com/hautrank2/portfolio",
+        url: "https://github.com/hautrank2/ops-desk-client",
+      },
+      {
+        title: "GitBe",
+        kind: "github",
+        url: "https://github.com/hautrank2-dev/ops-desk-server",
       },
     ],
   },
@@ -64,6 +78,7 @@ export const projectData: ProjectModel[] = [
     desc: "The site you are reading right now.",
     imgUrl: "/img/portfolio-page.png",
     featured: true,
+    start: "2025-04",
     technologies: [technologyData.next],
     links: [
       {

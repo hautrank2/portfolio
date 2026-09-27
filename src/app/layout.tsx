@@ -38,10 +38,10 @@ export default function RootLayout({
           {/* Blurred gradient blob, parked behind everything. */}
           <div
             aria-hidden
-            className="pointer-events-none fixed inset-0 -z-10 bg-[url(/svg/bg-gr.svg)] bg-[length:150vw_auto] bg-[-20vw_-60vh] bg-no-repeat opacity-30 dark:opacity-60"
+            className="pointer-events-none fixed inset-0 -z-10 print:hidden bg-[url(/svg/bg-gr.svg)] bg-[length:150vw_auto] bg-[-20vw_-60vh] bg-no-repeat opacity-30 dark:opacity-60"
           />
           <Header />
-          <main className="pt-16">{children}</main>
+          <main className="pt-16 print:pt-0">{children}</main>
           <Footer />
         </ThemeProvider>
       </body>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, FileText } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -26,7 +26,22 @@ export default function AboutPage() {
         kicker="About"
         title={`Hi, I am ${profileData.name}`}
         description={profileData.tagline}
-      />
+      >
+        <Button
+          asChild
+          size="lg"
+          className="group mt-8 h-12 rounded-full px-7 text-base shadow-lg shadow-primary/30"
+        >
+          <Link href="/cv">
+            <FileText className="size-5" />
+            View my CV
+            <ArrowRight
+              size={16}
+              className="transition-transform group-hover:translate-x-1"
+            />
+          </Link>
+        </Button>
+      </PageHeader>
 
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-24 px-4 py-16 sm:px-8 sm:gap-32 lg:px-16">
         <section className="grid gap-10 lg:grid-cols-[auto_minmax(0,1fr)] lg:gap-16">

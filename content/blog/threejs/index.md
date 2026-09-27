@@ -1,5 +1,7 @@
 ---
 title: Three.js
+# Tạm ẩn khỏi blog cho tới khi học xong — xoá dòng dưới để bật lại.
+draft: true
 description: Note theo giáo trình 45 bài, từ dựng môi trường tới deploy. Mỗi bài một bài tập chạy được ngay.
 status: seed
 updated: 2026-08-23

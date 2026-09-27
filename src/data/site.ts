@@ -23,9 +23,11 @@ export const profileData: ProfileModel = {
   avatar: "/img/avt.jpg",
   tagline:
     "Of all the software, I especially like websites. I want to build websites that are friendly, useful, places where people can go to actually get something done.",
-  bio: "I studied software engineering at Ho Chi Minh City University of Technology and Education (HCMUTE). Today I work as a frontend developer at Becamex IDC, where I sit close to both the UI/UX side and the code that ships.",
+  bio: "I studied software engineering at Ho Chi Minh City University of Technology and Education (HCMUTE). Today I work as a frontend developer at VNTT, where I sit close to both the UI/UX side and the code that ships.",
   email: "hautrantrung.02@gmail.com",
-  cv: "/docs/CV.pdf",
+  // Generated from `cv.json` by `app/cv/pdf/route.ts`, so it never drifts
+  // from the `/cv` page the way a hand-exported PDF would.
+  cv: "/cv/pdf",
   university: {
     name: "HCMUTE",
     href: "https://hcmute.edu.vn",

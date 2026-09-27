@@ -3,3 +3,4 @@ export * from "./project";
 export * from "./site";
 export * from "./blog";
 export * from "./recipe";
+export * from "./cv";

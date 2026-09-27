@@ -3,7 +3,7 @@ title: "8.6 Tạo & cấu hình cluster với EKS"
 description: "Đi hết một lần tạo cluster trên Console — hai IAM role, một VPC dựng bằng CloudFormation, rồi nối kubectl vào cụm từ máy của bạn."
 status: growing
 created: 2026-09-25
-updated: 2026-09-25
+updated: 2026-09-26
 tags: [k8s, aws, eks, iam, vpc, cloudformation, cli, kubectl]
 ---
 
@@ -64,6 +64,27 @@ Chọn **Custom configuration** chứ không phải chế độ tự động. Ch
 gần hết, và đó chính là thứ cần tránh ở đây — mục đích của section này là **nhìn thấy cột
 phải**, không phải là đi nhanh.
 
+Ngay bên dưới còn một công tắc nữa: **EKS Auto Mode**, và Console thường **bật sẵn**.
+
+| | Auto Mode bật | Auto Mode tắt |
+| --- | --- | --- |
+| Node | AWS tự tạo, tự thay, bạn không thấy node group | Bạn tự tạo node group ở [8.7](/blog/k8s/deploy-to-cloud/adding-worker-nodes) |
+| CNI, kube-proxy, CoreDNS | Dựng sẵn bên trong, **không** có addon nào để xem | Bạn tự cài addon |
+| `type: LoadBalancer` | Một bộ điều khiển riêng của AWS dựng **NLB** | In-tree cloud provider dựng **Classic ELB** |
+| IAM | Cluster role cần **5 policy** và thêm `sts:TagSession` | Cluster role chỉ cần `AmazonEKSClusterPolicy` |
+
+**Tắt nó đi** cho section này. Auto Mode là thứ tốt khi đi làm, nhưng nó giấu đúng những
+thứ bảy note tới đang muốn cho bạn nhìn thấy — và khi hỏng, nó hỏng ở những chỗ khoá học
+không hề nhắc tới.
+
+Kiểm tra sau khi tạo xong, nếu không chắc mình đã tắt hay chưa:
+
+```bash
+aws eks describe-cluster --name kub-dep-demo --query "cluster.computeConfig" --output json
+```
+
+`{"enabled": false}` hoặc `null` là Auto Mode đang tắt.
+
 Tên cluster:
 
 ```
@@ -108,6 +129,44 @@ Role này là câu trả lời cho câu hỏi đã treo từ [note 8.5](/blog/k8
 khi bạn viết `type: LoadBalancer`, **ai** gọi API AWS để tạo ELB? Chính là dịch vụ EKS,
 đóng vai role này. Ở k3s thì ServiceLB làm việc đó không cần xin phép ai, nên cả tầng này
 vô hình suốt bảy section vừa rồi.
+
+### Nếu cluster của bạn đang bật Auto Mode
+
+Một policy là **không đủ**. Auto Mode tự lo compute, networking, storage và load
+balancing, nên nó cần role này có thêm bốn policy:
+
+```bash
+for p in AmazonEKSLoadBalancingPolicy AmazonEKSNetworkingPolicy AmazonEKSComputePolicy AmazonEKSBlockStoragePolicy; do aws iam attach-role-policy --role-name eksClusterRole --policy-arn arn:aws:iam::aws:policy/$p; done
+```
+
+```bash
+aws iam list-attached-role-policies --role-name eksClusterRole --query "AttachedPolicies[].PolicyName" --output table
+```
+
+Trên Console: **IAM → Roles → eksClusterRole → Add permissions → Attach policies**, gõ
+`AmazonEKS` rồi tick cả bốn trong một lần.
+
+Và trust policy phải cho phép **`sts:TagSession`**, không chỉ `sts:AssumeRole`:
+
+```bash
+printf '%s' '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":"eks.amazonaws.com"},"Action":["sts:AssumeRole","sts:TagSession"]}]}' > /tmp/eks-trust.json
+```
+
+```bash
+aws iam update-assume-role-policy --role-name eksClusterRole --policy-document file:///tmp/eks-trust.json
+```
+
+Thiếu hai thứ này thì cluster vẫn `Active`, `kubectl` vẫn vào được, và mọi thứ trông bình
+thường **cho tới khi** bạn tạo Service đầu tiên ở
+[8.8](/blog/k8s/deploy-to-cloud/applying-config-to-the-cluster). Lúc đó `EXTERNAL-IP` đứng
+ở `<pending>` mãi, và lý do chỉ hiện trong `kubectl describe svc`:
+
+```
+AccessDenied: ... is not authorized to perform: sts:TagSession on resource: .../eksClusterRole
+```
+
+Đây là loại lỗi đáng nhớ vì nó **nằm ngoài Kubernetes hoàn toàn**: không Pod nào hỏng,
+không event nào ở Deployment, `kubectl get all` xanh hết.
 
 ## 3. Node IAM role
 
@@ -374,10 +433,18 @@ aws eks describe-cluster --name kub-dep-demo --query cluster.status --output tex
 Còn `CREATING` thì chờ. `ACTIVE` rồi thì nối:
 
 ```bash
-aws eks --region ap-southeast-2 update-kubeconfig --name kub-dep-demo
+aws eks --region ap-southeast-2 update-kubeconfig --name kub-dep-demo --alias eks
 ```
 
 Lệnh này ghi thêm một context vào `~/.kube/config` và **chuyển sang context đó**.
+
+`--alias` là thứ nên gõ ngay từ lần đầu. Không có nó, context mang tên đầy đủ của ARN:
+
+```
+arn:aws:eks:ap-southeast-2:123456789012:cluster/kub-dep-demo
+```
+
+Mỗi lần muốn đổi qua lại là phải chép nguyên chuỗi đó.
 
 > **Đây là chỗ sẽ làm bạn giật mình.** Từ giờ `kubectl get pods` trỏ vào EKS, không còn
 > vào cụm k3s cũ. Mọi thứ bạn đã dựng ở [section 6](/blog/k8s/data-and-volumes) và
@@ -390,15 +457,124 @@ Xem mình đang ở context nào, và có những context nào:
 kubectl config get-contexts
 ```
 
-Dấu `*` ở đầu dòng là context đang dùng. Quay về k3s bất cứ lúc nào:
+Dấu `*` ở đầu dòng là context đang dùng. Đổi qua lại:
 
 ```bash
 kubectl config use-context default
 ```
 
+```bash
+kubectl config use-context eks
+```
+
+Nếu đã lỡ tạo context không có `--alias`, không cần chép tay chuỗi ARN:
+
+```bash
+EKS=$(kubectl config get-contexts -o name | grep kub-dep-demo) && kubectl config use-context $EKS
+```
+
+Chạy lại `update-kubeconfig` với `--alias` cũng được — nó ghi đè context cũ và đổi tên
+luôn.
+
+Ba cách biết mình đang đứng ở đâu:
+
+| Cách | Dấu hiệu |
+| --- | --- |
+| `kubectl config current-context` | In thẳng tên context |
+| `kubectl get nodes` | k3s ra tên máy của bạn; EKS ra `ip-10-x-x-x.<region>.compute.internal` |
+| Prompt của shell | Starship đọc kubeconfig, hiện `☸ <context>` ngay trên dòng lệnh |
+
 Đây là thứ đáng ghi vào phản xạ: **trước mỗi lệnh `kubectl` ở section này, biết mình đang
 nói với cụm nào.** Một `kubectl delete` gõ đúng lệnh nhưng sai context là cách tự tạo ra
 một sự cố rất khó hiểu.
+
+## Khi `kubectl` báo "must be logged in to the server"
+
+```
+E0926 22:03:17 memcache.go:265] "Unhandled Error" err="couldn't get current server API
+group list: the server has asked for the client to provide credentials"
+error: You must be logged in to the server
+```
+
+Lỗi này **không** nói rằng cụm hỏng, cũng không nói kubeconfig sai. Nó nói: API server đã
+nhận được danh tính của bạn và **từ chối**.
+
+Bước đầu tiên luôn là tách hai tầng ra:
+
+```bash
+aws sts get-caller-identity
+```
+
+| Kết quả | Nghĩa |
+| --- | --- |
+| Lỗi `ExpiredToken` hoặc `InvalidClientTokenId` | Credential AWS hết hạn — chạy lại `aws login`, hoặc kiểm `~/.aws/credentials` |
+| Ra `Arn` bình thường | Tầng AWS ổn. Vấn đề nằm ở **quyền bên trong cụm** |
+
+Nhắc lại ranh giới đã nói ở mục 9, vì đây là chỗ nó lộ ra:
+
+| Tầng | Quyết định | Khai ở đâu |
+| --- | --- | --- |
+| **IAM** | Bạn gọi được API nào của AWS, ví dụ `aws eks describe-cluster` | IAM policy |
+| **Kubernetes** | Bạn làm được gì **bên trong** cụm | Access entry của EKS |
+
+`AdministratorAccess` là quyền ở tầng trên, và nó **không** tự cho bạn vào cụm.
+
+### Vì sao `eks-admin` bị từ chối
+
+EKS chỉ tự cấp quyền admin trong cụm cho đúng **danh tính đã tạo cluster**. Nếu bạn bấm
+Create bằng **root** rồi cấu hình CLI bằng `eks-admin` theo Đường 2 ở mục 9, thì với cụm,
+`eks-admin` là người lạ.
+
+```bash
+aws eks list-access-entries --cluster-name kub-dep-demo
+```
+
+Không thấy ARN của mình trong danh sách là đúng nguyên nhân.
+
+### Cấp quyền cho `eks-admin`
+
+Làm bằng **danh tính đã tạo cluster**, nhanh nhất là trên Console:
+**EKS → kub-dep-demo → Access → Create access entry**, chọn IAM principal là `eks-admin`,
+type `Standard`, rồi gắn policy `AmazonEKSClusterAdminPolicy` với scope `Cluster`.
+
+Bằng CLI thì hai lệnh:
+
+```bash
+aws eks create-access-entry --cluster-name kub-dep-demo --principal-arn arn:aws:iam::123456789012:user/eks-admin --type STANDARD
+```
+
+```bash
+aws eks associate-access-policy --cluster-name kub-dep-demo --principal-arn arn:aws:iam::123456789012:user/eks-admin --policy-arn arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy --access-scope type=cluster
+```
+
+Có hiệu lực ngay, không phải tạo lại kubeconfig:
+
+```bash
+kubectl auth whoami
+```
+
+Hai chỗ dễ vấp:
+
+- **ARN phải là của IAM user hoặc role thường.** Truyền nhầm một role có
+  `/aws-service-role/` trong đường dẫn sẽ nhận
+  `not allowed to modify access entries with a principalArn value of a Service Linked Role`.
+  Lấy chuỗi đúng bằng `aws sts get-caller-identity --query Arn --output text`, và nhớ
+  thay `<account-id>` bằng số thật.
+- **Access entry chỉ dùng được khi authentication mode là `EKS API` hoặc
+  `EKS API and ConfigMap`.** Xem ở tab **Access**, hoặc:
+
+```bash
+aws eks describe-cluster --name kub-dep-demo --query cluster.accessConfig.authenticationMode --output text
+```
+
+  Nếu là `CONFIG_MAP`, quyền nằm trong ConfigMap `aws-auth` ở namespace `kube-system`, và
+  muốn sửa nó thì phải `kubectl` được vào cụm — tức là phải làm từ danh tính đã tạo
+  cluster. Chuyển sang `API_AND_CONFIG_MAP` bằng `aws eks update-cluster-config` là lối ra
+  gọn hơn, nhưng **chỉ đi được một chiều**, không quay lại được.
+
+Cách tránh toàn bộ chuyện này ngay từ đầu: **tạo cluster bằng chính danh tính sẽ dùng để
+chạy `kubectl`.** Tạo `eks-admin` trước, đăng nhập Console bằng user đó, rồi mới bấm
+Create cluster.
 
 ## Cụm đã `Active` — nhưng chưa có gì chạy được
 
@@ -446,7 +622,11 @@ trên cụm thật, bạn sẽ nhớ có một tầng IAM ở dưới.
 - [ ] Nói được rủi ro của root **key** khác gì với việc đăng nhập Console bằng root
 - [ ] Tìm được region code và Account ID khi header Console bị gập
 - [ ] Nói được vì sao `kubectl` cần AWS CLI có sẵn trên `PATH`
-- [ ] Biết kiểm mình đang ở context nào, và cách quay về k3s
+- [ ] Biết kiểm mình đang ở context nào, và cách đổi qua lại giữa k3s và EKS
+- [ ] Phân biệt quyền IAM với quyền bên trong cụm, và nói được `AdministratorAccess` **không** đủ để `kubectl` vào cụm
+- [ ] Nói được vì sao danh tính tạo cluster lại quan trọng
+- [ ] Biết cluster của mình có bật Auto Mode không, và Auto Mode giấu đi những gì
+- [ ] Nói được vì sao thiếu quyền trên `eksClusterRole` chỉ lộ ra khi tạo Service đầu tiên
 - [ ] Kể hai tài nguyên bắt đầu tính tiền ngay sau note này
 
 ## Open questions

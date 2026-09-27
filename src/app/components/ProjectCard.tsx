@@ -1,4 +1,10 @@
-import { Server, SquareArrowOutUpRight } from "lucide-react";
+import {
+  CalendarDays,
+  GraduationCap,
+  Keyboard,
+  Server,
+  SquareArrowOutUpRight,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -25,6 +31,17 @@ function initials(title: string) {
     .slice(0, 2)
     .map((word) => word[0])
     .join("");
+}
+
+const monthFormat = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  year: "numeric",
+  timeZone: "UTC",
+});
+
+/** `2025-02` -> "Feb 2025". Parsed as UTC so no timezone shifts the month. */
+function formatMonth(month: string) {
+  return monthFormat.format(new Date(`${month}-01T00:00:00Z`));
 }
 
 type ProjectCardPropsType = {
@@ -61,12 +78,44 @@ function ProjectCard({ project, className }: ProjectCardPropsType) {
           aria-hidden
           className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/80 to-transparent"
         />
+        {project.learning && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              {/* Focusable so keyboard users can reach the tooltip too. */}
+              <span
+                tabIndex={0}
+                className="absolute left-3 top-3 flex cursor-help items-center gap-1.5 rounded-full bg-primary px-2.5 py-1 text-xs font-semibold text-primary-foreground shadow-md outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <GraduationCap size={14} aria-hidden />
+                Learning project
+              </span>
+            </TooltipTrigger>
+            <TooltipContent className="flex items-center gap-1.5">
+              <Keyboard size={14} aria-hidden />
+              Mostly hand-coded, with little AI
+            </TooltipContent>
+          </Tooltip>
+        )}
       </div>
 
       <div className="flex flex-1 flex-col p-5">
         <Typography variant="h3" className="text-xl">
           {project.title}
         </Typography>
+        <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+          <CalendarDays size={13} aria-hidden className="text-primary" />
+          <time dateTime={project.start}>{formatMonth(project.start)}</time>
+          {project.end !== project.start && (
+            <>
+              <span aria-hidden>–</span>
+              {project.end ? (
+                <time dateTime={project.end}>{formatMonth(project.end)}</time>
+              ) : (
+                "Present"
+              )}
+            </>
+          )}
+        </p>
         <Typography variant="p" className="mt-2 text-muted-foreground">
           {project.desc}
         </Typography>

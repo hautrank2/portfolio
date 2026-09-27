@@ -44,7 +44,7 @@ export default function Home() {
               index="02"
               title="Projects"
               href="projects"
-              description="A few things I built on my own time, from first sketch to deploy."
+              description="Built on my own time, from first sketch to deploy. The ones marked as learning projects were for learning and practising a technology — written mostly by hand, with little AI, so the knowledge actually sticks."
               action={
                 <Button
                   asChild

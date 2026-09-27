@@ -1,0 +1,129 @@
+{
+  "name": "Tran Trung Hau",
+  "title": "Web Developer",
+  "avatar": "/img/avt.jpg",
+  "phone": "0357 647 771",
+  "birthday": "Sep 06, 2002",
+  "email": "hautrantrung.02@gmail.com",
+  "location": "Ho Chi Minh City, Vietnam",
+  "links": [
+    {
+      "label": "LinkedIn",
+      "url": "https://www.linkedin.com/in/hautrank2/"
+    },
+    {
+      "label": "GitHub",
+      "url": "https://github.com/hautrank2"
+    },
+    {
+      "label": "Portfolio",
+      "url": "https://portfolio-hautrank2.vercel.app"
+    }
+  ],
+  "objective": [
+    "I am a Web Developer with 3.5 years of experience, seeking to become a senior developer with a deep understanding of the full software lifecycle — from frontend and backend development to business analysis and UI/UX design.",
+    "Having grown within a diverse team environment, I've developed strong communication and collaboration skills, working closely with AI, Data, BA, and Automation teams. I've also been involved in multiple projects from the ground up, giving me hands-on experience in technology selection, library evaluation, and system architecture design.",
+    "In the long term, I aim to grow into a Team Leader and Product Owner role."
+  ],
+  "education": [
+    {
+      "school": "Ho Chi Minh City University of Technology and Education",
+      "period": "Sep 2020 - Jul 2024",
+      "major": "Information Technology",
+      "specialty": "Software Engineering"
+    }
+  ],
+  "skills": [
+    {
+      "label": "Languages",
+      "items": ["TypeScript", "JavaScript", "Python", "C#"]
+    },
+    {
+      "label": "Frontend",
+      "items": [
+        "React",
+        "Angular",
+        "Next.js",
+        "Tailwind CSS",
+        "shadcn/ui",
+        "Ant Design",
+        "MUI",
+        "Angular Material"
+      ]
+    },
+    {
+      "label": "Backend",
+      "items": ["NestJS", ".NET", "FastAPI"]
+    },
+    {
+      "label": "Database",
+      "items": ["MongoDB", "PostgreSQL"]
+    },
+    {
+      "label": "AI",
+      "items": ["Claude", "ChatGPT"]
+    },
+    {
+      "label": "Tools",
+      "items": ["Figma", "GitLab", "Docker"]
+    }
+  ],
+  "experiences": [
+    {
+      "company": "VNTT - VIET NAM TECHNOLOGY & TELECOMMUNICATION JOINT STOCK COMPANY",
+      "role": "Frontend Developer & UI/UX",
+      "period": "Oct 2023 - Present",
+      "note": "Internship: Mar 2023 - Sep 2023",
+      "highlights": [
+        "Developed responsive and scalable frontend and backend for Smart City, Industrial Park and Factory solutions — digital transformation covering energy, environment, wastewater and security — using React and Angular.",
+        "Joined in the early phase, before a BA was in place, and worked directly with the PO to analyze requirements and shape the product scope.",
+        "Refactored an unstructured FastAPI backend into a layered controller–service–repository architecture, making services easier to extend and maintain.",
+        "Defined the web theme and UI library stack that became the standard for subsequent company projects.",
+        "Collaborated with BA to design website UI/UX."
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "Video Analytics System (VMS)",
+      "kind": "Work project",
+      "period": "Sep 2024 - Present",
+      "role": "Full-stack developer, UI/UX",
+      "stack": ["React", "FastAPI", "shadcn/ui", "Tailwind CSS"],
+      "highlights": [
+        "Developed an API server to manage cameras, users and gateways, and to handle large-scale event data ingestion.",
+        "Refactored the FastAPI backend from an unstructured codebase into a layered controller–service–repository architecture, making features easier to extend and maintain.",
+        "Optimized backend services by reducing algorithmic complexity and removing redundant processing steps, noticeably shortening response times.",
+        "Built software to visualize camera operations such as streaming, recording and detection.",
+        "Implemented multi-camera streaming on the frontend with optimized video handling to keep the browser performant.",
+        "Displayed camera locations on an interactive map."
+      ]
+    },
+    {
+      "name": "Smart City",
+      "kind": "Work project",
+      "period": "Mar 2023 - Present",
+      "role": "Frontend, UI/UX",
+      "stack": ["React", "Ant Design"],
+      "highlights": [
+        "Designed the web theme and selected the UI libraries that became the standard for subsequent projects.",
+        "Built a multi-app web platform for environment, security and energy operations across buildings, factories, warehouses and industrial parks.",
+        "Standardized a frontend codebase carried over from earlier projects, originally built by another department: replaced a 10,000+ line SCSS file of per-class Ant Design overrides (colors, sizes, spacing) with theme tokens in Ant Design's ConfigProvider, and guided the team to theme through the provider.",
+        "Reorganized the project structure into clear pages, apis and utils modules, and introduced a dedicated hooks folder for shared logic.",
+        "Centralized manual data collection into the cloud and delivered real-time dashboards, letting operators manage large areas with less manpower.",
+        "Collaborated with BA and PO teams to design the UI/UX."
+      ]
+    },
+    {
+      "name": "Data Lake",
+      "kind": "Work project",
+      "period": "Sep 2024 - Present",
+      "role": "Frontend, UI/UX",
+      "stack": ["Angular", "Angular Material", "Tailwind CSS"],
+      "highlights": [
+        "Designed and implemented the frontend for a data lake management system that ingests and visualizes large-scale structured and unstructured data — data catalog, schema inspection and pipeline status monitoring.",
+        "Leveraged Angular's component reusability with Angular Material and Tailwind CSS to keep the UI consistent and responsive while accelerating development."
+      ]
+    }
+  ]
+}

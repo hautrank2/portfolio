@@ -21,7 +21,7 @@ function Header() {
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-30 h-16",
+        "fixed inset-x-0 top-0 z-30 h-16 print:hidden",
         "flex items-center justify-between gap-4 px-4 sm:px-8 lg:px-16",
         "border-b transition-colors duration-500",
         scrolled

@@ -415,3 +415,38 @@
   border-radius: var(--radius-lg);
   border: 1px solid color-mix(in oklch, var(--border) 60%, transparent);
 }
+
+/*
+ * The CV sheet follows the site theme on screen — a card in either mode — and
+ * turns back into paper when printed: ink on white, whatever theme the page
+ * was in. Printing re-declares the light tokens locally rather than switching
+ * classes, so the semantic utilities inside (`text-primary`, `border-border`)
+ * keep working. Avoid `dark:` variants inside `.cv-paper` — they would still
+ * match the `.dark` ancestor on paper.
+ */
+.cv-paper {
+  background-color: var(--card);
+  color: var(--card-foreground);
+  print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  body {
+    background: transparent;
+  }
+
+  .cv-paper {
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.129 0.042 264.695);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.129 0.042 264.695);
+    --muted-foreground: oklch(0.554 0.046 257.417);
+    --border: oklch(0.9 0.01 255);
+  }
+}
