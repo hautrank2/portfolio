@@ -1,0 +1,39 @@
+# Ba object này chỉ dùng được sau khi đã tạo EFS và cài add-on aws-efs-csi-driver.
+# Xem note 8.10 và 8.11.
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: efs-sc
+# Ở kiểu tĩnh, provisioner này không cấp phát gì cả — nó chỉ là cái tên để
+# PV và PVC tìm thấy nhau.
+provisioner: efs.csi.aws.com
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: menu-images-pv
+spec:
+  # EFS giãn theo dữ liệu thật, nên con số này không giới hạn gì.
+  # Nó chỉ để ghép với requests.storage của PVC.
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  storageClassName: efs-sc
+  csi:
+    driver: efs.csi.aws.com
+    # Thay bằng FileSystemId của bạn: aws efs describe-file-systems
+    volumeHandle: fs-0abc123
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: menu-images-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: efs-sc
+  resources:
+    requests:
+      storage: 5Gi

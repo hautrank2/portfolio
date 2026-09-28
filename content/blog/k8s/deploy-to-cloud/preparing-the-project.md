@@ -1,132 +1,162 @@
 ---
 title: "8.3 Chuẩn bị dự án"
-description: Dự án mới, hai API và một database thật — đổi ba giá trị, build hai image, và xong phần chuẩn bị.
+description: "Một quán cà phê nhỏ: ba API, hai frontend, một database. Đủ để chạm vào cả hai loại volume mà section này cần."
 status: growing
 created: 2026-09-25
-updated: 2026-09-25
-tags: [k8s, deploy, docker, mongodb, env]
+updated: 2026-09-29
+tags: [k8s, deploy, docker, mongodb, react, env]
 ---
 
-Section này dùng một dự án **khác** với section 7 — nhỏ hơn về số service, nhưng lần đầu
-có một **database thật** nằm ngoài cụm.
+Section này dùng một dự án **khác** với section 7, và lần đầu có đủ ba thứ mà một hệ thật
+luôn có: xác thực, database có state, và file do người dùng tải lên.
 
-📦 [Tải source về](/code/kub-deploy.zip) — giải nén ra thư mục `kub-deploy`.
+📦 [Tải source về](/code/kub-cafe-01-starting-setup.zip) — giải nén ra thư mục
+`kub-cafe-01-starting-setup`.
 
-## Hai service
+## Cà phê Nhỏ
+
+Khách xem menu và đặt đồ uống, không cần đăng nhập. Chủ quán đăng nhập vào trang quản trị
+để thêm món kèm ảnh, và xem đơn.
+
+```
+        ┌──────────────┐                      ┌──────────────┐
+ Khách  │  shop-web    │             Chủ quán │  admin-web   │
+ ─────► │  :8210 (LB)  │             ───────► │  :8211 (LB)  │
+        └──────┬───────┘                      └──────┬───────┘
+               │  nginx proxy /api/*                 │
+       ┌───────┴───────────┬─────────────────┬───────┘
+       ▼                   ▼                 ▼
+┌─────────────┐   ┌─────────────┐   ┌─────────────┐
+│  menu-api   │   │  order-api  │   │  auth-api   │  ← ClusterIP, không ra ngoài
+└──────┬──────┘   └──────┬──────┘   └─────────────┘
+       │ ảnh món         │ đơn hàng          ▲
+       ▼                 ▼                   │ kiểm token
+┌─────────────┐   ┌───────────────┐          │
+│  thư mục    │   │  mongo :27017 │──────────┘
+│  ảnh dùng   │   │  (PVC)        │
+│  chung      │   └───────────────┘
+└─────────────┘
+```
 
 | Service | Cổng | Biến môi trường cần | Gọi ai |
 | --- | --- | --- | --- |
-| **auth-api** | `3000` | `TOKEN_KEY` | Không ai — nó ký và kiểm JWT |
-| **users-api** | `3000` | `MONGODB_CONNECTION_URI`, `AUTH_API_ADDRESS` | → auth, → MongoDB Atlas |
+| **auth-api** | `3000` | `TOKEN_KEY`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` | Không ai — nó là đáy |
+| **menu-api** | `3000` | `MONGODB_URI`, `AUTH_ADDRESS`, `MENU_IMAGE_FOLDER` | → auth, → mongo, → thư mục ảnh |
+| **order-api** | `3000` | `MONGODB_URI`, `AUTH_ADDRESS` | → auth, → mongo |
+| **shop-web** | `80` | Không có | → menu, order (qua nginx) |
+| **admin-web** | `80` | Không có | → cả ba (qua nginx) |
+| **mongo** | `27017` | Không có | — |
 
-Cả hai đều nghe **3000** — khác section trước, nơi mỗi service một cổng. Việc phân biệt
-chúng từ ngoài là do Service của K8s làm, không phải do cổng app.
+Ba API **đều nghe cổng 3000**. Việc phân biệt chúng là của Service, không phải của cổng
+app — đúng như [section 7](/blog/k8s/networking) đã dựng nền.
+
+## Vì sao chỉ hai Service ra ngoài
+
+Mỗi frontend tự mang một nginx, và nginx proxy `/api/*` xuống các API bên trong cụm:
+
+```nginx
+location /api/auth/  { proxy_pass http://auth-service:3000/auth/; }
+location /api/menu/  { proxy_pass http://menu-service:3000/menu/; }
+location /api/orders { proxy_pass http://order-service:3000/orders; }
+```
+
+Đây là mẫu reverse proxy ở [note 7.13](/blog/k8s/networking/reverse-proxy), lần này dùng
+ngay từ đầu. Đổi lại ba thứ:
+
+| | |
+| --- | --- |
+| **Hai `LoadBalancer`** thay vì năm | Trên cloud, mỗi cái là một hoá đơn riêng |
+| **Không cần CORS** | Trình duyệt chỉ gọi cùng origin với trang |
+| **API không có đường vào từ internet** | `auth` đặc biệt không nên có |
+
+Để ý tên service viết trần — `auth-service`, không phải `auth-service.default`. Nhờ vậy
+**một file `nginx.conf` chạy được cả ở Docker Compose lẫn trong cụm**, vì Compose cũng
+phân giải tên service y như vậy.
+
+## Hai loại volume, hai bài toán khác nhau
+
+Đây là điểm dự án này khác hẳn section 6 và 7, và cũng là lý do nó hợp với phần EFS:
+
+| | **Ảnh món** | **Dữ liệu Mongo** |
+| --- | --- | --- |
+| Ai ghi | `menu-api`, khi admin upload | Chỉ tiến trình `mongod` |
+| Bao nhiêu Pod cùng chạm vào | **Nhiều** — mọi bản `menu-api` phải đọc được | **Đúng một** |
+| Access mode cần | `ReadWriteMany` → **EFS** | `ReadWriteOnce` → **PVC thường** |
+| Hỏng thì thấy gì | Ảnh lúc hiện lúc mất, tuỳ Pod nào trả lời | Mất sạch menu và đơn sau mỗi lần Pod sinh lại |
+
+Ở source khởi điểm, `menu-api` **chưa có volume nào** — ảnh ghi thẳng vào lớp ghi của
+container. Đó là chủ ý: [note 8.9](/blog/k8s/deploy-to-cloud/getting-started-with-volumes)
+sẽ cho bạn thấy nó gãy ở đâu trước khi gắn EFS vào.
+
+> Ở dự án thật, ảnh thường nằm trên **S3** chứ không phải EFS. EFS ở đây là để học
+> `ReadWriteMany` — một cơ chế của Kubernetes — chứ không phải vì nó là kiến trúc mẫu cho
+> việc lưu ảnh.
 
 ## Bản đồ cổng
 
-Section này dùng block **8200–8201**, chọn để không đụng bất cứ thứ gì các section trước
-đã chiếm:
+Section này dùng block **8210–8211**, chọn để không đụng thứ gì các section trước đã chiếm:
 
 | Cổng trên node | Ai giữ |
 | --- | --- |
 | 80, 443 | Traefik của k3s |
 | 3000 | `story-service` — [section 6](/blog/k8s/data-and-volumes) |
 | 8000, 8080, 8081, 8090 | `tasks`, `users`, `frontend` — [section 7](/blog/k8s/networking) |
-| **8200** | **`auth` của section này** (chỉ khi chạy bằng Docker) |
-| **8201** | **`users` của section này** |
+| **8210** | **`shop-web` của section này** |
+| **8211** | **`admin-web` của section này** |
 
-Bản gốc của khoá dùng `8000` và `8080`, tôi đã đổi trong cả `docker-compose.yaml` lẫn
-`kubernetes/users.yaml`.
+## Hai giá trị bạn phải tự đổi
 
-> `auth-service` giữ nguyên `port: 3000` và **không** cần đổi, dù `story-service` cũng
-> dùng 3000. Nó là `ClusterIP` — cổng nằm trên IP ảo trong cụm, không bind lên node. Chỉ
-> `LoadBalancer` mới tranh cổng node, đúng như bạn đã gặp ở section 7.
-
-Khác biệt lớn nhất so với `tasks-api` ở section 7: `users-api` **không ghi file**. Nó ghi
-vào MongoDB Atlas — một database chạy ngoài cụm, ngoài cả AWS. Nên toàn bộ bài toán volume
-của [section 6](/blog/k8s/data-and-volumes) biến mất, và thay vào đó là bài toán *"làm sao
-đưa một chuỗi bí mật vào container"*.
-
-## Ba giá trị bạn phải tự điền
-
-Source ship kèm giá trị mẫu. **Cả ba đều phải đổi** trước khi chạy.
-
-### 1. `MONGODB_CONNECTION_URI`
+### 1. Bí mật của `auth-api`
 
 ```yaml
-MONGODB_CONNECTION_URI: 'mongodb+srv://<user>:<password>@<cluster>.mongodb.net/users?retryWrites=true&w=majority'
+TOKEN_KEY: 'doi-chuoi-nay-di'
+ADMIN_PASSWORD: 'cafe1234'
 ```
 
-Tạo một cluster miễn phí ở [MongoDB Atlas](https://www.mongodb.com/atlas), lấy chuỗi
-kết nối, rồi thay vào **hai chỗ**:
+Hai chuỗi này nằm ở **hai chỗ**: `docker-compose.yaml` và `kubernetes/auth.yaml`. Chúng
+đang nằm thẳng trong YAML, ai chạy `kubectl describe pod` cũng đọc được — Secret giải
+quyết chuyện đó, và đó là câu hỏi mở ở cuối note.
 
-| File | Dùng khi |
-| --- | --- |
-| `docker-compose.yaml` | Chạy thử bằng Docker |
-| `kubernetes/users.yaml` | Chạy trong cụm |
-
-> Bản gốc của khoá nhúng sẵn một chuỗi kết nối **thật** kèm mật khẩu của tác giả. Tôi đã
-> thay bằng placeholder — đừng đi tìm lại chuỗi đó ở đâu khác để dùng.
-
-Nhớ vào **Network Access** của Atlas mở IP. Trong lab thì `0.0.0.0/0` cho nhanh, nhưng
-biết rõ là bạn đang mở database ra cả internet.
-
-### 2. `TOKEN_KEY`
+### 2. Tên image
 
 ```yaml
-TOKEN_KEY: 'shouldbeverysecure'
+image: <your-docker-user>/kub-cafe-auth:1
 ```
 
-Chuỗi này ký JWT. Tên nó đã nói rồi — đổi đi. Cũng ở hai chỗ: `docker-compose.yaml` và
-`kubernetes/auth.yaml`.
+Thay `<your-docker-user>` bằng tài khoản Docker Hub của bạn, ở cả `docker-compose.yaml`
+lẫn năm file trong `kubernetes/`.
 
-### 3. Tên image
+`MONGODB_URI` thì **không phải đổi**: `mongodb://mongo-service:27017/cafe` đúng ở cả hai
+môi trường, vì Mongo chạy ngay trong cụm.
 
-Trong `kubernetes/auth.yaml` và `kubernetes/users.yaml`:
-
-```yaml
-        - name: auth-api
-          image: <your-docker-user>/kub-dep-auth:1
-          imagePullPolicy: IfNotPresent
-```
-
-Thay `<your-docker-user>` bằng tài khoản Docker Hub của bạn. Bản gốc của khoá ghi
-`academind/kub-dep-auth:latest` — tài khoản của tác giả, bạn không push lên đó được.
-
-Hai chi tiết tôi đã sửa sẵn so với bản gốc:
-
-| | Vì sao |
-| --- | --- |
-| `:latest` → `:1` | Tag di động khiến K8s không thấy gì để rollout khi bạn build lại — [note 5.12](/blog/k8s/k8s-in-action/updating-deployments) |
-| Thêm `imagePullPolicy: IfNotPresent` | Để lab k3s dùng được image đã `ctr images import`, khỏi đi hỏi Docker Hub |
-
-Dùng cụm thật (EKS) thì đổi `imagePullPolicy` thành `Always` và nhớ `docker push` — node
-trên EKS không có kho local của bạn.
-
-## Build hai image
+## Build năm image
 
 ```bash
-cd kub-deploy && docker build -t <your-docker-user>/kub-dep-auth:1 ./auth-api && docker build -t <your-docker-user>/kub-dep-users:1 ./users-api
-```
-
-Đưa tới cụm — chọn **một** trong hai đường:
-
-```bash
-docker push <your-docker-user>/kub-dep-auth:1 && docker push <your-docker-user>/kub-dep-users:1
+cd kub-cafe-01-starting-setup
 ```
 
 ```bash
-docker save <your-docker-user>/kub-dep-auth:1 | sudo k3s ctr images import - && docker save <your-docker-user>/kub-dep-users:1 | sudo k3s ctr images import -
+for s in auth menu order; do docker build -t <your-docker-user>/kub-cafe-$s:1 ./$s-api; done
 ```
-
-Đường trên cho cụm thật (EKS bắt buộc phải qua registry). Đường dưới cho lab k3s — nhớ
-đặt `imagePullPolicy: IfNotPresent` trong manifest, nếu không kubelet vẫn đi hỏi Docker Hub.
-
-Kiểm cả hai image đã có:
 
 ```bash
-docker images | grep kub-dep
+docker build -t <your-docker-user>/kub-cafe-shop:1 ./shop-web && docker build -t <your-docker-user>/kub-cafe-admin:1 ./admin-web
 ```
+
+Đưa lên registry — **bắt buộc** với EKS, vì node ở đó không có kho image của bạn:
+
+```bash
+for i in auth menu order shop admin; do docker push <your-docker-user>/kub-cafe-$i:1; done
+```
+
+Nếu chạy lab bằng k3s hoặc k3d thì nhập thẳng vào node, nhanh hơn nhiều:
+
+```bash
+for i in auth menu order shop admin; do docker save <your-docker-user>/kub-cafe-$i:1 | sudo k3s ctr images import -; done
+```
+
+Hai đường này quyết định `imagePullPolicy` trong manifest: `Always` cho đường registry,
+`IfNotPresent` cho đường nhập tay.
 
 ## Chạy thử bằng Docker trước
 
@@ -135,67 +165,62 @@ docker compose up -d --build
 ```
 
 ```bash
-curl -i -X POST -H 'Content-Type: application/json' -d '{"email":"a@b.c","password":"1234567"}' http://localhost:8201/signup
+docker compose ps
 ```
 
-```bash
-curl -s -X POST -H 'Content-Type: application/json' -d '{"email":"a@b.c","password":"1234567"}' http://localhost:8201/login
-```
+Mở **trang quản trị** ở `http://localhost:8211`:
 
-`signup` ra `201` nghĩa là **cả ba mắt xích đã thông**: `users` gọi được `auth`, và
-`users` ghi được vào Atlas. `login` trả về một JWT.
+1. Đăng nhập bằng `admin@cafe.local` và mật khẩu bạn vừa đặt.
+2. Thêm một món, chọn một ảnh bất kỳ dưới 2MB.
+3. Món hiện ra trong danh sách, kèm ảnh.
 
-> Nhận `422 {"message":"Invalid email or password."}` thì **chưa phải lỗi hạ tầng**.
-> `validateCredentials` trong `users-api/controllers/user-actions.js` đòi password **≥ 7
-> ký tự** và email phải có `@`. Nó chặn trước khi gọi `auth` hay Mongo, nên một `422` ở đây
-> không nói được gì về việc hai service đã nối được nhau chưa.
+Rồi mở **trang khách** ở `http://localhost:8210`:
 
-Phân biệt được hai loại lỗi này là kỹ năng đáng giữ: `422` là app tự từ chối, còn `500`
-mới là dấu hiệu một mắt xích phía sau đứt.
+1. Món vừa thêm phải hiện ra kèm ảnh.
+2. Nhập số lượng, điền tên, bấm **Đặt đơn**.
+3. Quay lại trang quản trị, bấm **Tải lại** ở mục đơn — đơn vừa đặt nằm đó.
 
-Vào Atlas xem collection `users` — bản ghi vừa tạo nằm ở đó, **ngoài cụm**, nên nó sống
-sót qua mọi thứ bạn sắp làm với Kubernetes.
+Chuỗi này chạy được nghĩa là **cả năm mắt xích đều thông**: nginx proxy đúng, `menu` và
+`order` nối được Mongo, và cả hai gọi được `auth` để kiểm token.
+
+| Triệu chứng | Nơi hỏng |
+| --- | --- |
+| Đăng nhập báo `401` | Sai `ADMIN_EMAIL` hoặc `ADMIN_PASSWORD` |
+| Thêm món báo `503 Không kiểm tra được token` | `menu-api` không gọi được `auth-service` |
+| Menu trống dù đã thêm | `menu-api` không nối được Mongo — xem `docker compose logs menu-service` |
+| Ảnh vỡ, các phần khác bình thường | File không nằm ở `MENU_IMAGE_FOLDER` |
+
+Dọn trước khi sang cụm, để khỏi tranh cổng:
 
 ```bash
 docker compose down
 ```
 
-## Một chỗ khác với bản gốc của khoá
+Thêm `-v` nếu muốn xoá luôn dữ liệu Mongo và ảnh đã upload.
 
-Source gốc gõ nhầm tên biến thành `AUTH_API_ADDRESSS` — **ba chữ `S`**. Tôi đã sửa thành
-`AUTH_API_ADDRESS` ở cả bốn chỗ nó xuất hiện:
+## Một chi tiết của `order-api` đáng đọc
 
-| File | Vai trò |
-| --- | --- |
-| `users-api/controllers/user-actions.js` | Hai lần `process.env.…` |
-| `docker-compose.yaml` | Khai biến khi chạy bằng Docker |
-| `kubernetes/users.yaml` | Khai biến khi chạy trong cụm |
+Client **chỉ gửi `itemId` và `quantity`**. Giá và tên món do server tự đọc từ Mongo rồi
+tính `total`:
 
-Nếu bạn đối chiếu với video của khoá và thấy ba chữ `S`, đó là lý do.
-
-**Vì sao chi tiết này đáng nhớ:** tên biến môi trường phải khớp **từng ký tự** giữa nơi
-khai và nơi đọc, mà không có gì kiểm giúp bạn. Sửa một chỗ quên chỗ kia thì `process.env`
-trả `undefined`, URL thành `http://undefined/hashed-pw/…`, và bạn nhận lỗi 500 không hé lộ
-gì về nguyên nhân.
-
-Cùng họ với `targetPort` sai số và `selector` lệch nhãn: **K8s không kiểm được thứ nằm
-bên trong container.**
-
-```bash
-kubectl exec deploy/users-deployment -- printenv | grep AUTH
+```js
+const item = await Item.findById(line.itemId);
+resolved.push({ itemId: item.id, name: item.name, price: item.price, quantity });
 ```
 
-Lệnh này là cách duy nhất chắc chắn — nó đọc từ chính tiến trình, không phải từ file YAML.
+Hai lý do: không tin giá do client gửi, và **chép lại giá vào đơn** để chủ quán đổi giá
+hôm sau không làm đổi đơn hôm nay.
 
 ## Self-check
 
-- [ ] Kể hai service, cổng và biến môi trường từng cái cần
-- [ ] Đổi được ba giá trị ở đúng mọi chỗ chúng xuất hiện
-- [ ] Build và đưa được hai image tới nơi cụm lấy được
-- [ ] `signup` ra `201` khi chạy bằng Docker
-- [ ] Nói được vì sao section này không còn bài toán volume
+- [ ] Kể năm service, cổng, và ai gọi ai
+- [ ] Nói được vì sao chỉ hai Service cần `LoadBalancer`
+- [ ] Giải thích vì sao `nginx.conf` dùng chung được cho Compose và cụm
+- [ ] Phân biệt hai bài toán volume: ảnh món và dữ liệu Mongo
+- [ ] Chạy được chuỗi thêm món → đặt đơn → xem đơn bằng Docker Compose
 
 ## Open questions
 
-- Chuỗi kết nối MongoDB nằm thẳng trong YAML — ai đọc `kubectl describe pod` sẽ thấy gì?
-- Database ở ngoài cụm thì `kubectl delete namespace` có xoá dữ liệu không?
+- `TOKEN_KEY` và `ADMIN_PASSWORD` đang nằm thẳng trong YAML. Secret thay đổi được gì, và **không** thay đổi được gì?
+- Mongo chạy trong cụm với `replicas: 1`. Muốn ba bản thì thiếu gì ở Deployment?
+- Ảnh lưu trên filesystem còn dữ liệu ở Mongo. Vì sao không nhét luôn ảnh vào database?

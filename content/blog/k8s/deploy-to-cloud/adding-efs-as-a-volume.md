@@ -3,14 +3,14 @@ title: "8.10 Thêm EFS làm Volume (kiểu CSI)"
 description: "Một security group, một file system, hai mount target, một driver. Ba thứ đầu nằm ngoài Kubernetes — và đó mới là chỗ mọi lỗi mount bắt nguồn."
 status: growing
 created: 2026-09-25
-updated: 2026-09-27
+updated: 2026-09-29
 tags: [k8s, aws, efs, csi, volume, security-group]
 ---
 
-> Tiếp [8.9](/blog/k8s/deploy-to-cloud/getting-started-with-volumes), nơi `hostPath` gãy
-> ngay khi có node thứ hai.
+> Tiếp [8.9](/blog/k8s/deploy-to-cloud/getting-started-with-volumes), nơi ảnh món biến mất
+> sau khi Pod sinh lại, và chỉ hiện một nửa số lần khi `menu-api` chạy hai bản.
 
-Note này làm bốn bước đầu trong bảy bước ở 8.9 — tức là **toàn bộ phần AWS**, cộng việc
+Gắn EFS vào cụm là bảy bước. Note này làm bốn bước đầu — **toàn bộ phần AWS**, cộng việc
 cài driver. Chưa có PV, chưa có PVC, chưa Pod nào mount gì cả.
 
 ```
@@ -144,7 +144,27 @@ kubectl get nodes -o custom-columns='NODE:.metadata.name,AZ:.metadata.labels.top
 Đây là phần **duy nhất** của note này nằm trong cụm. Driver là thứ dịch từ *"Pod cần
 volume này"* sang *"mount NFS vào đường dẫn kia trên node"*.
 
-Cách được khuyến nghị là dùng EKS add-on:
+Cách được khuyến nghị là dùng **EKS add-on**, vì AWS tự cập nhật và vá lỗi cho bạn.
+
+**Trên Console** — đây là đường ngắn nhất, và cũng là chỗ dễ bỏ sót nhất vì nó nằm ở tab
+mà không hướng dẫn nào nhắc tới:
+
+1. **EKS → Clusters → kub-dep-demo → tab Add-ons**
+2. Bấm **Get more add-ons**
+3. Trong danh sách **Amazon EKS add-ons**, tick **Amazon EFS CSI Driver**
+4. **Next** → để mặc định hết version và conflict resolution → **Next** → **Create**
+
+Trạng thái chuyển từ `Creating` sang **`Active`** trong 1–2 phút. Tab **Add-ons** lúc này
+phải có đủ những gì cụm cần:
+
+| Add-on | Cho việc gì |
+| --- | --- |
+| `vpc-cni` | Cấp IP cho Pod. Thiếu là node `NotReady` |
+| `coredns`, `kube-proxy` | DNS và định tuyến Service trong cụm |
+| `aws-ebs-csi-driver` | PVC của Mongo ở [8.8](/blog/k8s/deploy-to-cloud/applying-config-to-the-cluster) |
+| **`aws-efs-csi-driver`** | **Ảnh món, từ note này trở đi** |
+
+**Bằng CLI**, nếu bạn thích gõ:
 
 ```bash
 aws eks create-addon --cluster-name kub-dep-demo --addon-name aws-efs-csi-driver

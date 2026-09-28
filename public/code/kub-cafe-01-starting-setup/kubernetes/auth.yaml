@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+spec:
+  selector:
+    app: auth
+  # ClusterIP: auth chỉ được gọi từ trong cụm, không bao giờ từ internet.
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+        - name: auth-api
+          # Thay bằng tài khoản Docker Hub của bạn, và tăng tag mỗi lần build lại.
+          image: <your-docker-user>/kub-cafe-auth:1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          env:
+            - name: TOKEN_KEY
+              value: 'doi-chuoi-nay-di'
+            - name: ADMIN_EMAIL
+              value: 'admin@cafe.local'
+            - name: ADMIN_PASSWORD
+              value: 'cafe1234'

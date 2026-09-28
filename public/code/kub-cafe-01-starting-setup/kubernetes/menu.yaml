@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: menu-service
+spec:
+  selector:
+    app: menu
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: menu-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: menu
+  template:
+    metadata:
+      labels:
+        app: menu
+    spec:
+      containers:
+        - name: menu-api
+          image: <your-docker-user>/kub-cafe-menu:1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          env:
+            - name: MONGODB_URI
+              value: 'mongodb://mongo-service:27017/cafe'
+            - name: AUTH_ADDRESS
+              value: 'auth-service:3000'
+            # Ảnh đang ghi vào lớp ghi của container, nên mất mỗi lần Pod sinh
+            # lại và không chia sẻ được giữa các bản. Note 8.11 gắn EFS vào đây.
+            - name: MENU_IMAGE_FOLDER
+              value: '/app/data/images'

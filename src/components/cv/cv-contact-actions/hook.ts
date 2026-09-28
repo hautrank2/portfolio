@@ -40,7 +40,8 @@ export const useCvContactActions = ({
         return;
       } catch (error) {
         // Closing the sheet is a choice, not a failure — do not copy then.
-        if (error instanceof DOMException && error.name === "AbortError") return;
+        if (error instanceof DOMException && error.name === "AbortError")
+          return;
       }
     }
     await writeClipboard("link", url);

@@ -1,170 +1,54 @@
 ---
 title: "8.12 Dùng EFS Volume"
-description: "Cho app ghi thật vào volume, rồi scale lên hai Pod ở hai node — nếu cả hai đọc được cùng một file, ReadWriteMany không còn là chữ trong YAML."
+description: "Chạy lại đúng hai bài tập đã làm hỏng ở 8.9 — lần này có EFS, và cả hai đều qua."
 status: growing
 created: 2026-09-25
-updated: 2026-09-27
-tags: [k8s, aws, efs, pvc, node, express]
+updated: 2026-09-29
+tags: [k8s, aws, efs, pvc, node, scaling]
 ---
 
 > Tiếp [8.11](/blog/k8s/deploy-to-cloud/persistent-volume-for-efs). PV và PVC đã `Bound`,
-> Deployment đã mount `efs-pvc` vào `/app/users`.
+> `menu-deployment` đã mount `menu-images-pvc` vào `/app/data/images`.
 
-Volume đã mount, nhưng `users-api` **không ghi gì** — nó ghi vào MongoDB Atlas. Thư mục
-`/app/users` đang trống và sẽ trống mãi.
+Note này không thêm cấu hình mới. Nó chạy lại **đúng hai bài tập đã thất bại ở
+[8.9](/blog/k8s/deploy-to-cloud/getting-started-with-volumes)**, và cho bạn thấy khác biệt
+duy nhất là storage giờ nằm ngoài node.
 
-Note này sửa code cho app ghi thật vào đó, rồi dùng chính tính năng mới ấy để chứng minh
-`ReadWriteMany` hoạt động: hai Pod, hai node, một file chung.
+## 1. Upload lại một tấm ảnh
 
-## 1. Ghi log mỗi lần tạo user
-
-Mở `users-api/controllers/user-actions.js`. Hai module ở đầu file:
-
-```js
-const path = require('path');
-const fs = require('fs');
-```
-
-Trong `createUser`, sau khi `savedUser` đã lưu vào Mongo và **trước** khi trả response:
-
-```js
-  const logEntry = `${new Date().toISOString()} - ${savedUser.id} - ${email}\n`;
-
-  fs.appendFile(
-    path.join('/app', 'users', 'users-log.txt'),
-    logEntry,
-    (err) => {
-      console.log(err);
-    }
-  );
-```
-
-Đường dẫn `/app/users` **phải khớp `mountPath`** trong Deployment. Đây là chỗ ghép duy
-nhất giữa code và YAML, và không có gì kiểm giúp bạn: sai đường dẫn thì app ghi vào lớp
-ghi của container, chạy vẫn ngon, và dữ liệu mất lặng lẽ mỗi lần Pod sinh lại.
-
-Để ý callback chỉ `console.log(err)`. Ghi hỏng thì client **vẫn nhận `201`**, còn lỗi nằm
-im trong log Pod. Nhớ điều này khi gỡ lỗi ở dưới.
-
-## 2. Thêm route đọc log
-
-Cuối `user-actions.js`:
-
-```js
-const getLogs = (req, res, next) => {
-  fs.readFile(path.join('/app', 'users', 'users-log.txt'), (err, data) => {
-    if (err) {
-      createAndThrowError('Could not open logs file.', 500);
-    } else {
-      const dataArr = data.toString().split('\n');
-      res.status(200).json({ logs: dataArr });
-    }
-  });
-};
-```
-
-```js
-exports.createUser = createUser;
-exports.verifyUser = verifyUser;
-exports.getLogs = getLogs;
-```
-
-Và `users-api/routes/user-routes.js`:
-
-```js
-router.get('/logs', userActions.getLogs);
-```
-
-Route này mới là công cụ đo: nó đọc file **từ Pod nhận request**, mà Service thì chia
-request cho các Pod luân phiên. Gọi `/logs` vài lần là bạn đang hỏi nhiều Pod khác nhau
-cùng một câu hỏi.
-
-## 3. Build lại và cập nhật Deployment
+Mở trang quản trị, thêm một món kèm ảnh. Rồi xem file đã nằm trên EFS chưa:
 
 ```bash
-docker build -t <your-docker-user>/kub-dep-users:2 ./users-api && docker push <your-docker-user>/kub-dep-users:2
-```
-
-Trong `kubernetes/users.yaml`, đổi tag và tăng số bản:
-
-```yaml
-spec:
-  replicas: 2
-  ...
-        - name: users-api
-          image: <your-docker-user>/kub-dep-users:2
+kubectl exec deploy/menu-deployment -- ls -la /app/data/images
 ```
 
 ```bash
-kubectl apply -f kubernetes/users.yaml && kubectl rollout status deployment users-deployment --timeout=120s
+kubectl exec deploy/menu-deployment -- wget -qO- http://localhost:3000/menu/health
+```
+
+Route `health` trả về tên Pod và số file nó nhìn thấy — hai thông tin vừa đủ để làm phép
+đo cho cả note này:
+
+```json
+{ "status": "ok", "pod": "menu-deployment-7d9c6b8f4-x2kqp", "images": 1 }
+```
+
+## 2. Bài tập — Xoá Pod, ảnh còn không?
+
+**Đoán trước:** ở 8.9, xoá Pod là ảnh về `0`. Lần này thì sao?
+
+```bash
+kubectl delete pod -l app=menu && kubectl rollout status deployment menu-deployment --timeout=180s
 ```
 
 ```bash
-kubectl get pods -l app=users -o wide
+kubectl exec deploy/menu-deployment -- wget -qO- http://localhost:3000/menu/health
 ```
 
-Ghi lại cột `NODE`. Hai Pod nằm **khác node** là điều kiện lý tưởng cho phép thử dưới —
-nếu chúng rơi cùng một node, xem mục cuối để ép tách ra.
+**Kết quả:** tên Pod đã khác, nhưng `images` vẫn là `1`. Mở lại trang khách — ảnh còn
+nguyên.
 
-## 4. Bài tập — Hai Pod, một file
-
-Tạo hai user. Nhớ password từ 7 ký tự:
-
-```bash
-USERS=$(kubectl get svc users-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}') && echo $USERS
-```
-
-```bash
-curl -s -X POST -H 'Content-Type: application/json' -d '{"email":"a@b.c","password":"1234567"}' http://$USERS:8201/signup
-```
-
-```bash
-curl -s -X POST -H 'Content-Type: application/json' -d '{"email":"d@e.f","password":"1234567"}' http://$USERS:8201/signup
-```
-
-Hai request này gần như chắc chắn rơi vào **hai Pod khác nhau**, nên mỗi Pod ghi một dòng.
-
-**Đoán trước:** gọi `/logs` — bạn thấy một dòng hay hai dòng?
-
-```bash
-curl -s http://$USERS:8201/logs
-```
-
-**Kết quả: hai dòng.** Hỏi Pod nào cũng ra đủ, vì cả hai đang nhìn vào **cùng một file
-trên EFS**.
-
-Xác nhận từng Pod một, không qua Service:
-
-```bash
-for p in $(kubectl get pods -l app=users -o name); do echo "== $p"; kubectl exec $p -- cat /app/users/users-log.txt; done
-```
-
-Đây chính là phép thử đã **thất bại** với `hostPath` ở
-[8.9](/blog/k8s/deploy-to-cloud/getting-started-with-volumes): ở đó hai Pod trên hai node
-thấy hai file khác nhau. Khác biệt duy nhất là storage giờ nằm ngoài node.
-
-```bash
-kubectl exec deploy/users-deployment -- df -h /app/users
-```
-
-Cột `Filesystem` là địa chỉ EFS, không phải `overlay`.
-
-## 5. Bài tập — Dữ liệu sống qua Pod
-
-**Đoán trước:** xoá cả hai Pod. Deployment tạo hai Pod mới, có thể ở node khác. Log còn không?
-
-```bash
-kubectl delete pod -l app=users && kubectl rollout status deployment users-deployment --timeout=120s
-```
-
-```bash
-curl -s http://$USERS:8201/logs
-```
-
-**Vẫn đủ hai dòng.** Với `emptyDir`, dữ liệu đã mất ngay ở bước này — như chuyện
-`tasks.txt` ở [section 7](/blog/k8s/networking).
-
-Ba tầng vòng đời, xếp từ ngắn tới dài:
+Bốn tầng vòng đời, xếp từ ngắn tới dài:
 
 | Storage | Sống qua container restart | Sống qua Pod | Sống qua cluster |
 | --- | --- | --- | --- |
@@ -173,38 +57,74 @@ Ba tầng vòng đời, xếp từ ngắn tới dài:
 | `hostPath` | Có | Có, nhưng chỉ trên **đúng node đó** | Có |
 | **EFS qua PVC** | Có | **Có** | **Có** |
 
-Dòng cuối là lý do EFS đắt hơn và chậm hơn: nó không thuộc về máy nào cả.
+## 3. Bài tập — Hai Pod, một thư mục
 
-## Khi log trống hoặc lỗi
-
-`GET /logs` trả `500 Could not open logs file.` nghĩa là `readFile` gặp `ENOENT` — chưa ai
-ghi dòng nào. Tạo một user rồi thử lại. Nếu vẫn vậy:
+Đây là bài tập đã hỏng ở 8.9, và là lý do cả ba note EFS tồn tại.
 
 ```bash
-kubectl logs deploy/users-deployment --tail=30
+kubectl scale deployment menu-deployment --replicas=2 && kubectl rollout status deployment menu-deployment --timeout=180s
 ```
 
-Callback của `appendFile` in thẳng lỗi ra đây.
+```bash
+kubectl get pods -l app=menu -o wide
+```
 
-| Lỗi trong log Pod | Nguyên nhân |
+Ghi lại cột `NODE`. Hai Pod nằm **khác node** là điều kiện lý tưởng — nếu chúng rơi cùng
+một node, xem mục cuối để ép tách ra.
+
+**Đoán trước:** hỏi từng Pod xem nó thấy bao nhiêu ảnh.
+
+```bash
+for p in $(kubectl get pods -l app=menu -o name); do echo "== $p"; kubectl exec $p -- wget -qO- http://localhost:3000/menu/health; echo; done
+```
+
+**Kết quả:** cả hai đều báo cùng một số. Ở 8.9, một bản báo `1` còn bản kia báo `0`.
+
+Kiểm tra bằng mắt luôn: tải lại trang khách chục lần, ảnh hiện **mọi lần**, không còn cảnh
+lúc được lúc vỡ.
+
+```bash
+kubectl exec deploy/menu-deployment -- df -h /app/data/images
+```
+
+Cột `Filesystem` là địa chỉ EFS chứ không phải `overlay` — đó là toàn bộ khác biệt.
+
+## 4. Bài tập — Ghi từ Pod này, đọc ở Pod kia
+
+`ReadWriteMany` không chỉ là cùng đọc, mà là **cùng ghi**. Thêm hai món nữa qua trang quản
+trị, mỗi lần một ảnh khác nhau. Request upload sẽ rơi vào hai Pod khác nhau.
+
+```bash
+for p in $(kubectl get pods -l app=menu -o name); do kubectl exec $p -- ls /app/data/images; echo "--"; done
+```
+
+Cả hai Pod liệt kê **đủ tất cả** các file, dù mỗi file do một Pod khác nhau ghi.
+
+Đây là thứ `hostPath` và `emptyDir` không làm được, và cũng là thứ EBS không làm được:
+EBS gắn vào một node tại một thời điểm, nên hai Pod ở hai node không thể cùng ghi.
+
+## Khi ảnh vẫn không hiện
+
+| Triệu chứng | Nguyên nhân |
 | --- | --- |
-| `ENOENT: no such file or directory, open '/app/users/users-log.txt'` | Thư mục `/app/users` không tồn tại — `mountPath` không khớp đường dẫn trong code |
-| `EACCES: permission denied` | EFS bật root squash, hoặc access point đặt UID khác với user chạy container |
-| `EROFS: read-only file system` | Volume mount ở chế độ chỉ đọc |
-| Không lỗi, nhưng `/logs` vẫn trống | Pod đang chạy image cũ — kiểm tag |
+| Pod kẹt `ContainerCreating` | Mount hỏng — security group cổng 2049, hoặc thiếu mount target ở AZ của node |
+| `EACCES: permission denied` trong log | EFS bật root squash, hoặc access point đặt UID khác |
+| Upload xong, `images` vẫn `0` | `MENU_IMAGE_FOLDER` lệch `mountPath` — app ghi chỗ khác |
+| `df` hiện `overlay` | Deployment chưa có `volumeMounts`, hoặc apply nhầm file |
+| Ảnh hiện một nửa số lần | Pod đang chạy image cũ, hoặc PVC chưa gắn vào **mọi** bản |
 
 ```bash
-kubectl exec deploy/users-deployment -- ls -la /app/users
+kubectl describe pod -l app=menu | grep -A8 -i "events"
 ```
 
 ```bash
-kubectl get deploy users-deployment -o jsonpath='{.spec.template.spec.containers[0].image}{"\n"}'
+kubectl logs deploy/menu-deployment --tail=30
 ```
 
 ## Nếu hai Pod rơi cùng một node
 
 Phép thử vẫn đúng, nhưng kém thuyết phục — cùng node thì `hostPath` cũng qua được. Ép
-chúng tách ra bằng `topologySpreadConstraints`:
+chúng tách ra bằng `topologySpreadConstraints` trong `kubernetes/menu.yaml`:
 
 ```yaml
     spec:
@@ -214,48 +134,77 @@ chúng tách ra bằng `topologySpreadConstraints`:
           whenUnsatisfiable: DoNotSchedule
           labelSelector:
             matchLabels:
-              app: users
+              app: menu
       containers:
-        - name: users-api
+        - name: menu-api
 ```
 
 ```bash
-kubectl apply -f kubernetes/users.yaml && kubectl get pods -l app=users -o wide
+kubectl apply -f kubernetes/menu.yaml && kubectl get pods -l app=menu -o wide
 ```
 
 Mỗi node tối đa một Pod, chênh lệch không quá `maxSkew: 1`.
 
+## Nhìn lại: hai loại volume trong cùng một hệ
+
+```bash
+kubectl get pvc
+```
+
+```
+NAME               STATUS   VOLUME           CAPACITY   ACCESS MODES   STORAGECLASS
+menu-images-pvc    Bound    menu-images-pv   5Gi        RWX            efs-sc
+mongo-pvc          Bound    pvc-8f3c…        2Gi        RWO            gp2
+```
+
+Hai dòng, hai câu trả lời cho hai câu hỏi khác nhau:
+
+| | `mongo-pvc` | `menu-images-pvc` |
+| --- | --- | --- |
+| Câu hỏi | "Dữ liệu sống qua rollout không?" | "Nhiều Pod thấy chung không?" |
+| Access mode | `ReadWriteOnce` | `ReadWriteMany` |
+| Hệ quả lên Deployment | `replicas: 1`, `strategy: Recreate` | Scale bao nhiêu bản cũng được |
+| Phía sau | EBS, gắn vào một node | EFS, nói NFS qua mạng |
+
+Nếu bạn nhớ được một thứ từ cả section, nên là bảng này: **access mode quyết định bạn scale
+được hay không**, chứ không phải ngược lại.
+
 ## Dọn
 
-Xoá Deployment, PVC, PV **không** xoá dữ liệu trên EFS. File `users-log.txt` vẫn nằm đó,
-và hoá đơn EFS vẫn chạy:
+Xoá Deployment, PVC, PV **không** xoá dữ liệu trên EFS. Ảnh vẫn nằm đó, và hoá đơn EFS vẫn
+chạy:
 
 ```bash
 aws efs describe-file-systems --query "FileSystems[].{id:FileSystemId,size:SizeInBytes.Value}" --output table
 ```
 
-Cách xoá hẳn nằm ở cuối [8.10](/blog/k8s/deploy-to-cloud/adding-efs-as-a-volume): xoá
-mount target trước, rồi tới file system.
+Cách xoá hẳn nằm ở cuối [8.10](/blog/k8s/deploy-to-cloud/adding-efs-as-a-volume): xoá mount
+target trước, rồi tới file system. Và nhớ rằng mount target còn sót lại là lý do hay gặp
+khiến stack `eksVpc` báo `DELETE_FAILED` lúc dọn cuối section.
+
+Trả `menu-api` về một bản nếu bạn còn để cụm chạy:
+
+```bash
+kubectl scale deployment menu-deployment --replicas=1
+```
 
 ## Nếu chỉ đọc chứ không bật EKS
 
-Trên k3d, thay `csi:` bằng `hostPath` như bản ở 8.11. Mọi thứ ở mục 1–3 chạy y hệt, và
-mục 5 (dữ liệu sống qua Pod) cũng đúng.
-
-Chỉ **mục 4 sẽ thất bại** khi hai Pod rơi vào hai node — và đó lại là điều đáng thấy nhất:
-bạn tự tay quan sát giới hạn mà `ReadWriteMany` sinh ra để giải quyết. Chạy bài tập ở
-[8.9](/blog/k8s/deploy-to-cloud/getting-started-with-volumes) với `replicas: 2` là ra ngay.
+Trên k3d, thay `csi:` bằng `hostPath` như bản ở 8.11. Mục 2 và 4 vẫn chạy đúng, còn **mục
+3 sẽ thất bại** khi hai Pod rơi vào hai node — và đó lại là điều đáng thấy nhất: bạn tự tay
+quan sát giới hạn mà `ReadWriteMany` sinh ra để giải quyết.
 
 ## Self-check
 
-- [ ] Nói được vì sao đường dẫn trong code phải khớp `mountPath`, và hỏng thế nào nếu lệch
-- [ ] Giải thích vì sao `GET /logs` là phép đo tốt cho `ReadWriteMany`
-- [ ] Nói được vì sao `appendFile` hỏng mà client vẫn nhận `201`
+- [ ] Giải thích vì sao xoá Pod không còn làm mất ảnh
+- [ ] Nói được vì sao hai Pod giờ báo cùng một số ảnh
 - [ ] Kể bốn tầng vòng đời của dữ liệu, từ lớp ghi container tới EFS
+- [ ] Nói được vì sao EBS không thay được EFS cho bài toán này
 - [ ] Biết ép hai Pod nằm khác node để phép thử có giá trị
+- [ ] Nói được access mode ảnh hưởng thế nào tới việc scale
 
 ## Open questions
 
-- Hai Pod cùng `appendFile` vào một file trên NFS — có mất dòng nào không, và vì sao?
-- App ghi log ra file trong khi user lưu ở Mongo: khi nào nên tách log ra khỏi filesystem hẳn?
-- `readFile` đọc cả file vào RAM. Log 2GB thì chuyện gì xảy ra với Pod?
+- Hai Pod cùng ghi vào một thư mục NFS — có va nhau không, và khi nào thì có?
+- Ảnh trên EFS không có ai dọn. Xoá món trong Mongo thì file ở EFS đi đâu?
+- Nếu đổi sang S3 thì ba note 8.10–8.12 rút gọn lại còn gì?
