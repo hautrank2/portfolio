@@ -1,0 +1,52 @@
+@import 'tailwindcss';
+
+/* Bảng màu dùng chung cho cả shop-web và admin-web. Đổi ở đây là đổi cả trang. */
+@theme {
+  --color-bean-50: #faf7f4;
+  --color-bean-100: #f2e9e1;
+  --color-bean-200: #e4d2c2;
+  --color-bean-300: #d0b29a;
+  --color-bean-400: #b98d6d;
+  --color-bean-500: #a26f4e;
+  --color-bean-600: #8a583d;
+  --color-bean-700: #6d4530;
+  --color-bean-800: #472d20;
+  --color-bean-900: #2c1c14;
+  --color-bean-950: #191008;
+
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Noto Sans', sans-serif;
+}
+
+/* Không nhúng font từ Google Fonts: container trong cụm có thể không ra được
+   internet, và một request treo sẽ làm trang trắng vài giây. */
+
+html {
+  color-scheme: light dark;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-bean-50);
+  color: var(--color-bean-900);
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: var(--color-bean-950);
+    color: var(--color-bean-100);
+  }
+}
+
+/* Bỏ mũi tên tăng/giảm của input number — ta tự làm nút +/− cho dễ bấm. */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}

@@ -31,11 +31,11 @@ Ba dòng đầu đều dính vào **một máy cụ thể**. Đó là toàn bộ
 Trước hết xác nhận ảnh đang nằm đâu:
 
 ```bash
-kubectl exec deploy/menu-deployment -- ls -la /app/data/images
+kubectl exec deploy/cafe-menu-deployment -- ls -la /app/data/images
 ```
 
 ```bash
-kubectl exec deploy/menu-deployment -- wget -qO- http://localhost:3000/menu/health
+kubectl exec deploy/cafe-menu-deployment -- wget -qO- http://localhost:3000/menu/health
 ```
 
 Trường `images` cho biết Pod này đang giữ bao nhiêu file.
@@ -44,11 +44,11 @@ Trường `images` cho biết Pod này đang giữ bao nhiêu file.
 thì sao?
 
 ```bash
-kubectl delete pod -l app=menu && kubectl rollout status deployment menu-deployment --timeout=120s
+kubectl delete pod -l app=menu && kubectl rollout status deployment cafe-menu-deployment --timeout=120s
 ```
 
 ```bash
-kubectl exec deploy/menu-deployment -- wget -qO- http://localhost:3000/menu/health
+kubectl exec deploy/cafe-menu-deployment -- wget -qO- http://localhost:3000/menu/health
 ```
 
 **Kết quả:** `images` về `0`. Mở lại trang khách, món vẫn đó nhưng **ảnh vỡ**.
@@ -69,7 +69,7 @@ cái kia thì không:
 Thêm lại một món kèm ảnh qua trang quản trị, rồi:
 
 ```bash
-kubectl scale deployment menu-deployment --replicas=2 && kubectl rollout status deployment menu-deployment --timeout=120s
+kubectl scale deployment cafe-menu-deployment --replicas=2 && kubectl rollout status deployment cafe-menu-deployment --timeout=120s
 ```
 
 ```bash
@@ -98,7 +98,7 @@ Service menu ──────►│
 Trả về một bản trước khi đi tiếp:
 
 ```bash
-kubectl scale deployment menu-deployment --replicas=1
+kubectl scale deployment cafe-menu-deployment --replicas=1
 ```
 
 ## Vì sao cloud cần một tầng khác

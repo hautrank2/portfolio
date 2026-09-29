@@ -8,7 +8,7 @@ tags: [k8s, eks, kubectl, deploy, loadbalancer, addon]
 ---
 
 > Tiếp [8.7](/blog/k8s/deploy-to-cloud/adding-worker-nodes). `kubectl get nodes` ra node
-> `Ready`, và thư mục `kub-cafe-01-starting-setup` từ
+> `Ready`, và thư mục `kub-demo-cafe-system` từ
 > [8.3](/blog/k8s/deploy-to-cloud/preparing-the-project) đã sẵn sàng.
 
 `kubectl apply -f` không có gì mới. Bảy section vừa rồi bạn học một API, và API ấy không
@@ -88,18 +88,18 @@ kubectl config current-context
 Database trước, vì hai API sẽ nối tới nó ngay khi khởi động:
 
 ```bash
-kubectl apply -f kubernetes/mongo.yaml && kubectl rollout status deployment mongo-deployment --timeout=180s
+kubectl apply -f kubernetes/mongo.yaml && kubectl rollout status deployment cafe-mongo-deployment --timeout=180s
 ```
 
 ```bash
 kubectl get pvc
 ```
 
-`mongo-pvc` phải `Bound`. Kẹt `Pending` thì xem lý do — gần như luôn là thiếu EBS CSI
+`cafe-mongo-pvc` phải `Bound`. Kẹt `Pending` thì xem lý do — gần như luôn là thiếu EBS CSI
 driver:
 
 ```bash
-kubectl describe pvc mongo-pvc | tail -10
+kubectl describe pvc cafe-mongo-pvc | tail -10
 ```
 
 Rồi tới ba API và hai frontend:
@@ -124,12 +124,12 @@ kubectl get svc
 
 ```
 NAME                TYPE           CLUSTER-IP      EXTERNAL-IP                                   PORT(S)
-admin-web-service   LoadBalancer   10.100.x.x      k8s-default-adminweb-...elb.amazonaws.com     8211:31234/TCP
-auth-service        ClusterIP      10.100.y.y      <none>                                        3000/TCP
-menu-service        ClusterIP      10.100.z.z      <none>                                        3000/TCP
-mongo-service       ClusterIP      10.100.a.a      <none>                                        27017/TCP
-order-service       ClusterIP      10.100.b.b      <none>                                        3000/TCP
-shop-web-service    LoadBalancer   10.100.c.c      k8s-default-shopweb-...elb.amazonaws.com      8210:32345/TCP
+cafe-admin-web-service   LoadBalancer   10.100.x.x      k8s-default-adminweb-...elb.amazonaws.com     8211:31234/TCP
+cafe-auth-service        ClusterIP      10.100.y.y      <none>                                        3000/TCP
+cafe-menu-service        ClusterIP      10.100.z.z      <none>                                        3000/TCP
+cafe-mongo-service       ClusterIP      10.100.a.a      <none>                                        27017/TCP
+cafe-order-service       ClusterIP      10.100.b.b      <none>                                        3000/TCP
+cafe-shop-web-service    LoadBalancer   10.100.c.c      k8s-default-shopweb-...elb.amazonaws.com      8210:32345/TCP
 ```
 
 | | k3s (ServiceLB) | EKS |
@@ -142,7 +142,7 @@ shop-web-service    LoadBalancer   10.100.c.c      k8s-default-shopweb-...elb.am
 Vì là tên miền nên jsonpath cũng khác — `.ip` không còn dùng được:
 
 ```bash
-SHOP=$(kubectl get svc shop-web-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}') && ADMIN=$(kubectl get svc admin-web-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}') && echo "shop=$SHOP admin=$ADMIN"
+SHOP=$(kubectl get svc cafe-shop-web-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}') && ADMIN=$(kubectl get svc cafe-admin-web-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}') && echo "shop=$SHOP admin=$ADMIN"
 ```
 
 Đây cũng là lúc `eksClusterRole` ở [8.6](/blog/k8s/deploy-to-cloud/creating-a-cluster-with-eks)
@@ -185,13 +185,13 @@ kubectl get pods
 | `Running` nhưng giao diện lỗi | Xem mục dưới |
 
 ```bash
-kubectl logs deploy/menu-deployment --tail=30
+kubectl logs deploy/cafe-menu-deployment --tail=30
 ```
 
 Ba lỗi hay gặp nhất của dự án này, và cách tách chúng ra:
 
 ```bash
-kubectl run probe --rm -i --restart=Never --image=busybox:1.36 -- wget -qO- -T 5 http://menu-service:3000/menu/health
+kubectl run probe --rm -i --restart=Never --image=busybox:1.36 -- wget -qO- -T 5 http://cafe-menu-service:3000/menu/health
 ```
 
 | Kết quả | Nghĩa |
@@ -205,7 +205,7 @@ kubectl run probe --rm -i --restart=Never --image=busybox:1.36 -- wget -qO- -T 5
 Lý do **luôn** nằm trong event của Service, không phải trong log Pod:
 
 ```bash
-kubectl describe svc shop-web-service | grep -A10 "Events:"
+kubectl describe svc cafe-shop-web-service | grep -A10 "Events:"
 ```
 
 | Event | Cách sửa |
@@ -228,7 +228,7 @@ aws ec2 create-tags --resources subnet-aaa subnet-bbb --tags Key=kubernetes.io/r
 Sửa IAM xong phải **tạo lại Service** — nó không tự thử lại:
 
 ```bash
-kubectl delete svc shop-web-service && kubectl apply -f kubernetes/shop-web.yaml
+kubectl delete svc cafe-shop-web-service && kubectl apply -f kubernetes/shop-web.yaml
 ```
 
 ## Nếu tên miền ra `ENOTFOUND`
@@ -262,7 +262,7 @@ mới, và tên miền sẽ khác tên cũ.
 `port-forward` bỏ qua cả Service lẫn load balancer:
 
 ```bash
-kubectl port-forward svc/admin-web-service 8211:8211
+kubectl port-forward svc/cafe-admin-web-service 8211:8211
 ```
 
 Mở `http://localhost:8211` là dùng được trang quản trị như thường, đủ để đi tiếp sang phần
@@ -280,5 +280,5 @@ volume.
 ## Open questions
 
 - Mỗi `LoadBalancer` là một hoá đơn. Hai frontend gộp về một cửa vào được không?
-- `mongo-pvc` dùng `gp2`. Nếu node ở AZ khác với volume thì Pod có chạy được không?
+- `cafe-mongo-pvc` dùng `gp2`. Nếu node ở AZ khác với volume thì Pod có chạy được không?
 - Bí mật vẫn nằm trong YAML. Secret của Kubernetes thật sự bảo vệ được gì?

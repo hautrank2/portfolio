@@ -1,0 +1,14 @@
+{
+  "name": "auth-api",
+  "version": "1.0.0",
+  "private": true,
+  "main": "auth-app.js",
+  "scripts": {
+    "start": "node auth-app.js",
+    "dev": "node --env-file=.env auth-app.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2"
+  }
+}

@@ -21,7 +21,7 @@ Ba object mới nằm trong một file riêng, `kubernetes/efs.yaml`.
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: efs-sc
+  name: cafe-efs-sc
 provisioner: efs.csi.aws.com
 ```
 
@@ -31,7 +31,7 @@ Chỉ một dòng có nội dung thật: `provisioner` trỏ vào cái tên mà 
 EFS, không tạo access point, không sinh PV. Nó chỉ là một cái tên để PV và PVC ghép được
 với nhau.
 
-| | `gp2` của Mongo ở [8.8](/blog/k8s/deploy-to-cloud/applying-config-to-the-cluster) | `efs-sc` ở đây |
+| | `gp2` của Mongo ở [8.8](/blog/k8s/deploy-to-cloud/applying-config-to-the-cluster) | `cafe-efs-sc` ở đây |
 | --- | --- | --- |
 | Khai PVC xong | Provisioner **tự tạo** một EBS volume và một PV | Không có gì xảy ra. PVC `Pending` tới khi bạn tự viết PV |
 | Vai trò của tên class | Chọn loại storage | Chỉ để ghép PV với PVC |
@@ -46,14 +46,14 @@ Vậy vì sao vẫn phải khai? Vì bỏ trống `storageClassName` ở PVC th�
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: menu-images-pv
+  name: cafe-menu-images-pv
 spec:
   capacity:
     storage: 5Gi
   volumeMode: Filesystem
   accessModes:
     - ReadWriteMany
-  storageClassName: efs-sc
+  storageClassName: cafe-efs-sc
   csi:
     driver: efs.csi.aws.com
     volumeHandle: fs-0abc123
@@ -108,18 +108,18 @@ có dùng hết hay không.
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: menu-images-pvc
+  name: cafe-menu-images-pvc
 spec:
   accessModes:
     - ReadWriteMany
-  storageClassName: efs-sc
+  storageClassName: cafe-efs-sc
   resources:
     requests:
       storage: 5Gi
 ```
 
 PVC **không** nhắc tới EFS, cũng không nhắc tới `fs-0abc123`. Nó chỉ nói: *"tôi cần 5Gi,
-kiểu `ReadWriteMany`, thuộc class `efs-sc`"*. Ranh giới này là chủ ý, đúng như
+kiểu `ReadWriteMany`, thuộc class `cafe-efs-sc`"*. Ranh giới này là chủ ý, đúng như
 [note 6.11](/blog/k8s/data-and-volumes/persistent-volume-claim): người viết app xin chỗ,
 người quản trị cụm quyết định chỗ đó là gì.
 
@@ -127,7 +127,7 @@ Kubernetes ghép PV với PVC khi **cả ba** điều kiện đúng:
 
 | Điều kiện | Ở ví dụ này |
 | --- | --- |
-| Cùng `storageClassName` | `efs-sc` ↔ `efs-sc` |
+| Cùng `storageClassName` | `cafe-efs-sc` ↔ `cafe-efs-sc` |
 | PV có đủ `accessModes` mà PVC xin | `ReadWriteMany` ↔ `ReadWriteMany` |
 | `capacity` của PV **≥** `requests` của PVC | `5Gi` ≥ `5Gi` |
 
@@ -169,9 +169,9 @@ PVC `Bound` rồi thì mới chỉ là **một chỗ đã được giữ**. Pod 
             - containerPort: 3000
           env:
             - name: MONGODB_URI
-              value: 'mongodb://mongo-service:27017/cafe'
+              value: 'mongodb://cafe-mongo-service:27017/cafe'
             - name: AUTH_ADDRESS
-              value: 'auth-service:3000'
+              value: 'cafe-auth-service:3000'
             - name: MENU_IMAGE_FOLDER
               value: '/app/data/images'
           volumeMounts:
@@ -180,7 +180,7 @@ PVC `Bound` rồi thì mới chỉ là **một chỗ đã được giữ**. Pod 
       volumes:
         - name: menu-images
           persistentVolumeClaim:
-            claimName: menu-images-pvc
+            claimName: cafe-menu-images-pvc
 ```
 
 | Khối | Cấp | Trả lời câu hỏi |
@@ -193,7 +193,7 @@ Ba cái tên phải khớp nhau, và không có gì kiểm giúp bạn:
 ```
 MENU_IMAGE_FOLDER = /app/data/images
         ║ phải bằng
-   mountPath      = /app/data/images ──► volume menu-images ──► PVC menu-images-pvc ──► PV ──► fs-0abc123
+   mountPath      = /app/data/images ──► volume menu-images ──► PVC cafe-menu-images-pvc ──► PV ──► fs-0abc123
 ```
 
 Lệch `MENU_IMAGE_FOLDER` với `mountPath` thì app **vẫn chạy**, vẫn nhận upload, chỉ là ghi
@@ -204,11 +204,11 @@ vào lớp ghi của container — tức là quay lại đúng bài toán ở 8.
 > còn phải nhớ: nếu image **có sẵn** file ở `/app/data/images`, mount sẽ **che** chúng đi.
 
 ```bash
-kubectl apply -f kubernetes/menu.yaml && kubectl rollout status deployment menu-deployment --timeout=180s
+kubectl apply -f kubernetes/menu.yaml && kubectl rollout status deployment cafe-menu-deployment --timeout=180s
 ```
 
 ```bash
-kubectl exec deploy/menu-deployment -- df -h /app/data/images
+kubectl exec deploy/cafe-menu-deployment -- df -h /app/data/images
 ```
 
 Cột `Filesystem` phải là địa chỉ EFS, dạng `127.0.0.1:/` hoặc `fs-0abc123.efs…:/`. Nếu nó
@@ -237,7 +237,7 @@ Cách gỡ: xoá PV rồi apply lại. Ảnh trên EFS **không** mất, vì PV 
 tới `fs-0abc123`:
 
 ```bash
-kubectl delete pv menu-images-pv && kubectl apply -f kubernetes/efs.yaml
+kubectl delete pv cafe-menu-images-pv && kubectl apply -f kubernetes/efs.yaml
 ```
 
 Đây là chỗ trực giác dễ sai: xoá PV không xoá dữ liệu, xoá cluster cũng không. Chỉ
@@ -248,14 +248,14 @@ kubectl delete pv menu-images-pv && kubectl apply -f kubernetes/efs.yaml
 Ba object này chạy trên k3d, chỉ đổi khối `csi:` thành một loại volume mà cụm local có:
 
 ```yaml
-  storageClassName: efs-sc
+  storageClassName: cafe-efs-sc
   hostPath:
     path: /tmp/menu-images
     type: DirectoryOrCreate
 ```
 
 StorageClass đổi `provisioner` thành `kubernetes.io/no-provisioner` — với PV tĩnh, class
-chỉ cần **tồn tại và đúng tên**. Giữ nguyên tên `menu-images-pvc` thì phần Deployment
+chỉ cần **tồn tại và đúng tên**. Giữ nguyên tên `cafe-menu-images-pvc` thì phần Deployment
 không phải sửa gì, và bài tập ở 8.12 vẫn chạy được **miễn là hai Pod cùng node**.
 
 ## Self-check

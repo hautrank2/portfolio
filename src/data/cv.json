@@ -2,7 +2,7 @@
   "name": "Tran Trung Hau",
   "title": "Web Developer",
   "avatar": "/img/avt.jpg",
-  "phone": "0357 647 771",
+  "phone": "+84 357 647 771",
   "birthday": "Sep 06, 2002",
   "email": "hautrantrung.02@gmail.com",
   "location": "Ho Chi Minh City, Vietnam",
@@ -21,9 +21,8 @@
     }
   ],
   "objective": [
-    "I am a Web Developer with 3.5 years of experience, seeking to become a senior developer with a deep understanding of the full software lifecycle — from frontend and backend development to business analysis and UI/UX design.",
-    "Having grown within a diverse team environment, I've developed strong communication and collaboration skills, working closely with AI, Data, BA, and Automation teams. I've also been involved in multiple projects from the ground up, giving me hands-on experience in technology selection, library evaluation, and system architecture design.",
-    "In the long term, I aim to grow into a Team Leader and Product Owner role."
+    "Web Developer with 3+ years building monitoring dashboards, video analytics and data platforms for Smart City and industrial park clients, working across React, Angular and FastAPI.",
+    "Having joined products from their earliest phase, working directly with the PO before a BA was in place, I enjoy turning loose requirements into a clear product scope. My goal is to grow into a Product Owner role, where hands-on engineering experience helps me make realistic product decisions."
   ],
   "education": [
     {
@@ -36,7 +35,12 @@
   "skills": [
     {
       "label": "Languages",
-      "items": ["TypeScript", "JavaScript", "Python", "C#"]
+      "items": [
+        "TypeScript",
+        "JavaScript",
+        "Python",
+        "C#"
+      ]
     },
     {
       "label": "Frontend",
@@ -53,33 +57,46 @@
     },
     {
       "label": "Backend",
-      "items": ["NestJS", ".NET", "FastAPI"]
+      "items": [
+        "NestJS",
+        ".NET",
+        "FastAPI"
+      ]
     },
     {
       "label": "Database",
-      "items": ["MongoDB", "PostgreSQL"]
+      "items": [
+        "MongoDB",
+        "PostgreSQL"
+      ]
     },
     {
-      "label": "AI",
-      "items": ["Claude", "ChatGPT"]
+      "label": "AI-assisted Dev",
+      "items": [
+        "Claude Code (agentic coding, refactoring, code review)",
+        "ChatGPT"
+      ]
     },
     {
       "label": "Tools",
-      "items": ["Figma", "GitLab", "Docker"]
+      "items": [
+        "Figma",
+        "GitLab",
+        "Docker"
+      ]
     }
   ],
   "experiences": [
     {
-      "company": "VNTT - VIET NAM TECHNOLOGY & TELECOMMUNICATION JOINT STOCK COMPANY",
+      "company": "VNTT - Vietnam Technology & Telecommunication JSC",
       "role": "Frontend Developer & UI/UX",
       "period": "Oct 2023 - Present",
       "note": "Internship: Mar 2023 - Sep 2023",
       "highlights": [
-        "Developed responsive and scalable frontend and backend for Smart City, Industrial Park and Factory solutions — digital transformation covering energy, environment, wastewater and security — using React and Angular.",
+        "Built web platforms for Smart City, industrial park and factory digital transformation, covering energy, environment, wastewater and security monitoring for large industrial parks in Binh Duong.",
         "Joined in the early phase, before a BA was in place, and worked directly with the PO to analyze requirements and shape the product scope.",
-        "Refactored an unstructured FastAPI backend into a layered controller–service–repository architecture, making services easier to extend and maintain.",
-        "Defined the web theme and UI library stack that became the standard for subsequent company projects.",
-        "Collaborated with BA to design website UI/UX."
+        "Owned the frontend and UI/UX across three concurrent products (React, Angular) and contributed to the FastAPI backend.",
+        "Worked day-to-day with AI, Data, BA and Automation teams to turn detection models, data pipelines and field requirements into product features."
       ]
     }
   ],
@@ -89,14 +106,21 @@
       "kind": "Work project",
       "period": "Sep 2024 - Present",
       "role": "Full-stack developer, UI/UX",
-      "stack": ["React", "FastAPI", "shadcn/ui", "Tailwind CSS"],
+      "stack": [
+        "React",
+        "hls.js",
+        "FastAPI",
+        "shadcn/ui",
+        "Tailwind CSS"
+      ],
       "highlights": [
-        "Developed an API server to manage cameras, users and gateways, and to handle large-scale event data ingestion.",
+        "Developed an API server to manage cameras, users and gateways, and to ingest high-volume event data.",
         "Refactored the FastAPI backend from an unstructured codebase into a layered controller–service–repository architecture, making features easier to extend and maintain.",
-        "Optimized backend services by reducing algorithmic complexity and removing redundant processing steps, noticeably shortening response times.",
-        "Built software to visualize camera operations such as streaming, recording and detection.",
-        "Implemented multi-camera streaming on the frontend with optimized video handling to keep the browser performant.",
-        "Displayed camera locations on an interactive map."
+        "Optimized backend services by reducing algorithmic complexity and removing redundant processing steps, significantly shortening response times.",
+        "Built a multi-protocol camera player in React: HLS via hls.js by default, with MSE-over-WebSocket and MP4 fallbacks, running 32 live streams concurrently on one screen.",
+        "Kept live streams close to real time by speeding up playback or seeking to the live edge when latency drifted, and recovered from network and media errors with exponential-backoff retries.",
+        "Added per-stream playback stats (FPS, bitrate, latency, buffer, dropped frames) and overlaid AI detection rules (lines, polygons, traffic lanes) aligned to the actual video frame under any object-fit.",
+        "Displayed about 2,000 camera and event markers on an interactive map."
       ]
     },
     {
@@ -104,13 +128,16 @@
       "kind": "Work project",
       "period": "Mar 2023 - Present",
       "role": "Frontend, UI/UX",
-      "stack": ["React", "Ant Design"],
+      "stack": [
+        "React",
+        "Ant Design"
+      ],
       "highlights": [
         "Designed the web theme and selected the UI libraries that became the standard for subsequent projects.",
         "Built a multi-app web platform for environment, security and energy operations across buildings, factories, warehouses and industrial parks.",
         "Standardized a frontend codebase carried over from earlier projects, originally built by another department: replaced a 10,000+ line SCSS file of per-class Ant Design overrides (colors, sizes, spacing) with theme tokens in Ant Design's ConfigProvider, and guided the team to theme through the provider.",
         "Reorganized the project structure into clear pages, apis and utils modules, and introduced a dedicated hooks folder for shared logic.",
-        "Centralized manual data collection into the cloud and delivered real-time dashboards, letting operators manage large areas with less manpower.",
+        "Centralized manual data collection into the cloud with real-time dashboards, letting operators monitor very large industrial areas (Bau Bang, My Phuoc and Thoi Hoa industrial parks, and the Binh Duong Industrial–Service–Urban Complex) with fewer on-site staff.",
         "Collaborated with BA and PO teams to design the UI/UX."
       ]
     },
@@ -119,10 +146,15 @@
       "kind": "Work project",
       "period": "Sep 2024 - Present",
       "role": "Frontend, UI/UX",
-      "stack": ["Angular", "Angular Material", "Tailwind CSS"],
+      "stack": [
+        "Angular",
+        "Angular Material",
+        "Tailwind CSS"
+      ],
       "highlights": [
-        "Designed and implemented the frontend for a data lake management system that ingests and visualizes large-scale structured and unstructured data — data catalog, schema inspection and pipeline status monitoring.",
-        "Leveraged Angular's component reusability with Angular Material and Tailwind CSS to keep the UI consistent and responsive while accelerating development."
+        "Designed and implemented the frontend for a data lake management system that visualizes and manages large-scale structured and unstructured data: data catalog, schema inspection and pipeline status monitoring.",
+        "Built many form-heavy screens in Angular with consistent validation and error handling.",
+        "Created a set of reusable Angular components on top of Angular Material and Tailwind CSS, most notably a shared data table (sorting, filtering, pagination) reused across the whole app."
       ]
     }
   ]

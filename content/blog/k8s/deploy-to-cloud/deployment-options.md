@@ -70,7 +70,7 @@ server phải có sẵn sàng cao, chứng chỉ phải xoay vòng, phiên bản
 nào trong đó là lợi thế cạnh tranh của bạn.
 
 Đổi lại, bạn trả tiền theo giờ cho control plane — kể cả khi cụm không chạy gì. Đó là
-nội dung [note 8.4](/blog/k8s/deploy-to-cloud/eks-cost-notes), và là lý do tôi không
+nội dung [note 8.4](/blog/k8s/deploy-to-cloud/services-and-cost), và là lý do tôi không
 khuyên bạn bật EKS lên chỉ để học.
 
 Hai đường còn lại vẫn có chỗ dùng thật:

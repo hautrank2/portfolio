@@ -10,10 +10,10 @@ tags: [k8s, deploy, docker, mongodb, react, env]
 Section này dùng một dự án **khác** với section 7, và lần đầu có đủ ba thứ mà một hệ thật
 luôn có: xác thực, database có state, và file do người dùng tải lên.
 
-📦 [Tải source về](/code/kub-cafe-01-starting-setup.zip) — giải nén ra thư mục
-`kub-cafe-01-starting-setup`.
+📦 [Tải source về](/code/kub-demo-cafe-system.zip) — giải nén ra thư mục
+`kub-demo-cafe-system`.
 
-## Cà phê Nhỏ
+## Cafe System
 
 Khách xem menu và đặt đồ uống, không cần đăng nhập. Chủ quán đăng nhập vào trang quản trị
 để thêm món kèm ảnh, và xem đơn.
@@ -55,9 +55,9 @@ app — đúng như [section 7](/blog/k8s/networking) đã dựng nền.
 Mỗi frontend tự mang một nginx, và nginx proxy `/api/*` xuống các API bên trong cụm:
 
 ```nginx
-location /api/auth/  { proxy_pass http://auth-service:3000/auth/; }
-location /api/menu/  { proxy_pass http://menu-service:3000/menu/; }
-location /api/orders { proxy_pass http://order-service:3000/orders; }
+location /api/auth/  { proxy_pass http://cafe-auth-service:3000/auth/; }
+location /api/menu/  { proxy_pass http://cafe-menu-service:3000/menu/; }
+location /api/orders { proxy_pass http://cafe-order-service:3000/orders; }
 ```
 
 Đây là mẫu reverse proxy ở [note 7.13](/blog/k8s/networking/reverse-proxy), lần này dùng
@@ -69,7 +69,7 @@ ngay từ đầu. Đổi lại ba thứ:
 | **Không cần CORS** | Trình duyệt chỉ gọi cùng origin với trang |
 | **API không có đường vào từ internet** | `auth` đặc biệt không nên có |
 
-Để ý tên service viết trần — `auth-service`, không phải `auth-service.default`. Nhờ vậy
+Để ý tên service viết trần — `cafe-auth-service`, không phải `cafe-auth-service.default`. Nhờ vậy
 **một file `nginx.conf` chạy được cả ở Docker Compose lẫn trong cụm**, vì Compose cũng
 phân giải tên service y như vậy.
 
@@ -126,13 +126,13 @@ image: <your-docker-user>/kub-cafe-auth:1
 Thay `<your-docker-user>` bằng tài khoản Docker Hub của bạn, ở cả `docker-compose.yaml`
 lẫn năm file trong `kubernetes/`.
 
-`MONGODB_URI` thì **không phải đổi**: `mongodb://mongo-service:27017/cafe` đúng ở cả hai
+`MONGODB_URI` thì **không phải đổi**: `mongodb://cafe-mongo-service:27017/cafe` đúng ở cả hai
 môi trường, vì Mongo chạy ngay trong cụm.
 
 ## Build năm image
 
 ```bash
-cd kub-cafe-01-starting-setup
+cd kub-demo-cafe-system
 ```
 
 ```bash
@@ -186,8 +186,8 @@ Chuỗi này chạy được nghĩa là **cả năm mắt xích đều thông**:
 | Triệu chứng | Nơi hỏng |
 | --- | --- |
 | Đăng nhập báo `401` | Sai `ADMIN_EMAIL` hoặc `ADMIN_PASSWORD` |
-| Thêm món báo `503 Không kiểm tra được token` | `menu-api` không gọi được `auth-service` |
-| Menu trống dù đã thêm | `menu-api` không nối được Mongo — xem `docker compose logs menu-service` |
+| Thêm món báo `503 Không kiểm tra được token` | `menu-api` không gọi được `cafe-auth-service` |
+| Menu trống dù đã thêm | `menu-api` không nối được Mongo — xem `docker compose logs cafe-menu-service` |
 | Ảnh vỡ, các phần khác bình thường | File không nằm ở `MENU_IMAGE_FOLDER` |
 
 Dọn trước khi sang cụm, để khỏi tranh cổng:

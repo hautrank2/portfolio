@@ -1,35 +1,40 @@
 ---
-title: "8.6 Tạo & cấu hình cluster với EKS"
-description: "Đi hết một lần tạo cluster trên Console — hai IAM role, một VPC dựng bằng CloudFormation, rồi nối kubectl vào cụm từ máy của bạn."
+title: "8.11 EKS — tạo cluster"
+description: "Dịch vụ đắt nhất nên dựng cuối cùng. Điền form cluster từ những gì sáu note trước đã tạo, rồi nối kubectl vào cụm từ máy của bạn."
 status: growing
 created: 2026-09-25
-updated: 2026-09-26
-tags: [k8s, aws, eks, iam, vpc, cloudformation, cli, kubectl]
+updated: 2026-09-29
+tags: [k8s, aws, eks, cli, kubectl, rbac]
 ---
 
-Note này là **bước 1–5 của cột phải** trong
-[note 8.1](/blog/k8s/deploy-to-cloud/deployment-options): có máy, nối mạng, cài phần mềm
-K8s, dựng control plane. Trên EKS, cả bốn bước đó gói lại thành một form — nhưng là một
-form bắt bạn phải chuẩn bị sẵn hai thứ trước khi điền được.
+Dịch vụ cuối cùng được tạo, và là **dịch vụ đắt nhất trong section**. Đó chính là lý do nó
+đứng ở đây chứ không ở đầu: control plane tính tiền theo giờ ngay khi `Active`, nên mọi thứ
+có thể chuẩn bị trước thì đã chuẩn bị xong ở sáu note trước.
 
-> **Từ lúc bấm Create, đồng hồ tính tiền chạy.** Control plane tính theo giờ dù cụm chưa
-> có node nào, và VPC bạn sắp dựng kèm một NAT Gateway cũng tính theo giờ. Nếu chưa đặt
-> cảnh báo ngân sách, quay lại [note 8.5](/blog/k8s/deploy-to-cloud/a-tour-of-aws) làm
+Note này là **bước 4 của cột phải** trong
+[note 8.1](/blog/k8s/deploy-to-cloud/deployment-options) — dựng control plane. Trên EKS nó
+gói lại thành một form, và form đó chỉ là chỗ **chọn lại** những gì đã có.
+
+> **Từ lúc bấm Create, đồng hồ tính tiền chạy** — khoảng `$0.10` mỗi giờ cho control plane,
+> cộng NAT Gateway đã chạy từ [8.6](/blog/k8s/deploy-to-cloud/vpc-and-subnets). Nếu chưa đặt
+> cảnh báo ngân sách, quay lại [note 8.4](/blog/k8s/deploy-to-cloud/services-and-cost) làm
 > trước — mất hai phút.
 
 Giao diện AWS đổi khá thường xuyên: tên nút, thứ tự bước, chỗ đặt link có thể khác lúc bạn
 đọc. **Những thứ cần điền thì không đổi** — nên hãy bám vào cột "là gì" chứ đừng bám vào
 vị trí nút.
 
-## Chuẩn bị: hai thứ phải có trước
+## Phải có sẵn ba thứ
 
-| | Vì sao cần trước |
-| --- | --- |
-| **Hai IAM role** | Form tạo cluster bắt chọn role, không cho tạo tại chỗ ở mọi bước |
-| **Một VPC đúng chuẩn EKS** | Form đòi VPC có ≥ 2 subnet ở 2 AZ khác nhau, định tuyến đúng |
+| | Tạo ở note | Thiếu thì |
+| --- | --- | --- |
+| **`eksClusterRole`** | [8.5](/blog/k8s/deploy-to-cloud/iam-roles) | Form không cho đi qua bước đầu |
+| **VPC ≥ 2 subnet ở 2 AZ** | [8.6](/blog/k8s/deploy-to-cloud/vpc-and-subnets) | Danh sách VPC trống, hoặc bị từ chối ở bước cuối |
+| **EFS đã tạo** | [8.7](/blog/k8s/deploy-to-cloud/efs-file-system) | Không chặn tạo cluster, nhưng sẽ chặn ở [8.15](/blog/k8s/deploy-to-cloud/adding-efs-as-a-volume) |
 
-Đây cũng là lý do note này dài hơn bạn tưởng: **phần lớn công việc không nằm trong EKS.**
-EKS chỉ là cái form cuối cùng.
+Nếu bạn nhảy thẳng vào note này, dừng lại và làm ba note kia trước. Chúng **miễn phí hoặc
+gần miễn phí**, còn note này thì không — và đó là toàn bộ lý do thứ tự trong section được
+sắp như vậy.
 
 ## Nếu Console không hiện thứ bạn đang tìm
 
@@ -105,132 +110,26 @@ https://ap-southeast-2.console.aws.amazon.com/eks/home#/clusters
 
 Đoạn ngay trước `.console.aws.amazon.com` chính là region code, và đó đúng là dạng CLI cần.
 
-## 2. Cluster IAM role
+## 2. Chọn role và VPC đã tạo
 
-Form sẽ đòi một role. Nếu chưa có, mở **IAM** ở tab khác:
+Tới đây form chỉ là chỗ **chọn lại** những gì bạn đã dựng:
 
-1. **IAM** → **Roles** → **Create role**
-2. Trusted entity: **AWS service**, use case **EKS → EKS - Cluster**
-3. Tab **Add permissions**: không cần chọn gì thêm — **Next**
-4. Tên role:
-
-```
-eksClusterRole
-```
-
-Các trường còn lại để mặc định, rồi **Create role**. Quay lại tab EKS, refresh danh sách
-role và chọn `eksClusterRole`.
-
-Bước 3 là bước dễ khựng nhất: màn hình permissions trống trơn khiến người ta tưởng mình
-bỏ sót. Không phải — khi bạn chọn use case `EKS - Cluster`, AWS **gắn sẵn** policy
-`AmazonEKSClusterPolicy` vào role. Không có gì để thêm.
-
-Role này là câu trả lời cho câu hỏi đã treo từ [note 8.5](/blog/k8s/deploy-to-cloud/a-tour-of-aws):
-khi bạn viết `type: LoadBalancer`, **ai** gọi API AWS để tạo ELB? Chính là dịch vụ EKS,
-đóng vai role này. Ở k3s thì ServiceLB làm việc đó không cần xin phép ai, nên cả tầng này
-vô hình suốt bảy section vừa rồi.
-
-### Nếu cluster của bạn đang bật Auto Mode
-
-Một policy là **không đủ**. Auto Mode tự lo compute, networking, storage và load
-balancing, nên nó cần role này có thêm bốn policy:
-
-```bash
-for p in AmazonEKSLoadBalancingPolicy AmazonEKSNetworkingPolicy AmazonEKSComputePolicy AmazonEKSBlockStoragePolicy; do aws iam attach-role-policy --role-name eksClusterRole --policy-arn arn:aws:iam::aws:policy/$p; done
-```
-
-```bash
-aws iam list-attached-role-policies --role-name eksClusterRole --query "AttachedPolicies[].PolicyName" --output table
-```
-
-Trên Console: **IAM → Roles → eksClusterRole → Add permissions → Attach policies**, gõ
-`AmazonEKS` rồi tick cả bốn trong một lần.
-
-Và trust policy phải cho phép **`sts:TagSession`**, không chỉ `sts:AssumeRole`:
-
-```bash
-printf '%s' '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":"eks.amazonaws.com"},"Action":["sts:AssumeRole","sts:TagSession"]}]}' > /tmp/eks-trust.json
-```
-
-```bash
-aws iam update-assume-role-policy --role-name eksClusterRole --policy-document file:///tmp/eks-trust.json
-```
-
-Thiếu hai thứ này thì cluster vẫn `Active`, `kubectl` vẫn vào được, và mọi thứ trông bình
-thường **cho tới khi** bạn tạo Service đầu tiên ở
-[8.8](/blog/k8s/deploy-to-cloud/applying-config-to-the-cluster). Lúc đó `EXTERNAL-IP` đứng
-ở `<pending>` mãi, và lý do chỉ hiện trong `kubectl describe svc`:
-
-```
-AccessDenied: ... is not authorized to perform: sts:TagSession on resource: .../eksClusterRole
-```
-
-Đây là loại lỗi đáng nhớ vì nó **nằm ngoài Kubernetes hoàn toàn**: không Pod nào hỏng,
-không event nào ở Deployment, `kubectl get all` xanh hết.
-
-## 3. Node IAM role
-
-Tương tự, nhưng cho **worker node**: mở form tạo role, đặt tên, còn lại để mặc định.
-
-Hai role này phục vụ hai chủ thể khác nhau, và lẫn chúng là lỗi phổ biến:
-
-| Role | Ai đóng vai | Để làm gì |
+| Mục trong form | Chọn | Đã tạo ở |
 | --- | --- | --- |
-| `eksClusterRole` | **Dịch vụ EKS** — control plane | Tạo ELB, gắn volume, đọc VPC thay bạn |
-| Node role | **EC2 instance** làm worker | Cho kubelet gia nhập cụm, pull image |
+| **Cluster service role** | `eksClusterRole` | [8.5](/blog/k8s/deploy-to-cloud/iam-roles) |
+| **VPC** | VPC của stack `cafe-eks-vpc` | [8.6](/blog/k8s/deploy-to-cloud/vpc-and-subnets) |
+| **Subnets** | **Chọn tất cả** | [8.6](/blog/k8s/deploy-to-cloud/vpc-and-subnets) |
 
-Nói cách khác: role đầu cấp quyền cho **phần AWS quản lý**, role sau cấp quyền cho **phần
-máy của bạn**. Node role sẽ được dùng thật ở [note 8.7](/blog/k8s/deploy-to-cloud/adding-worker-nodes)
-khi tạo node group.
+Không thấy `eksClusterRole` trong danh sách thì refresh trang — form đọc danh sách role lúc
+tải, không đọc lại theo thời gian thực.
 
-## 4. Networking: dựng VPC bằng CloudFormation
+Còn nếu danh sách VPC không có cái bạn vừa dựng, gần như chắc là **sai region**: stack
+CloudFormation nằm ở region bạn tạo nó, và form này chỉ hiện VPC của region đang chọn.
 
-Tới mục **Specify networking**, form đòi chọn một VPC. Danh sách gần như chắc chắn không
-có cái nào dùng được — VPC mặc định của tài khoản thường thiếu cấu hình subnet mà EKS cần.
+> Node role (`eksNodeRole`) **chưa dùng ở bước này**. Nó thuộc node group, tạo ở
+> [8.12](/blog/k8s/deploy-to-cloud/adding-worker-nodes) sau khi cluster đã `Active`.
 
-Cách AWS khuyên là dùng **template CloudFormation có sẵn**, thay vì tự bấm tạo VPC,
-subnet, route table, Internet Gateway và NAT Gateway từng cái một.
-
-**CloudFormation** là dịch vụ IaC của AWS: bạn đưa một file mô tả hạ tầng, nó tạo trọn bộ
-tài nguyên. Đúng ý tưởng `kubectl apply -f` — khai cái bạn muốn, để hệ thống tự dựng —
-nhưng ở tầng hạ tầng cloud thay vì tầng Kubernetes.
-
-Mở dịch vụ **CloudFormation** ở tab khác:
-
-1. **Create stack** → *With new resources (standard)*
-2. **Prepare template**: `Template is ready`
-3. **Template source**: `Amazon S3 URL`
-4. **Amazon S3 URL**: lấy từ trang tài liệu chính thức —
-   [Create a VPC for your EKS cluster](https://docs.aws.amazon.com/eks/latest/userguide/creating-a-vpc.html#create-vpc),
-   phần **Public and private subnets**, bản **IPv4**
-5. Stack name:
-
-```
-eksVpc
-```
-
-6. Các bước còn lại để mặc định → **Submit**
-
-> **Đừng chép URL template từ blog này hay từ video khoá học.** AWS thay đường dẫn theo
-> phiên bản, và một URL cũ hoặc sai bản sẽ dựng ra một VPC không hợp lệ với EKS — lỗi chỉ
-> lộ ra ở bước cuối, khi bạn đã đi qua bốn màn hình. Lấy từ trang tài liệu ở trên.
-
-Chọn đúng bản **Public and private subnets** là có lý do: worker node nằm ở subnet
-**private** (không lộ ra internet), còn load balancer nằm ở subnet **public**. Bản
-chỉ-public cũng dựng được cụm, nhưng đó không phải hình dạng dùng thật.
-
-Chờ stack chuyển sang `CREATE_COMPLETE` — khoảng vài phút. Tab **Resources** của stack
-cho bạn xem **chính xác** nó vừa tạo những gì. Đáng mở ra nhìn một lần: đó là danh sách
-những thứ mà [note 8.5](/blog/k8s/deploy-to-cloud/a-tour-of-aws) mới chỉ kể tên.
-
-> Trong danh sách đó có **NAT Gateway** — thứ tính tiền theo giờ, và là thứ hay bị bỏ sót
-> nhất khi dọn dẹp, vì nó do template tạo ngầm chứ không nằm trong đầu bạn như một thứ
-> "tôi đã bấm tạo". Tin tốt: xoá stack `eksVpc` sẽ gỡ luôn nó, miễn là bạn xoá stack chứ
-> không xoá tay từng tài nguyên.
-
-Quay lại tab EKS, refresh, chọn VPC vừa tạo. Ở mục **Subnets**: **chọn tất cả**.
-
-## 5. Cluster endpoint access
+## 3. Cluster endpoint access
 
 Chọn **Public and private**.
 
@@ -244,14 +143,14 @@ Chọn `Private` ở đây là cách tự khoá mình ra ngoài: cụm dựng xo
 kết nối được. Dùng thật trong công ty thì `Private` mới là lựa chọn đúng, kèm một bastion
 host hoặc VPN — nhưng đó là chuyện khác.
 
-## 6. Observability và Logging
+## 4. Observability và Logging
 
 Để mặc định, **Next**.
 
 Logging của control plane ghi vào CloudWatch và **tính tiền theo lượng log**. Ở lab thì
 không cần bật, và mỗi thứ bật thêm là một dòng nữa trên hoá đơn.
 
-## 7. Review và Create
+## 5. Review và Create
 
 Xem lại toàn bộ, rồi **Create**.
 
@@ -262,7 +161,7 @@ dựng control plane: API server, etcd, scheduler, controller manager — bốn 
 Trong lúc chờ, làm nốt phần dưới: cụm có rồi mà `kubectl` chưa biết đường tới thì cũng
 chưa dùng được.
 
-## 8. Cài AWS CLI
+## 6. Cài AWS CLI
 
 `kubectl` không tự xác thực được với EKS. Nó gọi **AWS CLI** để lấy token mỗi lần nói
 chuyện với API server — nên CLI là thành phần bắt buộc, không phải tiện ích.
@@ -279,7 +178,7 @@ aws --version
 
 Phải là **v2**. Nếu máy đã có bản cũ, chạy lại installer với `--update`.
 
-## 9. Chọn danh tính cho CLI
+## 7. Chọn danh tính cho CLI
 
 Khoá học bảo tạo access key cho **root user**. AWS bây giờ hiện một cảnh báo ngay tại chỗ
 đó, kèm hai đường thay thế. Cảnh báo đó đáng nghe.
@@ -358,7 +257,7 @@ Mục **Multi-factor authentication (MFA)** → **Assign MFA device**. Một tà
 thẻ mà chỉ có mật khẩu bảo vệ là điểm yếu lớn hơn nhiều so với chuyện dùng root hay IAM
 user.
 
-## 10. `aws configure`
+## 8. `aws configure`
 
 ```bash
 aws configure
@@ -413,7 +312,7 @@ aws sts get-caller-identity
 | `arn:aws:iam::…:root` | Đang dùng key của root — xem lại mục 9 |
 | `arn:aws:sts::…:assumed-role/…` | Đang dùng `aws login` hoặc SSO, cũng đúng |
 
-## 11. Nối `kubectl` vào cụm
+## 9. Nối `kubectl` vào cụm
 
 Trước khi nối, một lệnh kiểm gộp cả credential lẫn region:
 
@@ -585,7 +484,7 @@ kubectl get nodes
 Kết quả: `No resources found`.
 
 Đó là **đúng**, không phải lỗi. Bạn vừa dựng xong *bộ não* của cụm, còn *cơ bắp* thì chưa
-có — đó là việc của [note 8.7](/blog/k8s/deploy-to-cloud/adding-worker-nodes).
+có — đó là việc của [note 8.12](/blog/k8s/deploy-to-cloud/adding-worker-nodes).
 
 Nói theo bảy bước ở [note 8.1](/blog/k8s/deploy-to-cloud/deployment-options): bạn vừa
 xong bước 2 và 4 (nối mạng, dựng control plane). Bước 1, 3, 5 — có máy, cài phần mềm K8s,

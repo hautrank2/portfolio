@@ -8,7 +8,7 @@ tags: [k8s, aws, efs, pvc, node, scaling]
 ---
 
 > Tiếp [8.11](/blog/k8s/deploy-to-cloud/persistent-volume-for-efs). PV và PVC đã `Bound`,
-> `menu-deployment` đã mount `menu-images-pvc` vào `/app/data/images`.
+> `cafe-menu-deployment` đã mount `cafe-menu-images-pvc` vào `/app/data/images`.
 
 Note này không thêm cấu hình mới. Nó chạy lại **đúng hai bài tập đã thất bại ở
 [8.9](/blog/k8s/deploy-to-cloud/getting-started-with-volumes)**, và cho bạn thấy khác biệt
@@ -19,18 +19,18 @@ duy nhất là storage giờ nằm ngoài node.
 Mở trang quản trị, thêm một món kèm ảnh. Rồi xem file đã nằm trên EFS chưa:
 
 ```bash
-kubectl exec deploy/menu-deployment -- ls -la /app/data/images
+kubectl exec deploy/cafe-menu-deployment -- ls -la /app/data/images
 ```
 
 ```bash
-kubectl exec deploy/menu-deployment -- wget -qO- http://localhost:3000/menu/health
+kubectl exec deploy/cafe-menu-deployment -- wget -qO- http://localhost:3000/menu/health
 ```
 
 Route `health` trả về tên Pod và số file nó nhìn thấy — hai thông tin vừa đủ để làm phép
 đo cho cả note này:
 
 ```json
-{ "status": "ok", "pod": "menu-deployment-7d9c6b8f4-x2kqp", "images": 1 }
+{ "status": "ok", "pod": "cafe-menu-deployment-7d9c6b8f4-x2kqp", "images": 1 }
 ```
 
 ## 2. Bài tập — Xoá Pod, ảnh còn không?
@@ -38,11 +38,11 @@ Route `health` trả về tên Pod và số file nó nhìn thấy — hai thông
 **Đoán trước:** ở 8.9, xoá Pod là ảnh về `0`. Lần này thì sao?
 
 ```bash
-kubectl delete pod -l app=menu && kubectl rollout status deployment menu-deployment --timeout=180s
+kubectl delete pod -l app=menu && kubectl rollout status deployment cafe-menu-deployment --timeout=180s
 ```
 
 ```bash
-kubectl exec deploy/menu-deployment -- wget -qO- http://localhost:3000/menu/health
+kubectl exec deploy/cafe-menu-deployment -- wget -qO- http://localhost:3000/menu/health
 ```
 
 **Kết quả:** tên Pod đã khác, nhưng `images` vẫn là `1`. Mở lại trang khách — ảnh còn
@@ -62,7 +62,7 @@ Bốn tầng vòng đời, xếp từ ngắn tới dài:
 Đây là bài tập đã hỏng ở 8.9, và là lý do cả ba note EFS tồn tại.
 
 ```bash
-kubectl scale deployment menu-deployment --replicas=2 && kubectl rollout status deployment menu-deployment --timeout=180s
+kubectl scale deployment cafe-menu-deployment --replicas=2 && kubectl rollout status deployment cafe-menu-deployment --timeout=180s
 ```
 
 ```bash
@@ -84,7 +84,7 @@ Kiểm tra bằng mắt luôn: tải lại trang khách chục lần, ảnh hi�
 lúc được lúc vỡ.
 
 ```bash
-kubectl exec deploy/menu-deployment -- df -h /app/data/images
+kubectl exec deploy/cafe-menu-deployment -- df -h /app/data/images
 ```
 
 Cột `Filesystem` là địa chỉ EFS chứ không phải `overlay` — đó là toàn bộ khác biệt.
@@ -118,7 +118,7 @@ kubectl describe pod -l app=menu | grep -A8 -i "events"
 ```
 
 ```bash
-kubectl logs deploy/menu-deployment --tail=30
+kubectl logs deploy/cafe-menu-deployment --tail=30
 ```
 
 ## Nếu hai Pod rơi cùng một node
@@ -153,13 +153,13 @@ kubectl get pvc
 
 ```
 NAME               STATUS   VOLUME           CAPACITY   ACCESS MODES   STORAGECLASS
-menu-images-pvc    Bound    menu-images-pv   5Gi        RWX            efs-sc
-mongo-pvc          Bound    pvc-8f3c…        2Gi        RWO            gp2
+cafe-menu-images-pvc    Bound    cafe-menu-images-pv   5Gi        RWX            cafe-efs-sc
+cafe-mongo-pvc          Bound    pvc-8f3c…        2Gi        RWO            gp2
 ```
 
 Hai dòng, hai câu trả lời cho hai câu hỏi khác nhau:
 
-| | `mongo-pvc` | `menu-images-pvc` |
+| | `cafe-mongo-pvc` | `cafe-menu-images-pvc` |
 | --- | --- | --- |
 | Câu hỏi | "Dữ liệu sống qua rollout không?" | "Nhiều Pod thấy chung không?" |
 | Access mode | `ReadWriteOnce` | `ReadWriteMany` |
@@ -185,7 +185,7 @@ khiến stack `eksVpc` báo `DELETE_FAILED` lúc dọn cuối section.
 Trả `menu-api` về một bản nếu bạn còn để cụm chạy:
 
 ```bash
-kubectl scale deployment menu-deployment --replicas=1
+kubectl scale deployment cafe-menu-deployment --replicas=1
 ```
 
 ## Nếu chỉ đọc chứ không bật EKS

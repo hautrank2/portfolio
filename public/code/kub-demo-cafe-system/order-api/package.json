@@ -1,0 +1,14 @@
+{
+  "name": "order-api",
+  "version": "1.0.0",
+  "private": true,
+  "main": "order-app.js",
+  "scripts": {
+    "start": "node order-app.js",
+    "dev": "node --env-file=.env order-app.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "mongoose": "^8.5.1"
+  }
+}
