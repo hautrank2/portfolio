@@ -1,17 +1,17 @@
 ---
-title: "8.12 Dùng EFS Volume"
-description: "Chạy lại đúng hai bài tập đã làm hỏng ở 8.9 — lần này có EFS, và cả hai đều qua."
+title: "8.18 Dùng EFS Volume"
+description: "Chạy lại đúng hai bài tập đã làm hỏng ở 8.15 — lần này có EFS, và cả hai đều qua."
 status: growing
 created: 2026-09-25
 updated: 2026-09-29
 tags: [k8s, aws, efs, pvc, node, scaling]
 ---
 
-> Tiếp [8.11](/blog/k8s/deploy-to-cloud/persistent-volume-for-efs). PV và PVC đã `Bound`,
+> Tiếp [8.17](/blog/k8s/deploy-to-cloud/persistent-volume-for-efs). PV và PVC đã `Bound`,
 > `cafe-menu-deployment` đã mount `cafe-menu-images-pvc` vào `/app/data/images`.
 
 Note này không thêm cấu hình mới. Nó chạy lại **đúng hai bài tập đã thất bại ở
-[8.9](/blog/k8s/deploy-to-cloud/getting-started-with-volumes)**, và cho bạn thấy khác biệt
+[8.15](/blog/k8s/deploy-to-cloud/getting-started-with-volumes)**, và cho bạn thấy khác biệt
 duy nhất là storage giờ nằm ngoài node.
 
 ## 1. Upload lại một tấm ảnh
@@ -35,10 +35,16 @@ Route `health` trả về tên Pod và số file nó nhìn thấy — hai thông
 
 ## 2. Bài tập — Xoá Pod, ảnh còn không?
 
-**Đoán trước:** ở 8.9, xoá Pod là ảnh về `0`. Lần này thì sao?
+**Đoán trước:** ở 8.15, xoá Pod là ảnh về `0`. Lần này thì sao?
 
 ```bash
 kubectl delete pod -l app=menu && kubectl rollout status deployment cafe-menu-deployment --timeout=180s
+```
+
+**PowerShell:**
+
+```powershell
+kubectl delete pod -l app=menu; if ($?) { kubectl rollout status deployment cafe-menu-deployment --timeout=180s }
 ```
 
 ```bash
@@ -59,10 +65,16 @@ Bốn tầng vòng đời, xếp từ ngắn tới dài:
 
 ## 3. Bài tập — Hai Pod, một thư mục
 
-Đây là bài tập đã hỏng ở 8.9, và là lý do cả ba note EFS tồn tại.
+Đây là bài tập đã hỏng ở 8.15, và là lý do cả ba note EFS tồn tại.
 
 ```bash
 kubectl scale deployment cafe-menu-deployment --replicas=2 && kubectl rollout status deployment cafe-menu-deployment --timeout=180s
+```
+
+**PowerShell:**
+
+```powershell
+kubectl scale deployment cafe-menu-deployment --replicas=2; if ($?) { kubectl rollout status deployment cafe-menu-deployment --timeout=180s }
 ```
 
 ```bash
@@ -78,7 +90,13 @@ một node, xem mục cuối để ép tách ra.
 for p in $(kubectl get pods -l app=menu -o name); do echo "== $p"; kubectl exec $p -- wget -qO- http://localhost:3000/menu/health; echo; done
 ```
 
-**Kết quả:** cả hai đều báo cùng một số. Ở 8.9, một bản báo `1` còn bản kia báo `0`.
+**PowerShell:**
+
+```powershell
+foreach ($p in (kubectl get pods -l app=menu -o name)) { "== $p"; kubectl exec $p -- wget -qO- http://localhost:3000/menu/health; "" }
+```
+
+**Kết quả:** cả hai đều báo cùng một số. Ở 8.15, một bản báo `1` còn bản kia báo `0`.
 
 Kiểm tra bằng mắt luôn: tải lại trang khách chục lần, ảnh hiện **mọi lần**, không còn cảnh
 lúc được lúc vỡ.
@@ -96,6 +114,12 @@ trị, mỗi lần một ảnh khác nhau. Request upload sẽ rơi vào hai Pod
 
 ```bash
 for p in $(kubectl get pods -l app=menu -o name); do kubectl exec $p -- ls /app/data/images; echo "--"; done
+```
+
+**PowerShell:**
+
+```powershell
+foreach ($p in (kubectl get pods -l app=menu -o name)) { kubectl exec $p -- ls /app/data/images; "--" }
 ```
 
 Cả hai Pod liệt kê **đủ tất cả** các file, dù mỗi file do một Pod khác nhau ghi.
@@ -117,6 +141,12 @@ EBS gắn vào một node tại một thời điểm, nên hai Pod ở hai node 
 kubectl describe pod -l app=menu | grep -A8 -i "events"
 ```
 
+**PowerShell:**
+
+```powershell
+kubectl describe pod -l app=menu | Select-String -Pattern "events" -Context 0,8
+```
+
 ```bash
 kubectl logs deploy/cafe-menu-deployment --tail=30
 ```
@@ -124,7 +154,7 @@ kubectl logs deploy/cafe-menu-deployment --tail=30
 ## Nếu hai Pod rơi cùng một node
 
 Phép thử vẫn đúng, nhưng kém thuyết phục — cùng node thì `hostPath` cũng qua được. Ép
-chúng tách ra bằng `topologySpreadConstraints` trong `kubernetes/menu.yaml`:
+chúng tách ra bằng `topologySpreadConstraints` trong `kubernetes/menu-api.yaml`:
 
 ```yaml
     spec:
@@ -140,7 +170,13 @@ chúng tách ra bằng `topologySpreadConstraints` trong `kubernetes/menu.yaml`:
 ```
 
 ```bash
-kubectl apply -f kubernetes/menu.yaml && kubectl get pods -l app=menu -o wide
+kubectl apply -f kubernetes/menu-api.yaml && kubectl get pods -l app=menu -o wide
+```
+
+**PowerShell:**
+
+```powershell
+kubectl apply -f kubernetes/menu-api.yaml; if ($?) { kubectl get pods -l app=menu -o wide }
 ```
 
 Mỗi node tối đa một Pod, chênh lệch không quá `maxSkew: 1`.
@@ -178,9 +214,9 @@ chạy:
 aws efs describe-file-systems --query "FileSystems[].{id:FileSystemId,size:SizeInBytes.Value}" --output table
 ```
 
-Cách xoá hẳn nằm ở cuối [8.10](/blog/k8s/deploy-to-cloud/adding-efs-as-a-volume): xoá mount
+Cách xoá hẳn nằm ở cuối [8.16](/blog/k8s/deploy-to-cloud/adding-efs-as-a-volume): xoá mount
 target trước, rồi tới file system. Và nhớ rằng mount target còn sót lại là lý do hay gặp
-khiến stack `eksVpc` báo `DELETE_FAILED` lúc dọn cuối section.
+khiến stack `cafe-eks-vpc` báo `DELETE_FAILED` lúc dọn cuối section.
 
 Trả `menu-api` về một bản nếu bạn còn để cụm chạy:
 
@@ -188,9 +224,15 @@ Trả `menu-api` về một bản nếu bạn còn để cụm chạy:
 kubectl scale deployment cafe-menu-deployment --replicas=1
 ```
 
+## Xong section
+
+Cafe System đã chạy đủ trên EKS: hai frontend sau load balancer, Mongo trên EBS, ảnh trên
+EFS dùng chung giữa nhiều bản. Đừng để nó chạy qua đêm nếu không cần —
+[8.19](/blog/k8s/deploy-to-cloud/cleaning-up) dọn tất cả theo đúng thứ tự.
+
 ## Nếu chỉ đọc chứ không bật EKS
 
-Trên k3d, thay `csi:` bằng `hostPath` như bản ở 8.11. Mục 2 và 4 vẫn chạy đúng, còn **mục
+Trên k3d, thay `csi:` bằng `hostPath` như bản ở 8.17. Mục 2 và 4 vẫn chạy đúng, còn **mục
 3 sẽ thất bại** khi hai Pod rơi vào hai node — và đó lại là điều đáng thấy nhất: bạn tự tay
 quan sát giới hạn mà `ReadWriteMany` sinh ra để giải quyết.
 
@@ -206,5 +248,5 @@ quan sát giới hạn mà `ReadWriteMany` sinh ra để giải quyết.
 ## Open questions
 
 - Hai Pod cùng ghi vào một thư mục NFS — có va nhau không, và khi nào thì có?
-- Ảnh trên EFS không có ai dọn. Xoá món trong Mongo thì file ở EFS đi đâu?
-- Nếu đổi sang S3 thì ba note 8.10–8.12 rút gọn lại còn gì?
+- Đổi ảnh thì `menu-api` xoá file cũ trên EFS. Nếu Pod chết đúng lúc giữa hai bước đó, file nào bị bỏ lại?
+- Nếu đổi sang S3 thì ba note 8.16–8.18 rút gọn lại còn gì?

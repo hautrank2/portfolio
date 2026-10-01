@@ -85,7 +85,7 @@ phân giải tên service y như vậy.
 | Hỏng thì thấy gì | Ảnh lúc hiện lúc mất, tuỳ Pod nào trả lời | Mất sạch menu và đơn sau mỗi lần Pod sinh lại |
 
 Ở source khởi điểm, `menu-api` **chưa có volume nào** — ảnh ghi thẳng vào lớp ghi của
-container. Đó là chủ ý: [note 8.9](/blog/k8s/deploy-to-cloud/getting-started-with-volumes)
+container. Đó là chủ ý: [note 8.15](/blog/k8s/deploy-to-cloud/getting-started-with-volumes)
 sẽ cho bạn thấy nó gãy ở đâu trước khi gắn EFS vào.
 
 > Ở dự án thật, ảnh thường nằm trên **S3** chứ không phải EFS. EFS ở đây là để học
@@ -113,7 +113,7 @@ TOKEN_KEY: 'doi-chuoi-nay-di'
 ADMIN_PASSWORD: 'cafe1234'
 ```
 
-Hai chuỗi này nằm ở **hai chỗ**: `docker-compose.yaml` và `kubernetes/auth.yaml`. Chúng
+Hai chuỗi này nằm ở **hai chỗ**: `docker-compose.yaml` và `kubernetes/auth-api.yaml`. Chúng
 đang nằm thẳng trong YAML, ai chạy `kubectl describe pod` cũng đọc được — Secret giải
 quyết chuyện đó, và đó là câu hỏi mở ở cuối note.
 
@@ -139,14 +139,32 @@ cd kub-demo-cafe-system
 for s in auth menu order; do docker build -t <your-docker-user>/kub-cafe-$s:1 ./$s-api; done
 ```
 
+**PowerShell:**
+
+```powershell
+foreach ($s in "auth","menu","order") { docker build -t "<your-docker-user>/kub-cafe-${s}:1" "./$s-api" }
+```
+
 ```bash
 docker build -t <your-docker-user>/kub-cafe-shop:1 ./shop-web && docker build -t <your-docker-user>/kub-cafe-admin:1 ./admin-web
+```
+
+**PowerShell:**
+
+```powershell
+docker build -t "<your-docker-user>/kub-cafe-shop:1" ./shop-web; if ($?) { docker build -t "<your-docker-user>/kub-cafe-admin:1" ./admin-web }
 ```
 
 Đưa lên registry — **bắt buộc** với EKS, vì node ở đó không có kho image của bạn:
 
 ```bash
 for i in auth menu order shop admin; do docker push <your-docker-user>/kub-cafe-$i:1; done
+```
+
+**PowerShell:**
+
+```powershell
+foreach ($i in "auth","menu","order","shop","admin") { docker push "<your-docker-user>/kub-cafe-${i}:1" }
 ```
 
 Nếu chạy lab bằng k3s hoặc k3d thì nhập thẳng vào node, nhanh hơn nhiều:

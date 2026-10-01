@@ -1,5 +1,5 @@
 ---
-title: "8.9 Bắt đầu với Volume"
+title: "8.15 Bắt đầu với Volume"
 description: "Upload một tấm ảnh, xoá Pod, ảnh biến mất. Scale lên hai bản, ảnh lúc có lúc không. Hai lỗi đó là toàn bộ lý do EFS tồn tại."
 status: growing
 created: 2026-09-25
@@ -7,10 +7,10 @@ updated: 2026-09-29
 tags: [k8s, volume, storage, eks, csi, ebs, efs]
 ---
 
-> Tiếp [8.8](/blog/k8s/deploy-to-cloud/applying-config-to-the-cluster). Năm service đang
+> Tiếp [8.14](/blog/k8s/deploy-to-cloud/applying-config-to-the-cluster). Năm service đang
 > chạy, và bạn đã thêm được món kèm ảnh qua trang quản trị.
 
-Mongo đã có volume từ 8.8 — nó dùng PVC, và dữ liệu sống qua rollout. `menu-api` thì
+Mongo đã có volume từ 8.14 — nó dùng PVC, và dữ liệu sống qua rollout. `menu-api` thì
 **chưa có gì**: ảnh đang ghi vào lớp ghi của container.
 
 Note này để bạn tự tay làm hỏng nó hai lần, theo hai kiểu khác nhau.
@@ -47,6 +47,12 @@ thì sao?
 kubectl delete pod -l app=menu && kubectl rollout status deployment cafe-menu-deployment --timeout=120s
 ```
 
+**PowerShell:**
+
+```powershell
+kubectl delete pod -l app=menu; if ($?) { kubectl rollout status deployment cafe-menu-deployment --timeout=120s }
+```
+
 ```bash
 kubectl exec deploy/cafe-menu-deployment -- wget -qO- http://localhost:3000/menu/health
 ```
@@ -72,6 +78,12 @@ Thêm lại một món kèm ảnh qua trang quản trị, rồi:
 kubectl scale deployment cafe-menu-deployment --replicas=2 && kubectl rollout status deployment cafe-menu-deployment --timeout=120s
 ```
 
+**PowerShell:**
+
+```powershell
+kubectl scale deployment cafe-menu-deployment --replicas=2; if ($?) { kubectl rollout status deployment cafe-menu-deployment --timeout=120s }
+```
+
 ```bash
 kubectl get pods -l app=menu -o wide
 ```
@@ -81,6 +93,12 @@ trang khách vài lần thì ảnh thế nào?
 
 ```bash
 for p in $(kubectl get pods -l app=menu -o name); do echo "== $p"; kubectl exec $p -- wget -qO- http://localhost:3000/menu/health; echo; done
+```
+
+**PowerShell:**
+
+```powershell
+foreach ($p in (kubectl get pods -l app=menu -o name)) { "== $p"; kubectl exec $p -- wget -qO- http://localhost:3000/menu/health; "" }
 ```
 
 **Kết quả:** một Pod báo `images` bằng `1`, Pod kia bằng `0`. Trên giao diện, ảnh **lúc
@@ -118,7 +136,7 @@ AWS có hai lựa chọn, khác nhau ở chỗ căn bản:
 | Tính tiền | Theo dung lượng cấp phát | Theo dung lượng thật sự dùng |
 | Trong dự án này | **Mongo** — một Pod ghi | **Ảnh món** — nhiều Pod đọc ghi |
 
-Dòng cuối là bản đồ của cả phần còn lại: Mongo đã xong từ 8.8, còn ảnh là việc của ba note
+Dòng cuối là bản đồ của cả phần còn lại: Mongo đã xong từ 8.14, còn ảnh là việc của ba note
 tới.
 
 Ba access mode, và chi tiết dễ hiểu sai nằm ở dòng đầu:
@@ -146,9 +164,9 @@ StorageClass ──► CSI driver ──► API của AWS ──► EBS volume /
                  (Pod chạy trong cụm)
 ```
 
-Trên EKS, **driver không có sẵn**. Bạn đã gặp điều này ở 8.8: PVC của Mongo chỉ `Bound`
+Trên EKS, **driver không có sẵn**. Bạn đã gặp điều này ở 8.14: PVC của Mongo chỉ `Bound`
 sau khi cài add-on `aws-ebs-csi-driver`. EFS cũng vậy, và đó là
-[note 8.10](/blog/k8s/deploy-to-cloud/adding-efs-as-a-volume).
+[note 8.16](/blog/k8s/deploy-to-cloud/adding-efs-as-a-volume).
 
 ```bash
 kubectl get storageclass
@@ -182,8 +200,8 @@ nào, và nó gắn vào node hay gắn vào mạng"**.
 | --- | --- |
 | Cache, file tạm, chết cùng Pod cũng không sao | `emptyDir` |
 | Đọc thứ gì đó của chính node, ví dụ log hệ thống | `hostPath`, và chấp nhận Pod bị ghim vào node |
-| Một Pod ghi, cần sống qua rollout | PVC với **EBS** — chính là Mongo ở 8.8 |
-| Nhiều Pod cùng đọc ghi một thư mục | PVC với **EFS** — chính là ảnh món ở 8.10–8.12 |
+| Một Pod ghi, cần sống qua rollout | PVC với **EBS** — chính là Mongo ở 8.14 |
+| Nhiều Pod cùng đọc ghi một thư mục | PVC với **EFS** — chính là ảnh món ở 8.16–8.18 |
 | File tĩnh cho người dùng tải, quy mô thật | **S3**, và đây mới là câu trả lời ngoài đời cho bài toán ảnh |
 
 Dòng cuối đáng nói thẳng: một quán cà phê thật sẽ đẩy ảnh lên S3 chứ không dựng EFS. Ba

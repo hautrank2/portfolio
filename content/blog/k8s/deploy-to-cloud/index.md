@@ -13,12 +13,14 @@ order:
   - { slug: elastic-load-balancing, title: "8.9 ELB — đường vào cho hai frontend" }
   - { slug: ec2-instances, title: "8.10 EC2 — máy ảo làm worker node" }
   - { slug: creating-a-cluster-with-eks, title: "8.11 EKS — tạo cluster" }
-  - { slug: adding-worker-nodes, title: "8.12 Thêm Worker Node" }
-  - { slug: applying-config-to-the-cluster, title: "8.13 Áp cấu hình Kubernetes lên cluster" }
-  - { slug: getting-started-with-volumes, title: "8.14 Bắt đầu với Volume" }
-  - { slug: adding-efs-as-a-volume, title: "8.15 Thêm EFS làm Volume (kiểu CSI)" }
-  - { slug: persistent-volume-for-efs, title: "8.16 Tạo Persistent Volume cho EFS" }
-  - { slug: using-the-efs-volume, title: "8.17 Dùng EFS Volume" }
+  - { slug: connecting-kubectl-to-eks, title: "8.12 AWS CLI — nối kubectl vào cluster" }
+  - { slug: adding-worker-nodes, title: "8.13 Thêm Worker Node" }
+  - { slug: applying-config-to-the-cluster, title: "8.14 Áp cấu hình Kubernetes lên cluster" }
+  - { slug: getting-started-with-volumes, title: "8.15 Bắt đầu với Volume" }
+  - { slug: adding-efs-as-a-volume, title: "8.16 Thêm EFS làm Volume (kiểu CSI)" }
+  - { slug: persistent-volume-for-efs, title: "8.17 Tạo Persistent Volume cho EFS" }
+  - { slug: using-the-efs-volume, title: "8.18 Dùng EFS Volume" }
+  - { slug: cleaning-up, title: "8.19 Dọn dẹp — tắt hết để không mất phí" }
 ---
 
 ## Dự án của section này
@@ -48,9 +50,9 @@ mà do **phụ thuộc** quyết định:
 | 8.5 | **IAM** | Bạn, bằng tay — EKS đòi role trước khi cho điền form |
 | 8.6 | **VPC** | CloudFormation — EKS đòi VPC có ≥ 2 subnet ở 2 AZ |
 | 8.7 | **EFS** | Bạn, bằng tay — mount target cần subnet của 8.6 |
-| 8.8 | **EBS** | *Kubernetes tạo hộ* khi bạn apply PVC ở [8.13](/blog/k8s/deploy-to-cloud/applying-config-to-the-cluster) |
+| 8.8 | **EBS** | *Kubernetes tạo hộ* khi bạn apply PVC ở [8.14](/blog/k8s/deploy-to-cloud/applying-config-to-the-cluster) |
 | 8.9 | **ELB** | *Kubernetes tạo hộ* khi bạn apply Service `LoadBalancer` |
-| 8.10 | **EC2** | Qua node group ở [8.12](/blog/k8s/deploy-to-cloud/adding-worker-nodes) |
+| 8.10 | **EC2** | Qua node group ở [8.13](/blog/k8s/deploy-to-cloud/adding-worker-nodes) |
 | **8.11** | **EKS** | **Cuối cùng** — nó cần cả 8.5 lẫn 8.6 đã có |
 
 Ba note 8.8–8.10 giải thích trước, tạo sau. Đó không phải sắp xếp lạ: **bạn phải hiểu EBS
@@ -65,22 +67,29 @@ Dựng nó sớm rồi loay hoay với IAM và VPC trong ba tiếng là trả ti
 Khoá quay khoảng 2020, lúc đó EKS dựng xong là chạy. Bây giờ thì không: một cụm mới không
 có CNI, không có DNS, không có CSI driver, và IAM chặt hơn nhiều.
 
-Sáu thứ dưới đây **không** có trong khoá, nhưng thiếu cái nào cũng đủ làm bạn mất một buổi:
+Bảy thứ dưới đây **không** có trong khoá, nhưng thiếu cái nào cũng đủ làm bạn mất một buổi:
 
 | Thứ | Thiếu thì triệu chứng là |
 | --- | --- |
+| **Auto Mode tắt** khi tạo cluster | Node group tạo EC2 mà không máy nào join — access entry của node role bị Auto Mode tạo sai loại |
 | Access entry cho IAM user | `You must be logged in to the server` |
-| Add-on `vpc-cni` | Node `NotReady` |
-| Add-on `coredns`, `kube-proxy` | Pod không phân giải được tên nào |
-| Add-on `aws-ebs-csi-driver`, `aws-efs-csi-driver` | PVC kẹt `Pending` mãi |
+| Add-on **Amazon VPC CNI** (`vpc-cni`) | Node `NotReady` |
+| Add-on **CoreDNS** (`coredns`), **kube-proxy** (`kube-proxy`) | Pod không phân giải được tên nào |
+| Add-on `aws-ebs-csi-driver` **kèm quyền Pod Identity**, `aws-efs-csi-driver` | `ebs-csi-controller` `CrashLoopBackOff`, PVC kẹt `Pending` mãi |
 | `eksClusterRole` đủ policy và `sts:TagSession` | `EXTERNAL-IP` kẹt `<pending>` |
 | Tag subnet và annotation scheme | Load balancer dựng ra là `internal` |
 
-Danh sách kiểm đầy đủ nằm ở [8.13](/blog/k8s/deploy-to-cloud/applying-config-to-the-cluster).
+Danh sách kiểm đầy đủ nằm ở [8.14](/blog/k8s/deploy-to-cloud/applying-config-to-the-cluster).
 
-Điểm chung của cả sáu: **không cái nào là lỗi Kubernetes.** Chúng nằm ở IAM, add-on, DNS,
+Điểm chung của cả bảy: **không cái nào là lỗi Kubernetes.** Chúng nằm ở IAM, add-on, DNS,
 tường lửa — tầng mà lab một node che hết. Đó cũng là thứ đáng giá nhất khi bạn thật sự
 bật một cụm cloud lên.
+
+## Dọn dẹp: note cuối, và là note phải làm
+
+Mọi thứ ở trên tính tiền theo giờ cho tới khi bạn xoá, và một nửa trong số đó **không** đi
+theo cluster. [8.19](/blog/k8s/deploy-to-cloud/cleaning-up) xoá theo đúng thứ tự ngược lúc
+dựng, kiểm từng bước bằng lệnh, rồi đi tìm những thứ hay sống sót.
 
 ## Thực hành trên k3d nếu không muốn trả tiền
 
@@ -102,7 +111,7 @@ k3d cluster create lab --agents 2
 Mỗi note đều có mục **"Nếu chỉ đọc chứ không bật EKS"** ở cuối, nói rõ phần nào chạy được
 trên k3d và phần nào không.
 
-Riêng bài tập ở [8.14](/blog/k8s/deploy-to-cloud/getting-started-with-volumes) thì **nên
+Riêng bài tập ở [8.15](/blog/k8s/deploy-to-cloud/getting-started-with-volumes) thì **nên
 làm**, dù bằng k3d: nó cho bạn thấy ảnh biến mất khi Pod sinh lại, và chỉ hiện một nửa số
 lần khi chạy hai bản. Hai lỗi đó là toàn bộ lý do ba note EFS tồn tại.
 

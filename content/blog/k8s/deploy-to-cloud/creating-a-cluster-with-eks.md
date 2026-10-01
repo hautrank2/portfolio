@@ -1,10 +1,10 @@
 ---
 title: "8.11 EKS — tạo cluster"
-description: "Dịch vụ đắt nhất nên dựng cuối cùng. Điền form cluster từ những gì sáu note trước đã tạo, rồi nối kubectl vào cụm từ máy của bạn."
+description: "Dịch vụ đắt nhất nên dựng cuối cùng. Điền form cluster từ những gì sáu note trước đã tạo — và chọn đúng danh tính trước khi bấm Create."
 status: growing
 created: 2026-09-25
-updated: 2026-09-29
-tags: [k8s, aws, eks, cli, kubectl, rbac]
+updated: 2026-09-30
+tags: [k8s, aws, eks, control-plane, auto-mode]
 ---
 
 Dịch vụ cuối cùng được tạo, và là **dịch vụ đắt nhất trong section**. Đó chính là lý do nó
@@ -30,7 +30,7 @@ vị trí nút.
 | --- | --- | --- |
 | **`eksClusterRole`** | [8.5](/blog/k8s/deploy-to-cloud/iam-roles) | Form không cho đi qua bước đầu |
 | **VPC ≥ 2 subnet ở 2 AZ** | [8.6](/blog/k8s/deploy-to-cloud/vpc-and-subnets) | Danh sách VPC trống, hoặc bị từ chối ở bước cuối |
-| **EFS đã tạo** | [8.7](/blog/k8s/deploy-to-cloud/efs-file-system) | Không chặn tạo cluster, nhưng sẽ chặn ở [8.15](/blog/k8s/deploy-to-cloud/adding-efs-as-a-volume) |
+| **EFS đã tạo** | [8.7](/blog/k8s/deploy-to-cloud/efs-file-system) | Không chặn tạo cluster, nhưng sẽ chặn ở [8.16](/blog/k8s/deploy-to-cloud/adding-efs-as-a-volume) |
 
 Nếu bạn nhảy thẳng vào note này, dừng lại và làm ba note kia trước. Chúng **miễn phí hoặc
 gần miễn phí**, còn note này thì không — và đó là toàn bộ lý do thứ tự trong section được
@@ -61,44 +61,13 @@ xuất hiện **bên trong trang chi tiết của một user**. Chúng không c�
 không có ở danh sách Users. Và phải bấm vào **chính tên user** — bấm vào ô checkbox bên
 cạnh thì vẫn ở lại danh sách, không có tab nào hiện ra.
 
-## 1. Mở EKS và chọn Custom configuration
+## Mở form
 
 Console AWS → dịch vụ **EKS** → **Create cluster**.
 
-Chọn **Custom configuration** chứ không phải chế độ tự động. Chế độ tự động dựng hộ bạn
-gần hết, và đó chính là thứ cần tránh ở đây — mục đích của section này là **nhìn thấy cột
-phải**, không phải là đi nhanh.
-
-Ngay bên dưới còn một công tắc nữa: **EKS Auto Mode**, và Console thường **bật sẵn**.
-
-| | Auto Mode bật | Auto Mode tắt |
-| --- | --- | --- |
-| Node | AWS tự tạo, tự thay, bạn không thấy node group | Bạn tự tạo node group ở [8.7](/blog/k8s/deploy-to-cloud/adding-worker-nodes) |
-| CNI, kube-proxy, CoreDNS | Dựng sẵn bên trong, **không** có addon nào để xem | Bạn tự cài addon |
-| `type: LoadBalancer` | Một bộ điều khiển riêng của AWS dựng **NLB** | In-tree cloud provider dựng **Classic ELB** |
-| IAM | Cluster role cần **5 policy** và thêm `sts:TagSession` | Cluster role chỉ cần `AmazonEKSClusterPolicy` |
-
-**Tắt nó đi** cho section này. Auto Mode là thứ tốt khi đi làm, nhưng nó giấu đúng những
-thứ bảy note tới đang muốn cho bạn nhìn thấy — và khi hỏng, nó hỏng ở những chỗ khoá học
-không hề nhắc tới.
-
-Kiểm tra sau khi tạo xong, nếu không chắc mình đã tắt hay chưa:
-
-```bash
-aws eks describe-cluster --name kub-dep-demo --query "cluster.computeConfig" --output json
-```
-
-`{"enabled": false}` hoặc `null` là Auto Mode đang tắt.
-
-Tên cluster:
-
-```
-kub-dep-demo
-```
-
-**Ghi lại region đang chọn.** Mọi thứ bạn sắp tạo — cluster, VPC, NAT Gateway — đều gắn
-chặt vào region đó, và Console chỉ hiện những gì thuộc region đang xem. Đây là cách phổ
-biến nhất để quên dọn và trả tiền cho thứ mình tưởng đã xoá.
+**Ghi lại region đang chọn trước khi làm gì khác.** Mọi thứ bạn sắp tạo — cluster, VPC, NAT
+Gateway — đều gắn chặt vào region đó, và Console chỉ hiện những gì thuộc region đang xem.
+Đây là cách phổ biến nhất để quên dọn và trả tiền cho thứ mình tưởng đã xoá.
 
 Nếu không thấy ô chọn region vì header bị gập, đọc từ **thanh địa chỉ** — cách này luôn
 thấy được:
@@ -110,26 +79,114 @@ https://ap-southeast-2.console.aws.amazon.com/eks/home#/clusters
 
 Đoạn ngay trước `.console.aws.amazon.com` chính là region code, và đó đúng là dạng CLI cần.
 
-## 2. Chọn role và VPC đã tạo
+Trang đầu hỏi cách cấu hình. Chọn **Custom configuration** chứ không phải
+**Quick configuration**. Chế độ nhanh dựng hộ bạn gần hết, và đó chính là thứ cần tránh ở
+đây — mục đích của section này là **nhìn thấy cột phải**, không phải là đi nhanh.
 
-Tới đây form chỉ là chỗ **chọn lại** những gì bạn đã dựng:
+Từ đây form có năm bước:
 
-| Mục trong form | Chọn | Đã tạo ở |
+```
+Step 1  Configure cluster        tên, hai IAM role, Auto Mode
+Step 2  Specify networking       VPC, subnet, security group, endpoint
+Step 3  Configure observability  để mặc định
+Step 4  Select add-ons           CNI, DNS, kube-proxy
+Step 5  Review and create
+```
+
+## Step 1: Configure cluster
+
+| Ô | Giá trị | Đã tạo ở |
 | --- | --- | --- |
-| **Cluster service role** | `eksClusterRole` | [8.5](/blog/k8s/deploy-to-cloud/iam-roles) |
-| **VPC** | VPC của stack `cafe-eks-vpc` | [8.6](/blog/k8s/deploy-to-cloud/vpc-and-subnets) |
-| **Subnets** | **Chọn tất cả** | [8.6](/blog/k8s/deploy-to-cloud/vpc-and-subnets) |
+| **Name** | `kub-cafe-demo` | — |
+| **Cluster IAM role** | `eksClusterRole` | [8.5](/blog/k8s/deploy-to-cloud/iam-roles) |
+| **Node IAM role** | Bỏ trống — xem ngay dưới | [8.5](/blog/k8s/deploy-to-cloud/iam-roles) |
 
 Không thấy `eksClusterRole` trong danh sách thì refresh trang — form đọc danh sách role lúc
 tải, không đọc lại theo thời gian thực.
 
-Còn nếu danh sách VPC không có cái bạn vừa dựng, gần như chắc là **sai region**: stack
+### Auto Mode — tắt, và vì sao ô Node IAM role biến mất
+
+Ngay dưới ô Cluster IAM role là công tắc **EKS Auto Mode**, và Console thường **bật sẵn**.
+Ô **Node IAM role** nằm trong phần đó: nó chỉ hiện, và chỉ bắt buộc, khi Auto Mode bật —
+vì lúc đó AWS tự tạo node và cần biết gắn role nào cho chúng.
+
+| | Auto Mode bật | Auto Mode tắt |
+| --- | --- | --- |
+| Node | AWS tự tạo, tự thay, bạn không thấy node group | Bạn tự tạo node group ở [8.13](/blog/k8s/deploy-to-cloud/adding-worker-nodes) |
+| Ô **Node IAM role** ở bước này | **Bắt buộc** | Không có |
+| CNI, kube-proxy, CoreDNS | Dựng sẵn bên trong, **không** có addon nào để xem | Bạn chọn ở Step 4 |
+| `type: LoadBalancer` | Một bộ điều khiển riêng của AWS dựng **NLB** | In-tree cloud provider dựng **Classic ELB** |
+| IAM | Cluster role cần **5 policy** và thêm `sts:TagSession` | Cluster role chỉ cần `AmazonEKSClusterPolicy` |
+
+**Tắt nó đi** cho section này. Auto Mode là thứ tốt khi đi làm, nhưng nó giấu đúng những
+thứ bảy note tới đang muốn cho bạn nhìn thấy — và khi hỏng, nó hỏng ở những chỗ khoá học
+không hề nhắc tới.
+
+Tắt xong thì ô Node IAM role biến mất. `eksNodeRole` **không** bị bỏ phí: nó được chọn ở
+form tạo node group, [8.13](/blog/k8s/deploy-to-cloud/adding-worker-nodes), sau khi cluster
+đã `Active`.
+
+**Dấu hiệu nhận biết:** nếu trang này đang đòi bạn chọn **Node IAM role**, nghĩa là Auto
+Mode **vẫn đang bật**. Đừng điền ô đó — tắt công tắc đi.
+
+### Nếu lỡ để Auto Mode bật
+
+Không phải chỉ là "khác với bài". Hai chuyện sẽ xảy ra, và cả hai đều im lặng cho tới tận
+[8.13](/blog/k8s/deploy-to-cloud/adding-worker-nodes):
+
+| Chuyện gì | Triệu chứng | Lộ ra ở |
+| --- | --- | --- |
+| EKS tạo access entry cho `eksNodeRole` với loại **`EC2`** — loại dành cho node của Auto Mode | Node group tạo EC2, EC2 chạy, nhưng **không máy nào join được**; khoảng 20 phút sau node group báo `CREATE_FAILED` | 8.13 |
+| Auto Mode tự tạo node bằng API `ec2:CreateFleet`. Ở tài khoản thuộc một **AWS Organization**, policy của tổ chức (SCP) có thể chặn API này | Không node nào được tạo; `kube-system` `Pending` mãi với `no nodes available to schedule pods`. `kubectl get nodeclass default` báo `CreateFleetAuthCheckFailed` | 8.12 |
+
+**Nếu đã lỡ:** không cần xoá cluster. Tắt Auto Mode trên cluster đang chạy, rồi sửa access
+entry của `eksNodeRole` sang loại `EC2_LINUX` — cả hai nằm ở **bước 0** của
+[8.13](/blog/k8s/deploy-to-cloud/adding-worker-nodes). Tắt Auto Mode **không** tự sửa access
+entry, nên phải làm cả hai.
+
+Kiểm bằng CLI sau khi cài ở [8.12](/blog/k8s/deploy-to-cloud/connecting-kubectl-to-eks) —
+lệnh nằm cuối bước 4 của note đó.
+
+Các ô còn lại của trang — Kubernetes version, Cluster access, Secrets encryption, Tags — để
+mặc định. Riêng **Cluster access** đáng nhìn qua một lần: authentication mode mặc định có
+**EKS API**, và đó là điều kiện để cấp quyền bằng access entry nếu sau này
+[8.12](/blog/k8s/deploy-to-cloud/connecting-kubectl-to-eks) báo `Unauthorized`.
+
+## Step 2: Specify networking
+
+Trang này chỉ là chỗ **chọn lại** mạng đã dựng ở
+[8.6](/blog/k8s/deploy-to-cloud/vpc-and-subnets):
+
+| Ô | Chọn | Vì sao |
+| --- | --- | --- |
+| **VPC** | VPC của stack `cafe-eks-vpc` | Mạng hai AZ, public + private |
+| **Subnets** | **Chọn cả bốn** | Control plane đặt card mạng vào đây; subnet public còn cần cho load balancer |
+| **Additional security groups** | **Để trống** | Xem ngay dưới |
+| **Cluster endpoint access** | **Public and private** | Xem mục cuối của bước này |
+
+Danh sách VPC không có cái bạn vừa dựng thì gần như chắc là **sai region**: stack
 CloudFormation nằm ở region bạn tạo nó, và form này chỉ hiện VPC của region đang chọn.
 
-> Node role (`eksNodeRole`) **chưa dùng ở bước này**. Nó thuộc node group, tạo ở
-> [8.12](/blog/k8s/deploy-to-cloud/adding-worker-nodes) sau khi cluster đã `Active`.
+Chọn cả bốn subnet ở đây **khác** với chọn subnet cho node group. Ở bước này là chỗ đặt
+control plane và chỗ để load balancer tìm subnet; còn node thì chỉ vào hai subnet private,
+và chuyện đó quyết định ở [8.13](/blog/k8s/deploy-to-cloud/adding-worker-nodes).
 
-## 3. Cluster endpoint access
+### Additional security groups — để trống
+
+EKS **tự tạo** một security group cho cụm, tên dạng `eks-cluster-sg-kub-cafe-demo-…`, gắn
+vào cả control plane lẫn mọi node sau này. Nó cho mọi thành viên nói chuyện với nhau — đủ
+cho toàn bộ section. Chi tiết ở [8.10](/blog/k8s/deploy-to-cloud/ec2-instances).
+
+Ô **Additional** chỉ dùng khi bạn cần thêm luật cho **control plane**, ví dụ cho một bastion
+host gọi API server. Hai chỗ dễ nhầm:
+
+- **Đừng chọn `eks-efs` ở đây.** Security group đó thuộc về mount target của EFS, tạo ở
+  [8.7](/blog/k8s/deploy-to-cloud/efs-file-system). Gắn nó vào control plane không giúp node
+  mount được EFS.
+- **Đừng chọn security group `default` của VPC.** Cụm không cần nó, và nó chỉ thêm những
+  luật không ai nhớ lý do.
+
+### Cluster endpoint access
 
 Chọn **Public and private**.
 
@@ -143,360 +200,83 @@ Chọn `Private` ở đây là cách tự khoá mình ra ngoài: cụm dựng xo
 kết nối được. Dùng thật trong công ty thì `Private` mới là lựa chọn đúng, kèm một bastion
 host hoặc VPN — nhưng đó là chuyện khác.
 
-## 4. Observability và Logging
+## Step 3: Configure observability
 
-Để mặc định, **Next**.
+**Để mặc định**, **Next**.
 
 Logging của control plane ghi vào CloudWatch và **tính tiền theo lượng log**. Ở lab thì
-không cần bật, và mỗi thứ bật thêm là một dòng nữa trên hoá đơn.
+không cần bật, và mỗi thứ bật thêm là một dòng nữa trên hoá đơn. `kubectl logs` đủ dùng
+cho mọi thứ trong section này.
 
-## 5. Review và Create
+## Step 4: Select add-ons
 
-Xem lại toàn bộ, rồi **Create**.
+Auto Mode đã tắt, nên cụm **không có sẵn** mạng hay DNS — chúng là add-on, và đây là chỗ
+chọn. Console thường tick sẵn ba cái đầu; kiểm lại cho chắc:
 
-Cluster mất khoảng **10–15 phút** để chuyển từ `Creating` sang `Active`. Đây là AWS đang
+| Add-on | Chọn | Thiếu thì |
+| --- | --- | --- |
+| **Amazon VPC CNI** (`vpc-cni`) | **Có** | Node `NotReady`, `cni plugin not initialized` |
+| **CoreDNS** | **Có** | Pod chạy nhưng không phân giải được tên Service nào |
+| **kube-proxy** | **Có** | Service không định tuyến được tới Pod |
+| **Amazon EKS Pod Identity Agent** | Có, nếu cấp quyền driver EBS bằng Pod Identity | Xem [8.8](/blog/k8s/deploy-to-cloud/ebs-block-storage) |
+| Amazon EBS CSI Driver, Amazon EFS CSI Driver | Tuỳ — xem ngay dưới | Cài ở [8.14](/blog/k8s/deploy-to-cloud/applying-config-to-the-cluster) và [8.16](/blog/k8s/deploy-to-cloud/adding-efs-as-a-volume) cũng được |
+
+Ba dòng đầu là **ba thứ trong danh sách kiểm** ở
+[index của section](/blog/k8s/deploy-to-cloud). Chọn ở đây thì node sinh ra ở 8.13 là
+`Ready` ngay; bỏ sót thì bạn sẽ gặp lại chúng ở bảng gỡ lỗi của note đó.
+
+Trang tiếp theo — **Configure selected add-ons settings** — để mặc định phiên bản, **Next**.
+
+**Nếu đã tick Amazon EBS CSI Driver**, trang này có thêm mục **Add-on access** cho nó. Làm
+luôn ở đây: chọn **EKS Pod Identity** → dòng **Pod Identity IAM role for service account:
+ebs-csi-controller-sa** → **Create new role** — các bước đầy đủ ở
+[8.8](/blog/k8s/deploy-to-cloud/ebs-block-storage), mục *Cấp quyền bằng Pod Identity*. Cần
+tick cả **Pod Identity Agent** ở trang trước.
+
+Bỏ trống mục đó thì add-on vẫn cài được, nhưng sẽ **Degraded**, và `ebs-csi-controller` sẽ
+`CrashLoopBackOff` ngay khi có node ở 8.13. Sửa sau được — cùng các bước đó, qua nút
+**Edit** của add-on — nhưng làm ở đây thì khỏi gặp.
+
+## Step 5: Review and create
+
+> **Trước khi bấm, nhìn góc phải trên: bạn đang đăng nhập bằng ai?** EKS chỉ tự cho đúng
+> danh tính bấm Create vào cụm. Nếu định dùng `kubectl` bằng một IAM user như `eks-admin`,
+> tạo user đó theo Đường 2 ở [8.12](/blog/k8s/deploy-to-cloud/connecting-kubectl-to-eks),
+> đăng nhập Console bằng nó, rồi mới quay lại đây. Tạo bằng root rồi nối CLI bằng user khác
+> thì vẫn sửa được, nhưng mất thêm một vòng cấp quyền.
+
+Đọc lại trang tóm tắt, đối chiếu với bốn bước trên — nhất là **Auto Mode: tắt** và
+**Endpoint: Public and private**. Rồi **Create**.
+
+Cluster mất khoảng **10–20 phút** để chuyển từ `Creating` sang `Active`. Đây là AWS đang
 dựng control plane: API server, etcd, scheduler, controller manager — bốn thành phần của
-[note 5.24](/blog/k8s/k8s-in-action/module-summary), lần này có người khác dựng hộ.
+[note 5.24](/blog/k8s/k8s-in-action/module-summary), lần này có người khác dựng hộ — rồi
+cài các add-on ở Step 4.
 
-Trong lúc chờ, làm nốt phần dưới: cụm có rồi mà `kubectl` chưa biết đường tới thì cũng
-chưa dùng được.
+Lâu, nhưng bình thường. **Chỉ lo khi quá 30 phút vẫn `Creating`, hoặc trạng thái chuyển
+sang `Failed`**: mở tab **Overview** của cluster, phần **Health issues** — AWS ghi thẳng lý
+do ở đó, thường là `eksClusterRole` thiếu quyền hoặc subnet không đủ hai AZ.
 
-## 6. Cài AWS CLI
+Trong lúc chờ, sang [8.12](/blog/k8s/deploy-to-cloud/connecting-kubectl-to-eks): cụm có
+rồi mà `kubectl` chưa biết đường tới thì cũng chưa dùng được. Cài CLI và cấu hình danh tính
+không cần đợi cụm `Active`; chỉ bước nối `kubectl` ở cuối note đó mới cần.
 
-`kubectl` không tự xác thực được với EKS. Nó gọi **AWS CLI** để lấy token mỗi lần nói
-chuyện với API server — nên CLI là thành phần bắt buộc, không phải tiện ích.
+## Đồng hồ đã chạy
 
-Trên Linux x86_64:
+Từ lúc cụm `Active`, hoá đơn có hai dòng tính theo giờ:
 
-```bash
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o awscliv2.zip && unzip -q awscliv2.zip && sudo ./aws/install
-```
-
-```bash
-aws --version
-```
-
-Phải là **v2**. Nếu máy đã có bản cũ, chạy lại installer với `--update`.
-
-## 7. Chọn danh tính cho CLI
-
-Khoá học bảo tạo access key cho **root user**. AWS bây giờ hiện một cảnh báo ngay tại chỗ
-đó, kèm hai đường thay thế. Cảnh báo đó đáng nghe.
-
-Ba đường, và khác biệt thật sự nằm ở **có để lại bí mật tĩnh trên đĩa hay không**:
-
-| Cách | Bí mật tĩnh trên đĩa | Lộ thì mất gì |
-| --- | --- | --- |
-| **`aws login`** | **Không** — token có hạn, tự hết | Token cũ hết hạn là vô dụng |
-| Access key của **IAM user** | Có | Chỉ user đó — xoá key là xong |
-| Access key của **root** | Có, **không bao giờ hết hạn** | **Cả tài khoản** — không giới hạn phạm vi, không thu hồi theo quyền |
-
-Dòng cuối là dòng cần tránh, và đây là chỗ dễ nhầm nên nói rõ: **rủi ro nằm ở *key* của
-root, không phải ở việc đăng nhập Console bằng root.** Đăng nhập Console bằng root là bình
-thường và có những việc chỉ root làm được. Thứ nguy hiểm là một file bí mật vĩnh cửu nằm
-trong `~/.aws/credentials` với toàn quyền lên tài khoản đang gắn thẻ.
-
-### Đường 1: `aws login`
-
-Không tạo key nào cả:
-
-```bash
-aws login
-```
-
-Nó mở browser để bạn đăng nhập bằng chính tài khoản Console đang dùng, rồi cấp một token
-có hạn.
-
-Trên VM không có giao diện đồ hoạ — trường hợp phổ biến nếu bạn đang SSH vào máy ảo —
-`aws login` sẽ in ra một URL kèm mã ngắn. Mở URL đó trên browser của máy thật, nhập mã,
-CLI trên VM tự nhận token.
-
-Cái giá của cách này: token hết hạn sau vài giờ, và lúc đó `kubectl` báo lỗi xác thực dù
-cụm vẫn chạy bình thường. Chạy lại `aws login` là xong. Đây là cái giá của việc không có
-bí mật vĩnh cửu trên đĩa, và là cái giá nên trả.
-
-### Đường 2: IAM user riêng
-
-Nếu muốn một key dùng được lâu mà không phải key của root:
-
-1. `console.aws.amazon.com/iam/home#/users` → **Create user**, tên ví dụ `eks-admin`
-2. Tick **Provide user access to the AWS Management Console** ngay ở bước này nếu muốn
-   đăng nhập Console bằng user đó — đặt password luôn, khỏi phải đi tìm mục
-   **Console sign-in** sau
-3. **Attach policies directly** → `AdministratorAccess`
-4. Tạo xong, bấm vào tên user → tab **Security credentials** → mục **Access keys** →
-   **Create access key** → use case **Command Line Interface (CLI)** → tick ô xác nhận
-5. Copy **cả hai** giá trị ngay. Secret chỉ hiện đúng một lần
-
-Muốn đăng nhập Console bằng user này thì cần Account ID:
-
-```
-https://<account-id>.signin.aws.amazon.com/console
-```
-
-Account ID lấy ở trang Billing → Account, hoặc đọc từ **ARN của cluster** — chỗ 12 số
-giữa:
-
-```
-arn:aws:eks:ap-southeast-2:123456789012:cluster/kub-dep-demo
-                           ^^^^^^^^^^^^
-```
-
-Và mở **cửa sổ ẩn danh** để đăng nhập, vì Console không giữ hai danh tính cùng lúc trong
-một session — đăng nhập IAM user sẽ đẩy phiên root của bạn ra.
-
-### Việc nên làm một lần rồi quên
-
-Bật **MFA cho root**:
-
-```
-https://console.aws.amazon.com/iam/home#/security_credentials
-```
-
-Mục **Multi-factor authentication (MFA)** → **Assign MFA device**. Một tài khoản đã gắn
-thẻ mà chỉ có mật khẩu bảo vệ là điểm yếu lớn hơn nhiều so với chuyện dùng root hay IAM
-user.
-
-## 8. `aws configure`
-
-```bash
-aws configure
-```
-
-Bốn câu hỏi:
-
-| Trường | Điền gì |
+| Thứ | Từ khi nào |
 | --- | --- |
-| Access Key ID | Từ bước trên |
-| Secret Access Key | Từ bước trên — không hiện lại được |
-| **Default region name** | **Phải trùng region đã tạo cluster**, ví dụ `ap-southeast-2` |
-| Default output format | `json` — hoặc để trống, mặc định cũng là `json` |
-
-Trường region là trường duy nhất sai là gãy. Sai region thì CLI vẫn xác thực thành công
-nhưng **không thấy cluster nào** — không lỗi, không cảnh báo, chỉ là danh sách rỗng.
-
-Trường output format thì chỉ đổi cách in ra màn hình, và ghi đè được từng lệnh bằng
-`--output`:
-
-| Giá trị | Dùng khi |
-| --- | --- |
-| `json` | Mặc định — đi cùng `--query` và `jq` |
-| `text` | Cột cách nhau bằng tab, gán được vào biến shell |
-| `table` | Đọc bằng mắt |
-| `yaml` | Đọc bằng mắt, quen mắt K8s |
-
-Sửa về sau không cần chạy lại `aws configure`:
-
-```bash
-aws configure set region ap-southeast-2
-```
-
-> Installer có thể hỏi thêm: *Configure AWS skills and the AWS MCP server for your AI
-> coding agent(s)?* Gõ **`n`** — nó cấu hình MCP server cho các AI coding agent trên máy,
-> không liên quan tới `aws` hay `kubectl`. Đừng chọn `never`, để sau còn bật được.
->
-> Lý do cụ thể để không bật lúc này: MCP server đó cho agent gọi API AWS bằng credential
-> bạn vừa cấu hình — mà credential đó đang là `AdministratorAccess`. Trong một section mà
-> EKS, NAT Gateway và ELB đều tính tiền theo giờ, thêm một thứ có thể tạo tài nguyên mà
-> bạn không trực tiếp gõ lệnh là rủi ro không cần thiết.
-
-Kiểm bạn đang là ai — đọc thẳng từ AWS, không đoán qua giao diện:
-
-```bash
-aws sts get-caller-identity
-```
-
-| Trường `Arn` | |
-| --- | --- |
-| `arn:aws:iam::…:user/eks-admin` | Đúng đường |
-| `arn:aws:iam::…:root` | Đang dùng key của root — xem lại mục 9 |
-| `arn:aws:sts::…:assumed-role/…` | Đang dùng `aws login` hoặc SSO, cũng đúng |
-
-## 9. Nối `kubectl` vào cụm
-
-Trước khi nối, một lệnh kiểm gộp cả credential lẫn region:
-
-```bash
-aws eks list-clusters
-```
-
-Thấy `kub-dep-demo` là xong. Rỗng thì credential đúng nhưng **region sai** — sửa bằng
-`aws configure set region`.
-
-Xem cụm đã `ACTIVE` chưa:
-
-```bash
-aws eks describe-cluster --name kub-dep-demo --query cluster.status --output text
-```
-
-Còn `CREATING` thì chờ. `ACTIVE` rồi thì nối:
-
-```bash
-aws eks --region ap-southeast-2 update-kubeconfig --name kub-dep-demo --alias eks
-```
-
-Lệnh này ghi thêm một context vào `~/.kube/config` và **chuyển sang context đó**.
-
-`--alias` là thứ nên gõ ngay từ lần đầu. Không có nó, context mang tên đầy đủ của ARN:
-
-```
-arn:aws:eks:ap-southeast-2:123456789012:cluster/kub-dep-demo
-```
-
-Mỗi lần muốn đổi qua lại là phải chép nguyên chuỗi đó.
-
-> **Đây là chỗ sẽ làm bạn giật mình.** Từ giờ `kubectl get pods` trỏ vào EKS, không còn
-> vào cụm k3s cũ. Mọi thứ bạn đã dựng ở [section 6](/blog/k8s/data-and-volumes) và
-> [section 7](/blog/k8s/networking) trông như biến mất. Chúng **không** mất — bạn chỉ
-> đang hỏi một cụm khác.
-
-Xem mình đang ở context nào, và có những context nào:
-
-```bash
-kubectl config get-contexts
-```
-
-Dấu `*` ở đầu dòng là context đang dùng. Đổi qua lại:
-
-```bash
-kubectl config use-context default
-```
-
-```bash
-kubectl config use-context eks
-```
-
-Nếu đã lỡ tạo context không có `--alias`, không cần chép tay chuỗi ARN:
-
-```bash
-EKS=$(kubectl config get-contexts -o name | grep kub-dep-demo) && kubectl config use-context $EKS
-```
-
-Chạy lại `update-kubeconfig` với `--alias` cũng được — nó ghi đè context cũ và đổi tên
-luôn.
-
-Ba cách biết mình đang đứng ở đâu:
-
-| Cách | Dấu hiệu |
-| --- | --- |
-| `kubectl config current-context` | In thẳng tên context |
-| `kubectl get nodes` | k3s ra tên máy của bạn; EKS ra `ip-10-x-x-x.<region>.compute.internal` |
-| Prompt của shell | Starship đọc kubeconfig, hiện `☸ <context>` ngay trên dòng lệnh |
-
-Đây là thứ đáng ghi vào phản xạ: **trước mỗi lệnh `kubectl` ở section này, biết mình đang
-nói với cụm nào.** Một `kubectl delete` gõ đúng lệnh nhưng sai context là cách tự tạo ra
-một sự cố rất khó hiểu.
-
-## Khi `kubectl` báo "must be logged in to the server"
-
-```
-E0926 22:03:17 memcache.go:265] "Unhandled Error" err="couldn't get current server API
-group list: the server has asked for the client to provide credentials"
-error: You must be logged in to the server
-```
-
-Lỗi này **không** nói rằng cụm hỏng, cũng không nói kubeconfig sai. Nó nói: API server đã
-nhận được danh tính của bạn và **từ chối**.
-
-Bước đầu tiên luôn là tách hai tầng ra:
-
-```bash
-aws sts get-caller-identity
-```
-
-| Kết quả | Nghĩa |
-| --- | --- |
-| Lỗi `ExpiredToken` hoặc `InvalidClientTokenId` | Credential AWS hết hạn — chạy lại `aws login`, hoặc kiểm `~/.aws/credentials` |
-| Ra `Arn` bình thường | Tầng AWS ổn. Vấn đề nằm ở **quyền bên trong cụm** |
-
-Nhắc lại ranh giới đã nói ở mục 9, vì đây là chỗ nó lộ ra:
-
-| Tầng | Quyết định | Khai ở đâu |
-| --- | --- | --- |
-| **IAM** | Bạn gọi được API nào của AWS, ví dụ `aws eks describe-cluster` | IAM policy |
-| **Kubernetes** | Bạn làm được gì **bên trong** cụm | Access entry của EKS |
-
-`AdministratorAccess` là quyền ở tầng trên, và nó **không** tự cho bạn vào cụm.
-
-### Vì sao `eks-admin` bị từ chối
-
-EKS chỉ tự cấp quyền admin trong cụm cho đúng **danh tính đã tạo cluster**. Nếu bạn bấm
-Create bằng **root** rồi cấu hình CLI bằng `eks-admin` theo Đường 2 ở mục 9, thì với cụm,
-`eks-admin` là người lạ.
-
-```bash
-aws eks list-access-entries --cluster-name kub-dep-demo
-```
-
-Không thấy ARN của mình trong danh sách là đúng nguyên nhân.
-
-### Cấp quyền cho `eks-admin`
-
-Làm bằng **danh tính đã tạo cluster**, nhanh nhất là trên Console:
-**EKS → kub-dep-demo → Access → Create access entry**, chọn IAM principal là `eks-admin`,
-type `Standard`, rồi gắn policy `AmazonEKSClusterAdminPolicy` với scope `Cluster`.
-
-Bằng CLI thì hai lệnh:
-
-```bash
-aws eks create-access-entry --cluster-name kub-dep-demo --principal-arn arn:aws:iam::123456789012:user/eks-admin --type STANDARD
-```
-
-```bash
-aws eks associate-access-policy --cluster-name kub-dep-demo --principal-arn arn:aws:iam::123456789012:user/eks-admin --policy-arn arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy --access-scope type=cluster
-```
-
-Có hiệu lực ngay, không phải tạo lại kubeconfig:
-
-```bash
-kubectl auth whoami
-```
-
-Hai chỗ dễ vấp:
-
-- **ARN phải là của IAM user hoặc role thường.** Truyền nhầm một role có
-  `/aws-service-role/` trong đường dẫn sẽ nhận
-  `not allowed to modify access entries with a principalArn value of a Service Linked Role`.
-  Lấy chuỗi đúng bằng `aws sts get-caller-identity --query Arn --output text`, và nhớ
-  thay `<account-id>` bằng số thật.
-- **Access entry chỉ dùng được khi authentication mode là `EKS API` hoặc
-  `EKS API and ConfigMap`.** Xem ở tab **Access**, hoặc:
-
-```bash
-aws eks describe-cluster --name kub-dep-demo --query cluster.accessConfig.authenticationMode --output text
-```
-
-  Nếu là `CONFIG_MAP`, quyền nằm trong ConfigMap `aws-auth` ở namespace `kube-system`, và
-  muốn sửa nó thì phải `kubectl` được vào cụm — tức là phải làm từ danh tính đã tạo
-  cluster. Chuyển sang `API_AND_CONFIG_MAP` bằng `aws eks update-cluster-config` là lối ra
-  gọn hơn, nhưng **chỉ đi được một chiều**, không quay lại được.
-
-Cách tránh toàn bộ chuyện này ngay từ đầu: **tạo cluster bằng chính danh tính sẽ dùng để
-chạy `kubectl`.** Tạo `eks-admin` trước, đăng nhập Console bằng user đó, rồi mới bấm
-Create cluster.
-
-## Cụm đã `Active` — nhưng chưa có gì chạy được
-
-```bash
-kubectl get nodes
-```
-
-Kết quả: `No resources found`.
-
-Đó là **đúng**, không phải lỗi. Bạn vừa dựng xong *bộ não* của cụm, còn *cơ bắp* thì chưa
-có — đó là việc của [note 8.12](/blog/k8s/deploy-to-cloud/adding-worker-nodes).
-
-Nói theo bảy bước ở [note 8.1](/blog/k8s/deploy-to-cloud/deployment-options): bạn vừa
-xong bước 2 và 4 (nối mạng, dựng control plane). Bước 1, 3, 5 — có máy, cài phần mềm K8s,
-nối node vào cụm — chính là cái node group sắp tạo.
-
-Nếu `kubectl apply` bất cứ thứ gì lúc này, Pod sẽ nằm mãi ở `Pending`. Đúng trạng thái
-`Pending` bạn đã gặp ở [section 6](/blog/k8s/data-and-volumes) khi PVC không tìm được PV,
-nhưng lý do khác hẳn: lần này scheduler không có node nào để chọn.
+| NAT Gateway | Từ [8.6](/blog/k8s/deploy-to-cloud/vpc-and-subnets) |
+| **Control plane EKS** | **Từ note này** — kể cả khi chưa có node, chưa có Pod nào |
+
+Cụm chưa chạy được gì cho tới khi có node ở
+[8.13](/blog/k8s/deploy-to-cloud/adding-worker-nodes). Đừng để khoảng giữa kéo dài qua đêm.
 
 ## Nếu chỉ đọc chứ không bật EKS
 
-Toàn bộ note này quy về **một dòng** trên k3d:
+Note này và [8.12](/blog/k8s/deploy-to-cloud/connecting-kubectl-to-eks) quy về **một dòng**
+trên k3d:
 
 ```bash
 k3d cluster create lab --agents 2
@@ -515,21 +295,17 @@ trên cụm thật, bạn sẽ nhớ có một tầng IAM ở dưới.
 
 - [ ] Nói được vì sao phải tạo IAM role **trước** khi mở form tạo cluster
 - [ ] Phân biệt `eksClusterRole` và node role — ai đóng vai nào
-- [ ] Giải thích vì sao dùng CloudFormation thay vì tự bấm tạo VPC
 - [ ] Nói được vì sao chọn bản template **public and private subnets**
 - [ ] Biết chọn endpoint access nào, và hậu quả nếu chọn `Private`
-- [ ] Nói được rủi ro của root **key** khác gì với việc đăng nhập Console bằng root
-- [ ] Tìm được region code và Account ID khi header Console bị gập
-- [ ] Nói được vì sao `kubectl` cần AWS CLI có sẵn trên `PATH`
-- [ ] Biết kiểm mình đang ở context nào, và cách đổi qua lại giữa k3s và EKS
-- [ ] Phân biệt quyền IAM với quyền bên trong cụm, và nói được `AdministratorAccess` **không** đủ để `kubectl` vào cụm
-- [ ] Nói được vì sao danh tính tạo cluster lại quan trọng
+- [ ] Tìm được region code khi header Console bị gập
 - [ ] Biết cluster của mình có bật Auto Mode không, và Auto Mode giấu đi những gì
+- [ ] Nói được vì sao ô **Node IAM role** chỉ hiện khi bật Auto Mode, và `eksNodeRole` được dùng ở đâu khi tắt
+- [ ] Nói được vì sao phải chọn danh tính **trước** khi bấm Create
 - [ ] Nói được vì sao thiếu quyền trên `eksClusterRole` chỉ lộ ra khi tạo Service đầu tiên
-- [ ] Kể hai tài nguyên bắt đầu tính tiền ngay sau note này
+- [ ] Kể hai tài nguyên đang tính tiền theo giờ sau note này
 
 ## Open questions
 
-- Xoá cluster có xoá luôn stack `eksVpc` không, hay phải xoá riêng?
-- `aws login` cấp token có hạn — hết hạn giữa lúc `kubectl apply` thì chuyện gì xảy ra?
+- Xoá cluster có xoá luôn stack `cafe-eks-vpc` không, hay phải xoá riêng?
 - Vì sao EKS bắt buộc ≥ 2 subnet ở 2 AZ, trong khi một node cũng đủ chạy Pod?
+- Control plane chạy ở đâu, trên máy của ai, và vì sao bạn không thấy nó trong `kubectl get nodes`?

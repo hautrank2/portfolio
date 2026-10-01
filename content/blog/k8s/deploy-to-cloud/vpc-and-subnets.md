@@ -112,11 +112,7 @@ Mở dịch vụ **CloudFormation**:
 4. **Amazon S3 URL**: lấy từ trang tài liệu chính thức —
    [Create a VPC for your EKS cluster](https://docs.aws.amazon.com/eks/latest/userguide/creating-a-vpc.html#create-vpc),
    phần **Public and private subnets**, bản **IPv4**
-5. **Stack name**:
-
-```
-cafe-eks-vpc
-```
+5. **Stack name**: `cafe-eks-vpc`
 
 6. Các bước còn lại để mặc định → **Submit**
 
@@ -197,7 +193,7 @@ sửa một route table sai, không tự đọc một lỗi *"subnet không có 
 
 Nhưng **khái niệm hai AZ thì k3d tái hiện được**, và đó mới là thứ quan trọng: hai node là
 hai chỗ vật lý khác nhau, nên một volume chỉ gắn được vào một node sẽ làm ảnh món hỏng đúng
-một nửa số lần. Chạy bài tập ở [8.14](/blog/k8s/deploy-to-cloud/getting-started-with-volumes)
+một nửa số lần. Chạy bài tập ở [8.15](/blog/k8s/deploy-to-cloud/getting-started-with-volumes)
 là thấy ngay, không cần trả tiền cho AWS.
 
 ## Self-check

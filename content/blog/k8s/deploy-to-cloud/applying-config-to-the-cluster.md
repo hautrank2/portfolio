@@ -1,5 +1,5 @@
 ---
-title: "8.8 Áp cấu hình Kubernetes lên cluster"
+title: "8.14 Áp cấu hình Kubernetes lên cluster"
 description: "Cùng bộ YAML, cụm khác — cộng một danh sách kiểm mà khoá học không có, vì năm 2020 EKS chưa bắt bạn tự cài những thứ này."
 status: growing
 created: 2026-09-25
@@ -7,7 +7,7 @@ updated: 2026-09-29
 tags: [k8s, eks, kubectl, deploy, loadbalancer, addon]
 ---
 
-> Tiếp [8.7](/blog/k8s/deploy-to-cloud/adding-worker-nodes). `kubectl get nodes` ra node
+> Tiếp [8.13](/blog/k8s/deploy-to-cloud/adding-worker-nodes). `kubectl get nodes` ra node
 > `Ready`, và thư mục `kub-demo-cafe-system` từ
 > [8.3](/blog/k8s/deploy-to-cloud/preparing-the-project) đã sẵn sàng.
 
@@ -24,23 +24,42 @@ sẽ hiện ra ở một chỗ rất xa nguyên nhân.
 | # | Thứ cần | Thiếu thì triệu chứng là |
 | --- | --- | --- |
 | 1 | Access entry cho IAM user của bạn | `kubectl` báo `You must be logged in to the server` |
-| 2 | Add-on `vpc-cni` | Node `NotReady`, `cni plugin not initialized` |
-| 3 | Add-on `coredns` và `kube-proxy` | Pod chạy nhưng **không phân giải được tên nào** — `bad address` |
-| 4 | Add-on `aws-ebs-csi-driver` | PVC của Mongo kẹt `Pending` mãi |
+| 2 | Add-on **Amazon VPC CNI** (`vpc-cni`) | Node `NotReady`, `cni plugin not initialized` |
+| 3 | Add-on **CoreDNS** (`coredns`) và **kube-proxy** (`kube-proxy`) | Pod chạy nhưng **không phân giải được tên nào** — `bad address` |
+| 4 | Add-on `aws-ebs-csi-driver` **và quyền Pod Identity cho nó** — xem [8.8](/blog/k8s/deploy-to-cloud/ebs-block-storage) | Add-on **Degraded**, `ebs-csi-controller` `CrashLoopBackOff`, PVC của Mongo kẹt `Pending` mãi |
 | 5 | `eksClusterRole` đủ policy và có `sts:TagSession` | `EXTERNAL-IP` kẹt `<pending>` |
 | 6 | Subnet public có tag, Service có annotation scheme | Load balancer dựng ra là `internal`, gọi từ ngoài ra `ENOTFOUND` |
 
 Kiểm nhanh bốn add-on:
 
 ```bash
-aws eks list-addons --cluster-name kub-dep-demo
+aws eks list-addons --cluster-name kub-cafe-demo
 ```
 
-Thiếu cái nào thì cài. Trên Console: **EKS → cluster → Add-ons → Get more add-ons**, tick
-rồi **Create**. Bằng CLI:
+Nếu đã chọn đủ ở Step 4 của [8.11](/blog/k8s/deploy-to-cloud/creating-a-cluster-with-eks),
+cả bốn đã có. Thiếu cái nào thì cài trên Console: **EKS → cluster → Add-ons → Get more
+add-ons**, tick rồi **Create**. Với **EBS CSI Driver**, trang cấu hình kế tiếp có mục
+**Add-on access** — cấp quyền Pod Identity ngay ở đó theo
+[8.8](/blog/k8s/deploy-to-cloud/ebs-block-storage), đừng bỏ trống.
+
+Ba add-on nền thì cài bằng CLI cũng được, mỗi lệnh một cái:
 
 ```bash
-for a in vpc-cni coredns kube-proxy aws-ebs-csi-driver; do aws eks create-addon --cluster-name kub-dep-demo --addon-name $a; done
+aws eks create-addon --cluster-name kub-cafe-demo --addon-name vpc-cni
+```
+
+```bash
+aws eks create-addon --cluster-name kub-cafe-demo --addon-name coredns
+```
+
+```bash
+aws eks create-addon --cluster-name kub-cafe-demo --addon-name kube-proxy
+```
+
+Rồi kiểm driver EBS có quyền chưa — trạng thái phải là `ACTIVE`, không phải `DEGRADED`:
+
+```bash
+aws eks describe-addon --cluster-name kub-cafe-demo --addon-name aws-ebs-csi-driver --query "addon.status" --output text
 ```
 
 Kiểm DNS trong cụm đã sống chưa — một lệnh, và nó cũng in ra **IP mà thế giới bên ngoài
@@ -51,8 +70,8 @@ kubectl run ipcheck --rm -i --restart=Never --image=busybox:1.36 -- wget -qO- -T
 ```
 
 `bad address` nghĩa là thiếu CoreDNS, quay lại dòng 3. Chi tiết từng thứ nằm ở
-[8.6](/blog/k8s/deploy-to-cloud/creating-a-cluster-with-eks) và
-[8.7](/blog/k8s/deploy-to-cloud/adding-worker-nodes).
+[8.11](/blog/k8s/deploy-to-cloud/creating-a-cluster-with-eks) và
+[8.13](/blog/k8s/deploy-to-cloud/adding-worker-nodes).
 
 ## 1. Sửa YAML cho cụm thật
 
@@ -74,6 +93,12 @@ Kiểm image đã thật sự lên Hub, trước khi ngồi đoán vì sao Pod l
 for i in auth menu order shop admin; do docker manifest inspect <your-docker-user>/kub-cafe-$i:1 > /dev/null && echo "OK $i"; done
 ```
 
+**PowerShell:**
+
+```powershell
+foreach ($i in "auth","menu","order","shop","admin") { docker manifest inspect "<your-docker-user>/kub-cafe-${i}:1" > $null; if ($?) { "OK $i" } }
+```
+
 Và trong `kubernetes/mongo.yaml`, `storageClassName: gp2` chỉ dùng được khi add-on
 `aws-ebs-csi-driver` đã cài. Trên k3d thì đổi thành `local-path`.
 
@@ -91,21 +116,35 @@ Database trước, vì hai API sẽ nối tới nó ngay khi khởi động:
 kubectl apply -f kubernetes/mongo.yaml && kubectl rollout status deployment cafe-mongo-deployment --timeout=180s
 ```
 
+**PowerShell:**
+
+```powershell
+kubectl apply -f kubernetes/mongo.yaml; if ($?) { kubectl rollout status deployment cafe-mongo-deployment --timeout=180s }
+```
+
 ```bash
 kubectl get pvc
 ```
 
 `cafe-mongo-pvc` phải `Bound`. Kẹt `Pending` thì xem lý do — gần như luôn là thiếu EBS CSI
-driver:
+driver, hoặc driver có mà thiếu quyền. Thiếu quyền thì `ebs-csi-controller` cũng đang
+`CrashLoopBackOff`, và cách sửa là mục *Cấp quyền bằng Pod Identity* ở
+[8.8](/blog/k8s/deploy-to-cloud/ebs-block-storage):
 
 ```bash
 kubectl describe pvc cafe-mongo-pvc | tail -10
 ```
 
+**PowerShell:**
+
+```powershell
+kubectl describe pvc cafe-mongo-pvc | Select-Object -Last 10
+```
+
 Rồi tới ba API và hai frontend:
 
 ```bash
-kubectl apply -f kubernetes/auth.yaml -f kubernetes/menu.yaml -f kubernetes/order.yaml -f kubernetes/shop-web.yaml -f kubernetes/admin-web.yaml
+kubectl apply -f kubernetes/auth-api.yaml -f kubernetes/menu-api.yaml -f kubernetes/order-api.yaml -f kubernetes/shop-web.yaml -f kubernetes/admin-web.yaml
 ```
 
 ```bash
@@ -145,7 +184,13 @@ Vì là tên miền nên jsonpath cũng khác — `.ip` không còn dùng đư�
 SHOP=$(kubectl get svc cafe-shop-web-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}') && ADMIN=$(kubectl get svc cafe-admin-web-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}') && echo "shop=$SHOP admin=$ADMIN"
 ```
 
-Đây cũng là lúc `eksClusterRole` ở [8.6](/blog/k8s/deploy-to-cloud/creating-a-cluster-with-eks)
+**PowerShell:**
+
+```powershell
+$SHOP = kubectl get svc cafe-shop-web-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'; $ADMIN = kubectl get svc cafe-admin-web-service -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'; "shop=$SHOP admin=$ADMIN"
+```
+
+Đây cũng là lúc `eksClusterRole` ở [8.11](/blog/k8s/deploy-to-cloud/creating-a-cluster-with-eks)
 làm việc của nó: bạn viết `type: LoadBalancer`, EKS đóng vai role đó gọi API AWS để dựng
 load balancer. Suốt bảy section trước, tầng này vô hình.
 
@@ -155,6 +200,12 @@ Tên miền cần thêm một hai phút để phân giải được, kể cả k
 
 ```bash
 until getent hosts $ADMIN > /dev/null; do sleep 10; done && echo "DNS san sang"
+```
+
+**PowerShell:**
+
+```powershell
+while (-not (Resolve-DnsName $ADMIN -ErrorAction SilentlyContinue)) { Start-Sleep 10 }; "DNS san sang"
 ```
 
 Mở `http://<ADMIN>:8211` trên trình duyệt:
@@ -208,9 +259,15 @@ Lý do **luôn** nằm trong event của Service, không phải trong log Pod:
 kubectl describe svc cafe-shop-web-service | grep -A10 "Events:"
 ```
 
+**PowerShell:**
+
+```powershell
+kubectl describe svc cafe-shop-web-service | Select-String -Pattern "Events:" -Context 0,10
+```
+
 | Event | Cách sửa |
 | --- | --- |
-| `sts:TagSession ... AccessDenied` | Trust policy của `eksClusterRole` — xem [8.6](/blog/k8s/deploy-to-cloud/creating-a-cluster-with-eks) |
+| `sts:TagSession ... AccessDenied` | Trust policy của `eksClusterRole` — xem [8.11](/blog/k8s/deploy-to-cloud/creating-a-cluster-with-eks) |
 | `is not authorized to perform: ec2:…` | Role thiếu policy, gắn bốn policy của Auto Mode |
 | `could not find any suitable subnets` | Subnet public thiếu tag `kubernetes.io/role/elb` |
 | Không có event nào | Cụm không có node `Ready` |
@@ -221,6 +278,12 @@ Chuỗi lỗi này đi **sâu dần**, nên mỗi lần đổi thông báo là m
 for p in AmazonEKSLoadBalancingPolicy AmazonEKSNetworkingPolicy AmazonEKSComputePolicy AmazonEKSBlockStoragePolicy; do aws iam attach-role-policy --role-name eksClusterRole --policy-arn arn:aws:iam::aws:policy/$p; done
 ```
 
+**PowerShell:**
+
+```powershell
+foreach ($p in "AmazonEKSLoadBalancingPolicy","AmazonEKSNetworkingPolicy","AmazonEKSComputePolicy","AmazonEKSBlockStoragePolicy") { aws iam attach-role-policy --role-name eksClusterRole --policy-arn "arn:aws:iam::aws:policy/$p" }
+```
+
 ```bash
 aws ec2 create-tags --resources subnet-aaa subnet-bbb --tags Key=kubernetes.io/role/elb,Value=1
 ```
@@ -229,6 +292,12 @@ Sửa IAM xong phải **tạo lại Service** — nó không tự thử lại:
 
 ```bash
 kubectl delete svc cafe-shop-web-service && kubectl apply -f kubernetes/shop-web.yaml
+```
+
+**PowerShell:**
+
+```powershell
+kubectl delete svc cafe-shop-web-service; if ($?) { kubectl apply -f kubernetes/shop-web.yaml }
 ```
 
 ## Nếu tên miền ra `ENOTFOUND`

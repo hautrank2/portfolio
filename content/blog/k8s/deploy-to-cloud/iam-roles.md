@@ -106,6 +106,12 @@ nên nó cần role này có thêm bốn policy:
 for p in AmazonEKSLoadBalancingPolicy AmazonEKSNetworkingPolicy AmazonEKSComputePolicy AmazonEKSBlockStoragePolicy; do aws iam attach-role-policy --role-name eksClusterRole --policy-arn arn:aws:iam::aws:policy/$p; done
 ```
 
+**PowerShell:**
+
+```powershell
+foreach ($p in "AmazonEKSLoadBalancingPolicy","AmazonEKSNetworkingPolicy","AmazonEKSComputePolicy","AmazonEKSBlockStoragePolicy") { aws iam attach-role-policy --role-name eksClusterRole --policy-arn "arn:aws:iam::aws:policy/$p" }
+```
+
 ```bash
 aws iam list-attached-role-policies --role-name eksClusterRole --query "AttachedPolicies[].PolicyName" --output table
 ```
@@ -125,7 +131,7 @@ aws iam update-assume-role-policy --role-name eksClusterRole --policy-document f
 
 Thiếu hai thứ này thì cluster vẫn `Active`, `kubectl` vẫn vào được, và mọi thứ trông bình
 thường **cho tới khi** bạn tạo Service đầu tiên ở
-[8.13](/blog/k8s/deploy-to-cloud/applying-config-to-the-cluster). Lúc đó `EXTERNAL-IP` đứng
+[8.14](/blog/k8s/deploy-to-cloud/applying-config-to-the-cluster). Lúc đó `EXTERNAL-IP` đứng
 ở `<pending>` mãi, và lý do chỉ hiện trong `kubectl describe svc`:
 
 ```

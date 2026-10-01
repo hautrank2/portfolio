@@ -112,6 +112,8 @@ aws configure get region
 
 ## Dọn dẹp: thứ tự quan trọng hơn danh sách
 
+Các bước chi tiết, kèm lệnh kiểm từng bước, nằm ở [8.19](/blog/k8s/deploy-to-cloud/cleaning-up). Dưới đây là khung.
+
 Xoá cluster **trước** khi xoá những thứ nó tạo hộ là sai thứ tự — lúc đó không còn ai gỡ
 load balancer và volume nữa, chúng thành rác mồ côi vẫn tính tiền.
 
