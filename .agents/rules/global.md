@@ -121,12 +121,27 @@ retroactively — use `<ComponentName>Props` for anything new.
 | --- | --- | --- |
 | Hooks | camelCase, matching the export | `useOnClickOutside.ts` |
 | Components in `components/` | kebab-case | `status-badge.tsx` |
-| Page-local sections in `app/components/` | PascalCase | `ProjectCard.tsx` |
+| Route-local components in `app/**/_components/` | kebab-case | `recipe-card.tsx` |
 | Content, lib, types | kebab-case | `blog.ts`, `nen-tang/index.md` |
 
 Component files are kebab-case because that is what `npx shadcn add` writes;
 renaming them would break the next update. The PascalCase files under
-`app/components/` predate this and are left alone.
+`app/_components/` and `app/showcase/_components/` predate this and are left
+alone.
+
+## Where a component lives
+
+- **Not reused → beside its route.** A component used by one route goes in a
+  `_components/` folder next to that route's `page.tsx`
+  (`app/recipes/_components/recipe-card.tsx`). The underscore keeps the folder
+  out of routing.
+- **Shared inside one route subtree → the nearest common segment.**
+  `app/blog/_components/` serves both `/blog` and `/blog/[...slug]`.
+- **Shared across unrelated routes → `src/components/`.** That is what
+  `components/sections/` (home + about) and `components/cv/cv-contact-actions`
+  (cv + resume) are. Move a component up only when the second user appears.
+- A page imports its own `./_components/…` relatively; anything further away
+  goes through the alias (`~/app/cv/_components/cv-document`).
 
 ---
 
@@ -140,8 +155,10 @@ failure mode here.
 | --- | --- |
 | `src/components/ui/` | shadcn/ui primitives + components pulled from registries |
 | `src/components/ai/` | chat/agent-oriented blocks (shadcn.io "AI" registry) |
-| `src/components/blog/` | blog views — specific, not general purpose |
+| `src/components/blog/` | the markdown pipeline only — shared by blog and recipes |
+| `src/components/sections/` | page sections used by more than one route |
 | `src/components/layouts/` | header, footer, page shell |
+| `src/app/**/_components/` | views that belong to a single route — not general purpose |
 
 1. **Look in `src/components/ui/` first.** Write a new component only when
    nothing there fits, and say why in the task summary.
@@ -206,11 +223,13 @@ content/blog/          # markdown notes — the blog's source of truth
 public/                # static assets served as-is (never put drafts here)
 src/
 ├── app/               # App Router: routes, layouts, globals.css
-│   └── components/    # one-off sections used by a single page
-├── components/
+│   ├── _components/   # sections used only by the home page
+│   └── <route>/_components/  # components used only by that route
+├── components/        # only what more than one route uses
 │   ├── ui/            # shadcn primitives + registry components
 │   ├── ai/            # AI-registry blocks
-│   ├── blog/          # blog views
+│   ├── blog/          # markdown pipeline
+│   ├── sections/      # sections shared by several pages
 │   ├── layouts/       # header, footer, page header
 │   └── icons/
 ├── data/              # static site content (profile, projects, experiences)

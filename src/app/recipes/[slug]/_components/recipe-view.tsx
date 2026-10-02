@@ -1,10 +1,10 @@
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
+import { RecipeMeta } from "~/app/recipes/_components/recipe-meta";
 import { renderMarkdown } from "~/components/blog/markdown";
 import { Typography } from "~/components/ui/typography";
 import { recipeCategoryLabels } from "~/lib/recipes";
 import type { RecipeModel } from "~/types";
-import { RecipeMeta } from "./recipe-meta";
 
 export type RecipeViewProps = {
   recipe: RecipeModel;

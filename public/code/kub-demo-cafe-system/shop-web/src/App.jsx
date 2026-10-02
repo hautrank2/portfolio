@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-const money = (n) => `${Number(n).toLocaleString('vi-VN')}đ`;
+const money = (n) => `${Number(n).toLocaleString('en-US')} ₫`;
 
 /* Ảnh trả về từ menu-api có thể không tồn tại: database chỉ giữ TÊN file, còn
    file thì nằm trên volume. Hai thứ đó lệch nhau được, nên luôn cần fallback. */
@@ -32,6 +32,47 @@ function ItemImage({ item }) {
   );
 }
 
+/* Nối WebSocket của order-api và gọi onEvent cho mỗi sự kiện { type, id, status }.
+   Rớt kết nối thì tự nối lại sau 2 giây. */
+function useOrderEvents(onEvent, enabled = true) {
+  const handler = useRef(onEvent);
+  handler.current = onEvent;
+
+  useEffect(() => {
+    if (!enabled) return undefined;
+
+    let socket;
+    let retry;
+    let stopped = false;
+
+    const connect = () => {
+      // Cùng host với trang, qua nginx (hoặc proxy của Vite) như mọi /api/* khác.
+      const scheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
+      socket = new WebSocket(`${scheme}://${window.location.host}/api/orders/ws`);
+      socket.onmessage = (e) => {
+        let event;
+        try {
+          event = JSON.parse(e.data);
+        } catch {
+          return;
+        }
+        handler.current(event);
+      };
+      socket.onclose = () => {
+        if (!stopped) retry = setTimeout(connect, 2000);
+      };
+    };
+
+    connect();
+
+    return () => {
+      stopped = true;
+      clearTimeout(retry);
+      socket.close();
+    };
+  }, [enabled]);
+}
+
 function Stepper({ value, onChange }) {
   const btn =
     'grid size-9 shrink-0 place-items-center rounded-lg border border-bean-200 text-lg leading-none transition ' +
@@ -40,7 +81,7 @@ function Stepper({ value, onChange }) {
 
   return (
     <div className="flex items-center gap-1.5">
-      <button type="button" className={btn} onClick={() => onChange(value - 1)} disabled={value <= 0} aria-label="Bớt một">
+      <button type="button" className={btn} onClick={() => onChange(value - 1)} disabled={value <= 0} aria-label="Decrease">
         −
       </button>
       <input
@@ -50,7 +91,7 @@ function Stepper({ value, onChange }) {
         onChange={(e) => onChange(Number(e.target.value))}
         className="h-9 w-12 rounded-lg border border-bean-200 bg-transparent text-center text-sm font-medium tabular-nums outline-none focus:border-bean-500 dark:border-bean-800"
       />
-      <button type="button" className={btn} onClick={() => onChange(value + 1)} aria-label="Thêm một">
+      <button type="button" className={btn} onClick={() => onChange(value + 1)} aria-label="Increase">
         +
       </button>
     </div>
@@ -65,6 +106,13 @@ export default function App() {
   const [note, setNote] = useState('');
   const [message, setMessage] = useState(null);
   const [sending, setSending] = useState(false);
+  const [placed, setPlaced] = useState([]);
+
+  useOrderEvents((event) => {
+    if (event.type !== 'order') return;
+    // Socket phát sự kiện của MỌI đơn — chỉ giữ những đơn mình đã đặt.
+    setPlaced((prev) => prev.map((o) => (o.id === event.id ? { ...o, status: event.status } : o)));
+  });
 
   const loadMenu = useCallback(async () => {
     setLoading(true);
@@ -73,7 +121,7 @@ export default function App() {
       const data = await res.json();
       setItems(data.items || []);
     } catch (err) {
-      setMessage({ type: 'err', text: 'Không tải được menu.' });
+      setMessage({ type: 'err', text: 'Could not load the menu.' });
     } finally {
       setLoading(false);
     }
@@ -119,15 +167,19 @@ export default function App() {
       const data = await res.json();
 
       if (!res.ok) {
-        setMessage({ type: 'err', text: data.message || 'Đặt đơn thất bại.' });
+        setMessage({ type: 'err', text: data.message || 'Could not place order.' });
         return;
       }
 
-      setMessage({ type: 'ok', text: `Đã đặt đơn, tổng ${money(data.order.total)}.` });
+      setMessage({ type: 'ok', text: `Order placed, total ${money(data.order.total)}.` });
+      setPlaced((prev) => [
+        { id: data.order.id, total: data.order.total, status: data.order.status || 'new', customerName },
+        ...prev,
+      ]);
       setQuantities({});
       setNote('');
     } catch (err) {
-      setMessage({ type: 'err', text: 'Không gọi được order-api.' });
+      setMessage({ type: 'err', text: 'Could not reach order-api.' });
     } finally {
       setSending(false);
     }
@@ -155,7 +207,7 @@ export default function App() {
           <div className="min-w-0 flex-1">
             <h1 className="truncate text-base font-semibold tracking-tight">Cafe System</h1>
             <p className="truncate text-xs text-bean-500 dark:text-bean-400">
-              Chọn món, để lại tên — đơn sẽ hiện ở màn hình pha chế
+              Pick your drinks, leave your name — your order goes straight to the bar
             </p>
           </div>
           <button
@@ -163,7 +215,7 @@ export default function App() {
             onClick={loadMenu}
             className="rounded-xl border border-bean-200 px-3 py-2 text-xs font-medium transition hover:border-bean-400 hover:bg-bean-100 dark:border-bean-800 dark:hover:border-bean-600 dark:hover:bg-bean-900"
           >
-            Tải lại
+            Reload
           </button>
         </div>
       </header>
@@ -181,6 +233,34 @@ export default function App() {
           >
             {message.text}
           </div>
+        )}
+
+        {/* Đơn khách đã đặt trong phiên này. Trạng thái do WebSocket đẩy về. */}
+        {placed.length > 0 && (
+          <section className="mb-5 space-y-2 rounded-2xl border border-bean-200 p-4 dark:border-bean-800 dark:bg-bean-900/30">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-bean-500 dark:text-bean-400">
+              Your orders
+            </h2>
+            <ul className="space-y-1.5">
+              {placed.map((order) => (
+                <li key={order.id} className="flex items-center gap-3 text-sm">
+                  <span className="min-w-0 flex-1 truncate">
+                    {order.customerName} · <span className="tabular-nums">{money(order.total)}</span>
+                  </span>
+                  <span
+                    className={
+                      'rounded-full px-2.5 py-0.5 text-xs font-medium ' +
+                      (order.status === 'received'
+                        ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
+                        : 'bg-bean-100 text-bean-600 dark:bg-bean-800 dark:text-bean-300')
+                    }
+                  >
+                    {order.status === 'received' ? 'Received' : 'New'}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
         )}
 
         <form onSubmit={submitOrder} className="grid gap-6 lg:grid-cols-[1fr_20rem] lg:items-start">
@@ -206,9 +286,9 @@ export default function App() {
               </div>
             ) : items.length === 0 ? (
               <div className="rounded-2xl border border-dashed border-bean-300 px-6 py-14 text-center dark:border-bean-800">
-                <p className="text-sm font-medium">Chưa có món nào trong menu</p>
+                <p className="text-sm font-medium">The menu is empty</p>
                 <p className="mx-auto mt-1 max-w-xs text-xs text-bean-500 dark:text-bean-400">
-                  Mở trang quản trị và thêm món đầu tiên, rồi bấm Tải lại.
+                  Open the admin page, add the first item, then press Reload.
                 </p>
               </div>
             ) : (
@@ -230,6 +310,11 @@ export default function App() {
                       <div className="space-y-2.5 p-3">
                         <div>
                           <p className="text-sm font-medium leading-snug">{item.name}</p>
+                          {item.description && (
+                            <p className="line-clamp-2 text-xs text-bean-500 dark:text-bean-400">
+                              {item.description}
+                            </p>
+                          )}
                           <p className="text-sm text-bean-500 tabular-nums dark:text-bean-400">
                             {money(item.price)}
                           </p>
@@ -248,9 +333,9 @@ export default function App() {
             <div className="mx-auto max-w-6xl space-y-3 p-4">
               <div className="hidden items-baseline justify-between lg:flex">
                 <h2 className="text-sm font-semibold uppercase tracking-wider text-bean-500 dark:text-bean-400">
-                  Đơn của bạn
+                  Your order
                 </h2>
-                <span className="text-xs text-bean-500 dark:text-bean-400">{count} món</span>
+                <span className="text-xs text-bean-500 dark:text-bean-400">{count} {count === 1 ? 'item' : 'items'}</span>
               </div>
 
               {lines.length > 0 && (
@@ -270,13 +355,13 @@ export default function App() {
               <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
                 <input
                   className={field}
-                  placeholder="Tên của bạn"
+                  placeholder="Your name"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
                 />
                 <input
                   className={field}
-                  placeholder="Ghi chú, ví dụ ít đá"
+                  placeholder="Note, e.g. less ice"
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                 />
@@ -287,14 +372,14 @@ export default function App() {
                 disabled={!canSubmit}
                 className="flex w-full items-center justify-between gap-3 rounded-xl bg-bean-800 px-4 py-3 text-sm font-semibold text-bean-50 transition hover:bg-bean-700 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-bean-800 dark:bg-bean-200 dark:text-bean-900 dark:hover:bg-bean-100 dark:disabled:hover:bg-bean-200"
               >
-                <span>{sending ? 'Đang gửi…' : 'Đặt đơn'}</span>
+                <span>{sending ? 'Sending…' : 'Place order'}</span>
                 <span className="tabular-nums">{money(total)}</span>
               </button>
 
               {/* Nói rõ vì sao nút đang tắt, thay vì để người dùng tự đoán. */}
               {!canSubmit && !sending && (
                 <p className="text-center text-xs text-bean-500 dark:text-bean-400">
-                  {lines.length === 0 ? 'Chọn ít nhất một món' : 'Nhập tên của bạn'}
+                  {lines.length === 0 ? 'Pick at least one item' : 'Enter your name'}
                 </p>
               )}
             </div>

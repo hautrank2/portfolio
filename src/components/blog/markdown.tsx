@@ -42,8 +42,12 @@ function rehypeCodeLanguage() {
 
 type MarkdownLinkProps = React.ComponentProps<"a">;
 
+/** Static images under /img — a link to one is a download, not a page. */
+const IMAGE_FILE = /^\/img\/.+\.(svg|png|jpe?g|webp)$/i;
+
 /** Internal links go through the router; external ones open safely. */
 const MarkdownLink = ({ href = "", ...props }: MarkdownLinkProps) => {
+  if (IMAGE_FILE.test(href)) return <a href={href} download {...props} />;
   if (href.startsWith("/")) return <Link href={href} {...props} />;
   if (href.startsWith("#")) return <a href={href} {...props} />;
   return <a href={href} target="_blank" rel="noreferrer" {...props} />;

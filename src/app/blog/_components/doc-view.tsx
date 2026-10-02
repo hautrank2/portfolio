@@ -1,7 +1,7 @@
 import { CalendarDays, Clock } from "lucide-react";
+import { extractHeadings, readingTime, renderMarkdown } from "~/components/blog/markdown";
 import { Reveal } from "~/components/ui/reveal";
 import { Typography } from "~/components/ui/typography";
-import { extractHeadings, readingTime, renderMarkdown } from "./markdown";
 import type { BlogNodeContextType } from "~/types";
 import { BlogBreadcrumb } from "./breadcrumb";
 import { DocNav } from "./doc-nav";

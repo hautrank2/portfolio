@@ -10,7 +10,7 @@ import {
   Upload,
 } from "lucide-react";
 import Link from "next/link";
-import { CvDocument } from "~/components/cv/cv-document";
+import { CvDocument } from "~/app/cv/_components/cv-document";
 import { Button } from "~/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { useCvEditor } from "./hook";

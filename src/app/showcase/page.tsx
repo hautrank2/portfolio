@@ -5,7 +5,7 @@ import React from "react";
 import PageHeader from "~/components/layouts/page-header";
 import { Button } from "~/components/ui/button";
 import { projectData } from "~/data/projects";
-import ProjectCard3D from "../components/ProjectCard3D";
+import ProjectCard3D from "./_components/ProjectCard3D";
 
 export const metadata: Metadata = {
   title: "showcase",

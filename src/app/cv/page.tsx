@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import PageHeader from "~/components/layouts/page-header";
 import { CvContactActions } from "~/components/cv/cv-contact-actions";
-import { CvDocument } from "~/components/cv/cv-document";
+import PageHeader from "~/components/layouts/page-header";
 import { cvData } from "~/data/cv";
 import { profileData } from "~/data/site";
+import { CvDocument } from "./_components/cv-document";
 
 export const metadata: Metadata = {
   title: "cv",

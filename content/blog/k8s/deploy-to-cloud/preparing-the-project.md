@@ -3,7 +3,7 @@ title: "8.3 Chuẩn bị dự án"
 description: "Một quán cà phê nhỏ: ba API, hai frontend, một database. Đủ để chạm vào cả hai loại volume mà section này cần."
 status: growing
 created: 2026-09-25
-updated: 2026-09-29
+updated: 2026-10-02
 tags: [k8s, deploy, docker, mongodb, react, env]
 ---
 
@@ -13,30 +13,29 @@ luôn có: xác thực, database có state, và file do người dùng tải lê
 📦 [Tải source về](/code/kub-demo-cafe-system.zip) — giải nén ra thư mục
 `kub-demo-cafe-system`.
 
-## Cafe System
+## Cả hệ trên AWS
 
 Khách xem menu và đặt đồ uống, không cần đăng nhập. Chủ quán đăng nhập vào trang quản trị
-để thêm món kèm ảnh, và xem đơn.
+để thêm món kèm ảnh, và xem đơn. Hình dưới là toàn bộ hệ đó khi đã chạy trên EKS: mỗi khối
+là một tài nguyên mà các note từ 8.5 tới 8.18 sẽ tạo ra, đặt đúng chỗ nó nằm trong mạng.
 
-```
-        ┌──────────────┐                      ┌──────────────┐
- Khách  │  shop-web    │             Chủ quán │  admin-web   │
- ─────► │  :8210 (LB)  │             ───────► │  :8211 (LB)  │
-        └──────┬───────┘                      └──────┬───────┘
-               │  nginx proxy /api/*                 │
-       ┌───────┴───────────┬─────────────────┬───────┘
-       ▼                   ▼                 ▼
-┌─────────────┐   ┌─────────────┐   ┌─────────────┐
-│  menu-api   │   │  order-api  │   │  auth-api   │  ← ClusterIP, không ra ngoài
-└──────┬──────┘   └──────┬──────┘   └─────────────┘
-       │ ảnh món         │ đơn hàng          ▲
-       ▼                 ▼                   │ kiểm token
-┌─────────────┐   ┌───────────────┐          │
-│  thư mục    │   │  mongo :27017 │──────────┘
-│  ảnh dùng   │   │  (PVC)        │
-│  chung      │   └───────────────┘
-└─────────────┘
-```
+![Cafe System on AWS EKS, infrastructure view: a VPC with public and private subnets in two Availability Zones, two Classic ELBs, a NAT Gateway, two EC2 worker nodes running the Pods, an EBS volume for MongoDB, EFS mount targets, the EKS control plane and IAM roles](/img/blog/k8s/cafe-eks-infrastructure.svg)
+
+⬇ [Tải hình SVG](/img/blog/k8s/cafe-eks-infrastructure.svg) · ⬇ [Tải hình PNG](/img/blog/k8s/cafe-eks-infrastructure.png)
+
+Chưa cần hiểu hết ngay. Quay lại hình này sau mỗi note — mỗi lần sẽ có thêm một khối bạn
+vừa tự tay tạo.
+
+| Khối trong hình | Tạo ở | Ai tạo |
+| --- | --- | --- |
+| IAM: `eksClusterRole`, `eksNodeRole` | [8.5](/blog/k8s/deploy-to-cloud/iam-roles) | Bạn |
+| VPC, bốn subnet, Internet Gateway, NAT Gateway | [8.6](/blog/k8s/deploy-to-cloud/vpc-and-subnets) | CloudFormation |
+| EFS file system, hai mount target | [8.7](/blog/k8s/deploy-to-cloud/efs-file-system) | Bạn |
+| EKS control plane và add-on | [8.11](/blog/k8s/deploy-to-cloud/creating-a-cluster-with-eks) | Bạn |
+| Hai EC2 worker node | [8.13](/blog/k8s/deploy-to-cloud/adding-worker-nodes) | Node group |
+| Hai Classic ELB, đĩa EBS | [8.14](/blog/k8s/deploy-to-cloud/applying-config-to-the-cluster) | **Kubernetes**, từ YAML của bạn |
+
+### Sáu thành phần chạy trong cụm
 
 | Service | Cổng | Biến môi trường cần | Gọi ai |
 | --- | --- | --- | --- |
@@ -49,6 +48,38 @@ Khách xem menu và đặt đồ uống, không cần đăng nhập. Chủ quán
 
 Ba API **đều nghe cổng 3000**. Việc phân biệt chúng là của Service, không phải của cổng
 app — đúng như [section 7](/blog/k8s/networking) đã dựng nền.
+
+### Vì sao có hai khối "EC2 worker node · node group"
+
+Đó là **một** node group, không phải hai. Node group là thứ *sinh ra* máy; bạn khai nó muốn
+**hai máy**, và nó đặt mỗi máy vào một subnet private ở một Availability Zone khác nhau.
+Hai khối trong hình là hai máy EC2 đó — cùng loại máy, cùng IAM role, cùng cấu hình.
+
+Hai máy chứ không phải một, vì ba lý do:
+
+| Lý do | Cụ thể |
+| --- | --- |
+| **Đủ chỗ** | Cả hệ cần khoảng 25 Pod, tính cả Pod hệ thống. Mỗi máy chỉ chứa được một số Pod giới hạn theo số IP của nó — xem [8.13](/blog/k8s/deploy-to-cloud/adding-worker-nodes) |
+| **Chịu lỗi** | EKS bắt VPC có subnet ở hai AZ. Một máy hoặc cả một AZ hỏng thì Pod được xếp lại sang máy còn lại |
+| **Để học** | Đây mới là lý do chính. Chỉ khi có hai máy ở hai nơi, bạn mới thấy được những thứ cụm một node che mất |
+
+Lý do thứ ba đáng nói kỹ, vì cả nửa sau của section xoay quanh nó:
+
+- **Đĩa EBS chỉ gắn vào một máy, trong một AZ.** Trong hình, nó nằm dưới máy bên trái, và
+  Pod `mongo` buộc phải chạy ở đúng máy đó. Mongo một bản thì ổn.
+- **`menu-api` chạy hai bản, mỗi bản một máy.** Hai bản phải thấy cùng một thư mục ảnh —
+  và một đĩa EBS không làm được việc đó. Vì vậy mới có EFS, với **một mount target ở mỗi
+  AZ**, để máy nào cũng với tới.
+
+Trên cụm một node ở các section trước, hai điều này không bao giờ lộ ra: mọi Pod nằm chung
+một máy, nên volume kiểu gì cũng "dùng chung" được.
+
+Hai lưu ý khi đọc hình:
+
+- **Vị trí các Pod chỉ là một ví dụ.** Scheduler tự quyết Pod nào nằm ở máy nào, và có thể
+  khác đi ở lần chạy của bạn. Chỉ `mongo` là bị ghim — vào máy cùng AZ với đĩa của nó.
+- **Control plane không nằm trong hai máy này.** Nó là khối riêng bên phải, do AWS vận hành.
+  Hai máy chỉ là worker: nơi container của bạn thật sự chạy.
 
 ## Vì sao chỉ hai Service ra ngoài
 
@@ -84,8 +115,8 @@ phân giải tên service y như vậy.
 | Access mode cần | `ReadWriteMany` → **EFS** | `ReadWriteOnce` → **PVC thường** |
 | Hỏng thì thấy gì | Ảnh lúc hiện lúc mất, tuỳ Pod nào trả lời | Mất sạch menu và đơn sau mỗi lần Pod sinh lại |
 
-Ở source khởi điểm, `menu-api` **chưa có volume nào** — ảnh ghi thẳng vào lớp ghi của
-container. Đó là chủ ý: [note 8.15](/blog/k8s/deploy-to-cloud/getting-started-with-volumes)
+Ở manifest bạn sẽ viết lúc đầu, `menu-api` **chưa có volume nào** — ảnh ghi thẳng vào lớp
+ghi của container. Đó là chủ ý: [note 8.15](/blog/k8s/deploy-to-cloud/getting-started-with-volumes)
 sẽ cho bạn thấy nó gãy ở đâu trước khi gắn EFS vào.
 
 > Ở dự án thật, ảnh thường nằm trên **S3** chứ không phải EFS. EFS ở đây là để học
@@ -104,30 +135,105 @@ Section này dùng block **8210–8211**, chọn để không đụng thứ gì 
 | **8210** | **`shop-web` của section này** |
 | **8211** | **`admin-web` của section này** |
 
-## Hai giá trị bạn phải tự đổi
+## Source có gì, và thiếu gì
 
-### 1. Bí mật của `auth-api`
+Giải nén ra, bạn có **code của năm service** và một thư mục ảnh mẫu:
 
-```yaml
-TOKEN_KEY: 'doi-chuoi-nay-di'
-ADMIN_PASSWORD: 'cafe1234'
+```
+kub-demo-cafe-system/
+├── auth-api/      menu-api/      order-api/     ← ba API Node.js, mỗi cái có Dockerfile
+├── shop-web/      admin-web/                    ← hai frontend React + nginx
+└── images/                                      ← vài tấm ảnh đồ uống để upload thử
 ```
 
-Hai chuỗi này nằm ở **hai chỗ**: `docker-compose.yaml` và `kubernetes/auth-api.yaml`. Chúng
-đang nằm thẳng trong YAML, ai chạy `kubectl describe pod` cũng đọc được — Secret giải
-quyết chuyện đó, và đó là câu hỏi mở ở cuối note.
+Thứ **cố ý không có** là mọi file YAML. Bạn sẽ tự viết chúng, đúng lúc cần tới:
 
-### 2. Tên image
+| File | Viết ở | Để làm gì |
+| --- | --- | --- |
+| `docker-compose.yaml` | Note này | Chạy thử cả hệ trên máy, trước khi đụng tới cụm |
+| Sáu file trong `kubernetes/` | [8.14](/blog/k8s/deploy-to-cloud/applying-config-to-the-cluster) | Mongo, ba API, hai frontend trên cụm |
+| `kubernetes/efs.yaml` | [8.17](/blog/k8s/deploy-to-cloud/persistent-volume-for-efs) | Volume dùng chung cho ảnh món |
+
+Viết tay bảy file nghe nhiều, nhưng chúng lặp lại cùng một mẫu Service + Deployment đã học
+ở [section 5](/blog/k8s/k8s-in-action) — và gõ lại một lần là cách chắc nhất để đọc được
+manifest của người khác sau này.
+
+## Viết `docker-compose.yaml`
+
+Tạo file `docker-compose.yaml` ở **gốc** thư mục `kub-demo-cafe-system`:
 
 ```yaml
-image: <your-docker-user>/kub-cafe-auth:1
+services:
+  cafe-mongo-service:
+    image: mongo:6
+    volumes:
+      - mongo-data:/data/db
+
+  cafe-auth-service:
+    build: ./auth-api
+    image: <your-docker-user>/kub-cafe-auth:1
+    environment:
+      TOKEN_KEY: 'doi-chuoi-nay-di'
+      ADMIN_EMAIL: 'admin@cafe.local'
+      ADMIN_PASSWORD: 'cafe1234'
+
+  cafe-menu-service:
+    build: ./menu-api
+    image: <your-docker-user>/kub-cafe-menu:1
+    environment:
+      MONGODB_URI: 'mongodb://cafe-mongo-service:27017/cafe'
+      AUTH_ADDRESS: 'cafe-auth-service:3000'
+      MENU_IMAGE_FOLDER: '/app/data/images'
+    volumes:
+      - menu-images:/app/data/images
+
+  cafe-order-service:
+    build: ./order-api
+    image: <your-docker-user>/kub-cafe-order:1
+    environment:
+      MONGODB_URI: 'mongodb://cafe-mongo-service:27017/cafe'
+      AUTH_ADDRESS: 'cafe-auth-service:3000'
+
+  shop-web:
+    build: ./shop-web
+    image: <your-docker-user>/kub-cafe-shop:1
+    ports:
+      - '8210:80'
+
+  admin-web:
+    build: ./admin-web
+    image: <your-docker-user>/kub-cafe-admin:1
+    ports:
+      - '8211:80'
+
+volumes:
+  mongo-data:
+  menu-images:
 ```
 
-Thay `<your-docker-user>` bằng tài khoản Docker Hub của bạn, ở cả `docker-compose.yaml`
-lẫn năm file trong `kubernetes/`.
+Ba điều đáng để ý trong file này:
+
+- **Tên service của Compose trùng với tên Service sẽ đặt trên cụm** — `cafe-auth-service`,
+  `cafe-menu-service`, `cafe-order-service`, `cafe-mongo-service`. Đó là lý do `nginx.conf` và các
+  biến `AUTH_ADDRESS`, `MONGODB_URI` không phải đổi khi lên Kubernetes.
+- **Chỉ hai frontend mở cổng ra máy.** Ba API và Mongo không có `ports`, giống hệt việc
+  chúng sẽ là `ClusterIP` trên cụm.
+- **Hai volume có tên** — `mongo-data` và `menu-images` — giữ dữ liệu Mongo và ảnh món qua
+  mỗi lần `docker compose down`. Trên cụm, hai vai đó thuộc về EBS và EFS.
+
+### Hai giá trị phải đổi trước khi chạy
+
+**1. Tên image.** Thay `<your-docker-user>` ở **cả năm chỗ** bằng tài khoản Docker Hub của
+bạn. Để nguyên thì Compose báo `invalid reference format`, vì `<` và `>` không hợp lệ trong
+tên image.
+
+**2. Bí mật của `auth-api`.** Đổi `TOKEN_KEY` và `ADMIN_PASSWORD` thành giá trị của riêng
+bạn. Hai chuỗi này sẽ xuất hiện lần nữa trong `kubernetes/auth-api.yaml` ở 8.14 — chúng nằm
+thẳng trong YAML, ai chạy `kubectl describe pod` cũng đọc được. Secret giải quyết chuyện
+đó, và đó là câu hỏi mở ở cuối note.
 
 `MONGODB_URI` thì **không phải đổi**: `mongodb://cafe-mongo-service:27017/cafe` đúng ở cả hai
-môi trường, vì Mongo chạy ngay trong cụm.
+môi trường, vì Mongo chạy ngay bên cạnh các API.
 
 ## Build năm image
 
@@ -188,24 +294,27 @@ docker compose ps
 
 Mở **trang quản trị** ở `http://localhost:8211`:
 
-1. Đăng nhập bằng `admin@cafe.local` và mật khẩu bạn vừa đặt.
-2. Thêm một món, chọn một ảnh bất kỳ dưới 2MB.
+1. Đăng nhập bằng `admin@cafe.local` và mật khẩu bạn vừa đặt, bấm **Log in**.
+2. Ở khung **Add item**, điền tên và giá, chọn một ảnh trong thư mục `images/` của source
+   (hoặc ảnh bất kỳ dưới 2MB), bấm **Add item**.
 3. Món hiện ra trong danh sách, kèm ảnh.
 
 Rồi mở **trang khách** ở `http://localhost:8210`:
 
 1. Món vừa thêm phải hiện ra kèm ảnh.
-2. Nhập số lượng, điền tên, bấm **Đặt đơn**.
-3. Quay lại trang quản trị, bấm **Tải lại** ở mục đơn — đơn vừa đặt nằm đó.
+2. Nhập số lượng, điền tên, bấm **Place order**.
+3. Quay lại trang quản trị — đơn vừa đặt hiện ở mục **Recent orders**. Chưa thấy thì bấm
+   **Reload**.
 
 Chuỗi này chạy được nghĩa là **cả năm mắt xích đều thông**: nginx proxy đúng, `menu` và
 `order` nối được Mongo, và cả hai gọi được `auth` để kiểm token.
 
 | Triệu chứng | Nơi hỏng |
 | --- | --- |
-| Đăng nhập báo `401` | Sai `ADMIN_EMAIL` hoặc `ADMIN_PASSWORD` |
-| Thêm món báo `503 Không kiểm tra được token` | `menu-api` không gọi được `cafe-auth-service` |
-| Menu trống dù đã thêm | `menu-api` không nối được Mongo — xem `docker compose logs cafe-menu-service` |
+| Đăng nhập báo `Wrong email or password.` | Sai `ADMIN_EMAIL` hoặc `ADMIN_PASSWORD` |
+| Thêm món báo `Could not verify token.` | `menu-api` không gọi được `cafe-auth-service` |
+| Thêm món báo `Could not save item.` | `menu-api` không nối được Mongo — xem `docker compose logs cafe-menu-service` |
+| `docker compose up` báo `invalid reference format` | Còn sót `<your-docker-user>` trong `docker-compose.yaml` |
 | Ảnh vỡ, các phần khác bình thường | File không nằm ở `MENU_IMAGE_FOLDER` |
 
 Dọn trước khi sang cụm, để khỏi tranh cổng:
@@ -232,6 +341,7 @@ hôm sau không làm đổi đơn hôm nay.
 ## Self-check
 
 - [ ] Kể năm service, cổng, và ai gọi ai
+- [ ] Viết được `docker-compose.yaml` cho cả hệ, và nói được vì sao chỉ hai service có `ports`
 - [ ] Nói được vì sao chỉ hai Service cần `LoadBalancer`
 - [ ] Giải thích vì sao `nginx.conf` dùng chung được cho Compose và cụm
 - [ ] Phân biệt hai bài toán volume: ảnh món và dữ liệu Mongo

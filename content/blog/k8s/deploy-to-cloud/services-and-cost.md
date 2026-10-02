@@ -52,7 +52,7 @@ hiện ra ở mặt hoá đơn: **K8s tiêu tài nguyên cloud thay bạn, nên 
 ## Ước tính chi phí
 
 Đây là con số cho **đúng cấu hình của demo này**: 1 cluster, 2 worker node `t3.medium`,
-1 NAT Gateway, 2 load balancer, EFS vài MB, 1 đĩa EBS 8Gi.
+1 NAT Gateway, 2 load balancer, EFS vài MB, 1 đĩa EBS 2Gi.
 
 | Khoản | Đơn vị tính | Xấp xỉ mỗi giờ |
 | --- | --- | --- |
@@ -60,7 +60,7 @@ hiện ra ở mặt hoá đơn: **K8s tiêu tài nguyên cloud thay bạn, nên 
 | EC2 worker | 2 × `t3.medium` | ~$0.10 |
 | NAT Gateway | 1 cái + lưu lượng | ~$0.06 |
 | ELB | 2 cái + lưu lượng | ~$0.05 |
-| EBS `gp2` | 8Gi | ~$0.001 |
+| EBS `gp2` | 2Gi | ~$0.001 |
 | EFS | vài MB | ~$0 |
 | **Tổng** | | **~$0.31 / giờ** |
 

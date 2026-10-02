@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import PageHeader from "~/components/layouts/page-header";
-import { RecipeCard } from "~/components/recipes/recipe-card";
 import { getAllRecipes, recipeCategoryLabels, recipePathTitle } from "~/lib/recipes";
 import type { RecipeCategoryType } from "~/types";
+import { RecipeCard } from "./_components/recipe-card";
 
 export const metadata: Metadata = {
   title: recipePathTitle(),

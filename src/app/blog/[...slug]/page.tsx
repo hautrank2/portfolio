@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { DocView } from "~/components/blog/doc-view";
-import { SectionView } from "~/components/blog/section-view";
 import { blogPathTitle, getAllBlogPaths, getBlogNode } from "~/lib/blog";
+import { DocView } from "../_components/doc-view";
+import { SectionView } from "../_components/section-view";
 
 type PagePropsType = { params: Promise<{ slug: string[] }> };
 

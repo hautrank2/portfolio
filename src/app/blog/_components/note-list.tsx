@@ -1,6 +1,6 @@
 import { CalendarDays } from "lucide-react";
 import Link from "next/link";
-import { readingTime } from "./markdown";
+import { readingTime } from "~/components/blog/markdown";
 import type { BlogNodeType } from "~/types";
 import { StatusBadge } from "./status-badge";
 

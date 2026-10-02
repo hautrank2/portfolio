@@ -176,6 +176,11 @@ kubectl get storageclass
 kubectl get csidrivers
 ```
 
+| Lệnh | Phải thấy |
+| --- | --- |
+| `get storageclass` | `gp2`, với `WaitForFirstConsumer` và `Delete`. Không có chữ `(default)` là bình thường trên EKS mới |
+| `get csidrivers` | `ebs.csi.aws.com`. Thêm `efs.csi.aws.com` nếu đã tick add-on EFS ở Step 4 của [8.11](/blog/k8s/deploy-to-cloud/creating-a-cluster-with-eks) — khi đó bước cài driver ở 8.16 bỏ qua được |
+
 Khác biệt lớn nhất so với k3s: k3s ship sẵn `local-path` và đặt làm mặc định, nên ở module
 6 bạn khai PVC là có ngay. Trên EKS, phần "có ngay" đó là thứ **bạn phải tự cài**.
 
@@ -187,6 +192,10 @@ khoác áo PVC.
 ```bash
 kubectl get storageclass local-path -o jsonpath='{.provisioner}{"\n"}'
 ```
+
+> Lệnh này dành cho cụm **k3s hoặc k3d**. Trên EKS nó báo `NotFound` — đúng, vì EKS không có
+> `local-path`. Mục này nói về bài học ở section 6 để so sánh; đang ở EKS thì đọc, không cần
+> chạy.
 
 Trên cụm nhiều node, PV do nó cấp bị **ghim vào một node** qua `nodeAffinity`. Pod nào cần
 PVC đó buộc phải chạy trên đúng node ấy, và node chết là Pod `Pending` vô thời hạn.

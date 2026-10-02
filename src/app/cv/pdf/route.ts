@@ -1,5 +1,5 @@
-import { renderCvPdf } from "~/components/cv/cv-pdf";
 import { cvData } from "~/data/cv";
+import { renderCvPdf } from "./_components/cv-pdf";
 
 /**
  * Rendered once at build time: the CV only changes when `cv.json` is committed,

@@ -1,5 +1,5 @@
-import { BlogSidebar, BlogTrackNavMobile } from "~/components/blog/sidebar";
 import { getBlogNode, toSidebarTree } from "~/lib/blog";
+import { BlogSidebar, BlogTrackNavMobile } from "../_components/sidebar";
 
 type LayoutPropsType = {
   children: React.ReactNode;

@@ -12,6 +12,7 @@ chạm vào file nào**, nên nó không liên quan gì tới bài toán EFS.
 | `POST` | `/orders` | **Không** | shop-web — khách đặt đơn |
 | `GET` | `/orders` | **Có** | admin-web — màn hình pha chế |
 | `GET` | `/orders/health` | Không | bạn, và probe |
+| `WS` | `/orders/ws` | Không | shop-web, admin-web — nhận trạng thái đơn theo thời gian thực |
 
 Bất đối xứng ở cột "Cần token" là chủ ý: **ai cũng đặt được đơn, nhưng chỉ chủ quán xem
 được danh sách đơn.** Đây là hình dạng thật của một quán cà phê, và nó khác mọi thứ bạn đã
@@ -27,7 +28,7 @@ Collection `orders`.
 | `note` | `String` | Mặc định `''` |
 | `lines[]` | `itemId`, `name`, `price`, `quantity` | **Chụp lại** tên và giá lúc đặt |
 | `total` | `Number` | Bắt buộc, do server tính |
-| `status` | `String` | Mặc định `'new'`. Chưa có endpoint nào đổi nó |
+| `status` | `String` | Chỉ có hai giá trị: `'new'` lúc đặt, `'received'` sau 10 giây |
 | `createdAt` | `Date` | Mặc định `Date.now` |
 
 `lines[]` lưu cả `name` và `price` thay vì chỉ `itemId` — đó không phải trùng lặp dữ liệu
@@ -65,7 +66,7 @@ lấy từ client.** Nếu tin giá do client gửi, ai cũng mở DevTools và 
 **Response `201`**
 
 ```json
-{ "order": { "id": "66f0aabbccddeeff00112233", "total": 50000 } }
+{ "order": { "id": "66f0aabbccddeeff00112233", "total": 50000, "status": "new" } }
 ```
 
 Chỉ trả `id` và `total` — khách không cần thấy lại toàn bộ đơn.
@@ -74,22 +75,22 @@ Chỉ trả `id` và `total` — khách không cần thấy lại toàn bộ đ�
 
 | Mã | `message` | Nguyên nhân |
 | --- | --- | --- |
-| `422` | `Thiếu tên khách hoặc danh sách món.` | Thiếu `customerName`, hoặc `lines` không phải array, hoặc rỗng |
-| `422` | `Không có món <id>.` | `itemId` không tồn tại trong collection `items` |
-| `500` | `Không tạo được đơn.` | Lỗi MongoDB, hoặc `itemId` **không đúng định dạng ObjectId** |
+| `422` | `Missing customer name or item list.` | Thiếu `customerName`, hoặc `lines` không phải array, hoặc rỗng |
+| `422` | `Item <id> not found.` | `itemId` không tồn tại trong collection `items` |
+| `500` | `Could not create order.` | Lỗi MongoDB, hoặc `itemId` **không đúng định dạng ObjectId** |
 
 Hai dòng cuối dễ lẫn nhau, và cách phân biệt đáng nhớ:
 
 | `itemId` gửi lên | Kết quả |
 | --- | --- |
-| Đúng định dạng, không có trong DB | `422 Không có món …` |
+| Đúng định dạng, không có trong DB | `422 Item … not found` |
 | Sai định dạng, ví dụ `"abc"` | `500` — `findById` ném lỗi cast trước khi kịp kiểm |
 
 Và một lỗi cấu hình gây ra `422` trông như lỗi dữ liệu:
 
 > `order-api` và `menu-api` **phải trỏ vào cùng một database**. Hai `MONGODB_URI` khác
 > nhau — khác host, hay chỉ khác tên db ở cuối chuỗi — thì `POST /orders` luôn trả
-> `422 Không có món <id>` dù menu trên trang đang hiện đầy món. Trang web trông hoàn toàn
+> `422 Item <id> not found` dù menu trên trang đang hiện đầy món. Trang web trông hoàn toàn
 > bình thường, `menu-api` không có lỗi gì, và `order-api` cũng không.
 
 Kiểm bằng cách so hai biến từ chính hai tiến trình:
@@ -131,15 +132,56 @@ Cần `Authorization: Bearer <token>`. Trả **50 đơn mới nhất**, `created
 
 | Mã | `message` | Nguyên nhân |
 | --- | --- | --- |
-| `401` | `Thiếu token.` | Không có header `Authorization` |
-| `401` | `Token không hợp lệ.` | Token sai, hoặc đã quá 8 giờ |
-| `500` | `Không đọc được đơn.` | Lỗi MongoDB |
-| `503` | `Không kiểm tra được token.` | Không gọi được auth-api — sai `AUTH_ADDRESS`, hoặc auth chết |
+| `401` | `Missing token.` | Không có header `Authorization` |
+| `401` | `Invalid token.` | Token sai, hoặc đã quá 8 giờ |
+| `500` | `Could not load orders.` | Lỗi MongoDB |
+| `503` | `Could not verify token.` | Không gọi được auth-api — sai `AUTH_ADDRESS`, hoặc auth chết |
 
 `admin-web` bắt riêng `401` và tự đăng xuất, nên triệu chứng bạn thấy trên trang là **bị
 đẩy về form đăng nhập** chứ không phải một thông báo lỗi. Gặp chuyện đó thì kiểm `401` hay
 `503` bằng tab Network, vì `503` cũng làm trang trông như hỏng nhưng nguyên nhân hoàn toàn
 khác.
+
+---
+
+## `WS /orders/ws`
+
+WebSocket, cùng cổng `3000` với HTTP — không phải khai thêm cổng nào trong Service.
+
+Mỗi đơn phát **hai** sự kiện tới mọi client đang nối:
+
+```json
+{ "type": "order", "id": "66f0aabbccddeeff00112233", "status": "new" }
+{ "type": "order", "id": "66f0aabbccddeeff00112233", "status": "received" }
+```
+
+Sự kiện đầu phát ngay khi `POST /orders` thành công; sự kiện sau phát **10 giây** sau, khi
+order-api tự chuyển đơn sang `received`. Sự kiện chỉ có `id` và `status` — socket công khai
+nên không được lộ tên khách. admin-web nhận `new` thì gọi lại `GET /orders` (có token) để
+lấy chi tiết; shop-web chỉ theo dõi những `id` nó vừa đặt.
+
+Server ping mỗi 30 giây để nginx và load balancer không cắt kết nối im lặng.
+
+Thử bằng Node ≥ 22 (có sẵn `WebSocket`):
+
+```bash
+node -e "new WebSocket('ws://localhost:8214/orders/ws').onmessage = (e) => console.log(e.data)"
+```
+
+**Đi qua nginx** thì cần khối `location /api/orders/ws` riêng với hai header `Upgrade` và
+`Connection` — nginx không tự chuyển tiếp chúng. Thiếu là trình duyệt nhận `400` và socket
+không bao giờ mở, trong khi mọi `fetch` khác vẫn chạy bình thường.
+
+**Hẹn giờ nằm trong bộ nhớ của Pod.** Hai hệ quả khi lên Kubernetes:
+
+- Pod chết trong 10 giây đó thì mất hẹn giờ. Lúc khởi động, order-api tìm mọi đơn còn
+  `new` và hẹn giờ lại — đơn quá hạn chuyển `received` ngay. Nhưng sự kiện chỉ tới những
+  client đã nối lại kịp.
+- **`replicas` > 1 thì sự kiện bị lạc.** Đơn được tạo ở Pod A, hẹn giờ chạy ở Pod A, nhưng
+  trình duyệt có thể đang nối WebSocket vào Pod B — và Pod B không biết gì. Trạng thái trong
+  MongoDB vẫn đúng (bấm Reload là thấy), chỉ có cập nhật trực tiếp là mất. Muốn scale thật
+  thì cần một kênh chung giữa các Pod (Redis pub/sub, hoặc change stream — cần MongoDB chạy
+  replica set). Giữ `replicas: 1` cho order-api.
 
 ---
 

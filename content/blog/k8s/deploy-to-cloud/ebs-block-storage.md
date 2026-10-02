@@ -11,7 +11,7 @@ tags: [k8s, aws, ebs, storage, pvc, csi]
 > này là chỗ ở của thứ còn lại có state: **dữ liệu MongoDB**.
 
 Khác với EFS, bạn **không bấm tạo** EBS. Nó sinh ra từ một dòng YAML trong
-`kubernetes/mongo.yaml`, lúc bạn apply ở [8.14](/blog/k8s/deploy-to-cloud/applying-config-to-the-cluster).
+`kubernetes/mongo.yaml` — file bạn sẽ viết và apply ở [8.14](/blog/k8s/deploy-to-cloud/applying-config-to-the-cluster).
 
 Vậy sao nó có note riêng, đặt trước cả cluster? Vì **dòng YAML đó chỉ viết đúng được khi
 bạn đã hiểu hai ràng buộc của EBS.** Không hiểu thì lỗi sẽ đến dưới dạng một Pod `Pending`
@@ -49,7 +49,7 @@ AZ, vì [8.6](/blog/k8s/deploy-to-cloud/vpc-and-subnets) bắt buộc như vậy
 gắn được vào một node"**. Hai Pod trên cùng node vẫn dùng chung được; hai Pod trên hai
 node thì không.
 
-Đó là lý do `mongo.yaml` có đoạn này:
+Đó là lý do `mongo.yaml` sẽ có đoạn này:
 
 ```yaml
 spec:
@@ -71,7 +71,7 @@ không có database — với một Mongo một bản, đó là cái giá không
 
 ## Từ một dòng PVC tới một đĩa thật
 
-`mongo.yaml` khai PVC như sau:
+`mongo.yaml` sẽ khai PVC như sau:
 
 ```yaml
 apiVersion: v1

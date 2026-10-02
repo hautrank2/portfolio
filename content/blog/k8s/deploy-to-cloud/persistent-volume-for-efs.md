@@ -13,7 +13,8 @@ tags: [k8s, aws, efs, csi, pv, pvc, storageclass]
 
 Note này **khai phía Kubernetes** những gì đã tồn tại phía AWS, rồi nối nó vào `menu-api`.
 
-Ba object mới nằm trong một file riêng, `kubernetes/efs.yaml`.
+Ba object mới nằm trong một file riêng. Tạo file `kubernetes/efs.yaml`, rồi chép lần lượt
+ba khối YAML ở ba mục dưới vào đó, **cách nhau bằng một dòng `---`**.
 
 ## StorageClass — cái tên để hai bên tìm thấy nhau
 
@@ -167,8 +168,9 @@ khi có Pod đi mount, tức là ngay dưới đây.
 
 ## Nối PVC vào `menu-api`
 
-PVC `Bound` rồi thì mới chỉ là **một chỗ đã được giữ**. Pod chưa thấy gì cả. Sửa
-`kubernetes/menu-api.yaml`, thêm hai khối:
+PVC `Bound` rồi thì mới chỉ là **một chỗ đã được giữ**. Pod chưa thấy gì cả. Mở
+`kubernetes/menu-api.yaml` đã viết ở [8.14](/blog/k8s/deploy-to-cloud/applying-config-to-the-cluster),
+thêm hai khối vào Deployment:
 
 ```yaml
     spec:

@@ -43,8 +43,8 @@ Payload trong token gồm `email` và `role: "admin"`. Không có gì bí mật 
 
 | Mã | `message` | Nguyên nhân |
 | --- | --- | --- |
-| `422` | `Thiếu email hoặc mật khẩu.` | Một trong hai trường rỗng hoặc thiếu |
-| `401` | `Sai email hoặc mật khẩu.` | Không khớp `ADMIN_EMAIL` / `ADMIN_PASSWORD` |
+| `422` | `Missing email or password.` | Một trong hai trường rỗng hoặc thiếu |
+| `401` | `Wrong email or password.` | Không khớp `ADMIN_EMAIL` / `ADMIN_PASSWORD` |
 | `500` | *(Express in stack trace)* | **`TOKEN_KEY` chưa được đặt** — `jwt.sign` ném lỗi |
 
 Dòng `500` là dòng đáng nhớ nhất: request đúng, mật khẩu đúng, nhưng vẫn `500` vì thiếu
@@ -71,7 +71,7 @@ middleware `requireAdmin`.
 
 | Mã | `message` | Nguyên nhân |
 | --- | --- | --- |
-| `401` | `Token không hợp lệ.` | Token sai, hỏng, đã hết 8 giờ, hoặc ký bằng `TOKEN_KEY` khác |
+| `401` | `Invalid token.` | Token sai, hỏng, đã hết 8 giờ, hoặc ký bằng `TOKEN_KEY` khác |
 
 Trường hợp cuối là bẫy: **đổi `TOKEN_KEY` rồi restart thì mọi token đang lưu ở trình duyệt
 thành vô hiệu.** Admin đang mở tab sẽ bị đẩy về trang đăng nhập, và trông như một lỗi ngẫu

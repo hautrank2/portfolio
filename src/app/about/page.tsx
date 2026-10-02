@@ -4,13 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import PageHeader from "~/components/layouts/page-header";
+import Experiences from "~/components/sections/experiences";
+import SectionHeadline from "~/components/sections/section-headline";
 import { Button } from "~/components/ui/button";
 import { Reveal } from "~/components/ui/reveal";
 import { Typography } from "~/components/ui/typography";
 import { experienceData } from "~/data/experiences";
 import { profileData, stackData } from "~/data/site";
-import Experiences from "../components/Experiences";
-import SectionHeadline from "../components/SectionHeadline";
 
 const current = experienceData[0];
 

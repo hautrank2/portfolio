@@ -3,18 +3,19 @@ title: "8.14 Áp cấu hình Kubernetes lên cluster"
 description: "Cùng bộ YAML, cụm khác — cộng một danh sách kiểm mà khoá học không có, vì năm 2020 EKS chưa bắt bạn tự cài những thứ này."
 status: growing
 created: 2026-09-25
-updated: 2026-09-29
+updated: 2026-10-02
 tags: [k8s, eks, kubectl, deploy, loadbalancer, addon]
 ---
 
 > Tiếp [8.13](/blog/k8s/deploy-to-cloud/adding-worker-nodes). `kubectl get nodes` ra node
-> `Ready`, và thư mục `kub-demo-cafe-system` từ
-> [8.3](/blog/k8s/deploy-to-cloud/preparing-the-project) đã sẵn sàng.
+> `Ready`, và năm image của [8.3](/blog/k8s/deploy-to-cloud/preparing-the-project) đã nằm
+> trên Docker Hub.
 
 `kubectl apply -f` không có gì mới. Bảy section vừa rồi bạn học một API, và API ấy không
 đổi khi cụm nằm trên máy người khác.
 
-Thứ đổi là **mọi tầng bên dưới nó**. Note này đi qua danh sách kiểm trước, rồi mới apply.
+Thứ đổi là **mọi tầng bên dưới nó**. Note này đi qua danh sách kiểm trước, viết sáu file
+manifest, rồi mới apply.
 
 ## Danh sách kiểm trước khi apply
 
@@ -73,14 +74,341 @@ kubectl run ipcheck --rm -i --restart=Never --image=busybox:1.36 -- wget -qO- -T
 [8.11](/blog/k8s/deploy-to-cloud/creating-a-cluster-with-eks) và
 [8.13](/blog/k8s/deploy-to-cloud/adding-worker-nodes).
 
-## 1. Sửa YAML cho cụm thật
+## 1. Viết sáu file manifest
 
-Năm file trong `kubernetes/` đều có hai chỗ cần xem:
+Source ở [8.3](/blog/k8s/deploy-to-cloud/preparing-the-project) không có manifest nào. Tạo
+thư mục `kubernetes/` ở gốc dự án, rồi viết sáu file dưới đây.
+
+```bash
+mkdir kubernetes
+```
+
+Cả sáu theo cùng một mẫu: **một Service, một dòng `---`, một Deployment**. Khác nhau ở
+tên, nhãn, cổng và biến môi trường — đúng những thứ đã ghi ở bảng service của 8.3.
+
+Ở năm file có image của bạn, thay `<your-docker-user>` bằng tài khoản Docker Hub — cùng tên
+đã dùng lúc `docker push`.
+
+### `kubernetes/mongo.yaml`
+
+File duy nhất có ba object: thêm một PVC xin đĩa cho Mongo. Từng dòng của nó đã được giải
+thích ở [8.8](/blog/k8s/deploy-to-cloud/ebs-block-storage).
 
 ```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cafe-mongo-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  # On EKS this class needs the aws-ebs-csi-driver add-on.
+  # On k3d, change it to local-path.
+  storageClassName: gp2
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cafe-mongo-service
+spec:
+  selector:
+    app: mongo
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cafe-mongo-deployment
+spec:
+  replicas: 1
+  # Recreate: delete the old Pod before creating the new one. With the default
+  # RollingUpdate, two Pods would claim the same ReadWriteOnce volume.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: mongo
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers:
+        - name: mongo
+          image: mongo:6
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongo-data
+              mountPath: /data/db
+      volumes:
+        - name: mongo-data
+          persistentVolumeClaim:
+            claimName: cafe-mongo-pvc
+```
+
+### `kubernetes/auth-api.yaml`
+
+`ClusterIP`: `auth` chỉ được gọi từ trong cụm, không bao giờ từ internet. Đổi `TOKEN_KEY`
+và `ADMIN_PASSWORD` thành đúng giá trị bạn đã đặt trong `docker-compose.yaml`.
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: cafe-auth-service
+spec:
+  selector:
+    app: auth
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cafe-auth-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auth
+  template:
+    metadata:
+      labels:
+        app: auth
+    spec:
+      containers:
+        - name: auth-api
           image: <your-docker-user>/kub-cafe-auth:1
           imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          env:
+            - name: TOKEN_KEY
+              value: 'doi-chuoi-nay-di'
+            - name: ADMIN_EMAIL
+              value: 'admin@cafe.local'
+            - name: ADMIN_PASSWORD
+              value: 'cafe1234'
 ```
+
+### `kubernetes/menu-api.yaml`
+
+Chưa có volume nào — đó là chủ ý. Ảnh sẽ ghi vào lớp ghi của container, và
+[8.15](/blog/k8s/deploy-to-cloud/getting-started-with-volumes) cho bạn thấy nó gãy ở đâu
+trước khi [8.17](/blog/k8s/deploy-to-cloud/persistent-volume-for-efs) gắn EFS vào.
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: cafe-menu-service
+spec:
+  selector:
+    app: menu
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cafe-menu-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: menu
+  template:
+    metadata:
+      labels:
+        app: menu
+    spec:
+      containers:
+        - name: menu-api
+          image: <your-docker-user>/kub-cafe-menu:1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          env:
+            - name: MONGODB_URI
+              value: 'mongodb://cafe-mongo-service:27017/cafe'
+            - name: AUTH_ADDRESS
+              value: 'cafe-auth-service:3000'
+            - name: MENU_IMAGE_FOLDER
+              value: '/app/data/images'
+```
+
+### `kubernetes/order-api.yaml`
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: cafe-order-service
+spec:
+  selector:
+    app: order
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cafe-order-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order
+  template:
+    metadata:
+      labels:
+        app: order
+    spec:
+      containers:
+        - name: order-api
+          image: <your-docker-user>/kub-cafe-order:1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+          env:
+            - name: MONGODB_URI
+              value: 'mongodb://cafe-mongo-service:27017/cafe'
+            - name: AUTH_ADDRESS
+              value: 'cafe-auth-service:3000'
+```
+
+### `kubernetes/shop-web.yaml`
+
+Một trong hai Service `LoadBalancer`. Cổng `8210` là cổng load balancer nghe; `targetPort:
+80` là cổng nginx trong container. Annotation `scheme` được giải thích ở
+[8.9](/blog/k8s/deploy-to-cloud/elastic-load-balancing).
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: cafe-shop-web-service
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+spec:
+  selector:
+    app: shop-web
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 8210
+      targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cafe-shop-web-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: shop-web
+  template:
+    metadata:
+      labels:
+        app: shop-web
+    spec:
+      containers:
+        - name: shop-web
+          image: <your-docker-user>/kub-cafe-shop:1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+```
+
+### `kubernetes/admin-web.yaml`
+
+Giống `shop-web.yaml`, khác tên, nhãn, image và cổng `8211`.
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: cafe-admin-web-service
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+spec:
+  selector:
+    app: admin-web
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 8211
+      targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cafe-admin-web-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: admin-web
+  template:
+    metadata:
+      labels:
+        app: admin-web
+    spec:
+      containers:
+        - name: admin-web
+          image: <your-docker-user>/kub-cafe-admin:1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+```
+
+### Kiểm trước khi apply
+
+Sáu file, không file nào còn placeholder:
+
+```bash
+kubectl apply --dry-run=client -f kubernetes/
+```
+
+**Đúng:** mười ba dòng `created (dry run)` — sáu Service, sáu Deployment, một PVC — và
+không có lỗi nào.
+
+**Nếu báo lỗi YAML:** gần như luôn là thụt lề. Thông báo ghi tên file và số dòng.
+
+Lệnh trên không bắt được placeholder còn sót, vì `<your-docker-user>` vẫn là một chuỗi hợp
+lệ với YAML. Tìm riêng:
+
+```bash
+grep -rn "your-docker-user" kubernetes/
+```
+
+**PowerShell:**
+
+```powershell
+Select-String -Path kubernetes\*.yaml -Pattern "your-docker-user"
+```
+
+**Đúng:** không in ra gì. Còn dòng nào thì Pod của file đó sẽ kẹt `InvalidImageName`.
+
+Hai trường trong năm Deployment của bạn quyết định image được kéo từ đâu:
 
 | Trường | Ở lab k3s | Trên EKS |
 | --- | --- | --- |
@@ -99,8 +427,6 @@ for i in auth menu order shop admin; do docker manifest inspect <your-docker-use
 foreach ($i in "auth","menu","order","shop","admin") { docker manifest inspect "<your-docker-user>/kub-cafe-${i}:1" > $null; if ($?) { "OK $i" } }
 ```
 
-Và trong `kubernetes/mongo.yaml`, `storageClassName: gp2` chỉ dùng được khi add-on
-`aws-ebs-csi-driver` đã cài. Trên k3d thì đổi thành `local-path`.
 
 ## 2. Apply theo thứ tự
 
@@ -151,9 +477,29 @@ kubectl apply -f kubernetes/auth-api.yaml -f kubernetes/menu-api.yaml -f kuberne
 kubectl get pods -o wide
 ```
 
-> Thứ tự apply không bắt buộc đúng — Kubernetes tự hội tụ về trạng thái bạn khai, và một
-> Pod khởi động trước database sẽ tự nối lại sau. Apply Mongo trước chỉ để bạn đọc log
-> cho dễ.
+Kiểm hai API đã nối được Mongo — mỗi lệnh phải in ra dòng `đã nối được MongoDB`:
+
+```bash
+kubectl logs deploy/cafe-menu-deployment --tail=5
+```
+
+```bash
+kubectl logs deploy/cafe-order-deployment --tail=5
+```
+
+**Nếu thấy `KHÔNG NỐI ĐƯỢC MONGODB`:** API đó khởi động trước khi Mongo sẵn sàng. `menu-api`
+và `order-api` chỉ thử nối **một lần** lúc khởi động, không tự thử lại — Pod vẫn `Running`,
+nhưng mọi thao tác với database sẽ báo `Could not save item.` hay `Could not load menu.`.
+Khởi động lại đúng Deployment đó:
+
+```bash
+kubectl rollout restart deployment cafe-menu-deployment
+```
+
+> Đó là lý do apply Mongo trước và **chờ `rollout status`** xong mới apply phần còn lại.
+> Chuyện này quay lại mỗi khi mọi Pod khởi động cùng lúc — sau khi tạo lại node group
+> chẳng hạn. Cách chữa tận gốc là `initContainers` chờ Mongo, hoặc `readinessProbe`; cả hai
+> nằm ở [9.2](/blog/k8s/wrap-up/what-to-learn-next).
 
 ## 3. `EXTERNAL-IP` không còn là một IP
 
@@ -163,12 +509,12 @@ kubectl get svc
 
 ```
 NAME                TYPE           CLUSTER-IP      EXTERNAL-IP                                   PORT(S)
-cafe-admin-web-service   LoadBalancer   10.100.x.x      k8s-default-adminweb-...elb.amazonaws.com     8211:31234/TCP
+cafe-admin-web-service   LoadBalancer   10.100.x.x      ad3fcc6c…-272975491.<region>.elb.amazonaws.com   8211:31234/TCP
 cafe-auth-service        ClusterIP      10.100.y.y      <none>                                        3000/TCP
 cafe-menu-service        ClusterIP      10.100.z.z      <none>                                        3000/TCP
 cafe-mongo-service       ClusterIP      10.100.a.a      <none>                                        27017/TCP
 cafe-order-service       ClusterIP      10.100.b.b      <none>                                        3000/TCP
-cafe-shop-web-service    LoadBalancer   10.100.c.c      k8s-default-shopweb-...elb.amazonaws.com      8210:32345/TCP
+cafe-shop-web-service    LoadBalancer   10.100.c.c      a70a358e…-1652082020.<region>.elb.amazonaws.com  8210:32345/TCP
 ```
 
 | | k3s (ServiceLB) | EKS |
@@ -210,11 +556,14 @@ while (-not (Resolve-DnsName $ADMIN -ErrorAction SilentlyContinue)) { Start-Slee
 
 Mở `http://<ADMIN>:8211` trên trình duyệt:
 
-1. Đăng nhập → chứng minh `admin-web` → `auth-api` thông.
-2. Thêm một món kèm ảnh → chứng minh `menu-api` ghi được Mongo và ghi được file.
-3. Mở `http://<SHOP>:8210`, đặt một đơn → chứng minh `order-api` đọc được giá từ Mongo và
-   gọi được `auth`.
-4. Quay lại admin, bấm **Tải lại** → đơn hiện ra.
+1. **Log in** → chứng minh `admin-web` → `auth-api` thông.
+2. **Add item** kèm một ảnh trong thư mục `images/` → chứng minh `menu-api` ghi được Mongo
+   và ghi được file.
+3. Mở `http://<SHOP>:8210`, bấm **Place order** → chứng minh `order-api` đọc được giá từ
+   Mongo và gọi được `auth`.
+4. Quay lại admin → đơn hiện ở **Recent orders**; chưa thấy thì bấm **Reload**.
+
+Nhớ gõ đủ `http://` và cổng. Load balancer chỉ nghe `8210` và `8211`, không nghe cổng 80.
 
 Bốn bước đó đi qua **toàn bộ** các mũi tên trong sơ đồ ở 8.3. Không cần `curl` dòng nào.
 
@@ -230,9 +579,10 @@ kubectl get pods
 | --- | --- |
 | `ImagePullBackOff` | Chưa push, repo private, hoặc `imagePullPolicy` vẫn `IfNotPresent` |
 | `ImagePullBackOff` kèm `no match for platform` | Build trên máy ARM — build lại với `--platform linux/amd64` |
-| `Pending` | Hết chỗ, hoặc PVC chưa `Bound` |
+| `Pending` | Node hết chỗ — `Too many pods`, kiểm 10 ở [8.13](/blog/k8s/deploy-to-cloud/adding-worker-nodes) — hoặc PVC chưa `Bound` |
 | `CrashLoopBackOff` | Thiếu hoặc sai biến môi trường |
-| `Completed` rồi restart | App tự thoát — với `menu`/`order` thường là không nối được Mongo |
+| `InvalidImageName` | Còn sót `<your-docker-user>` trong manifest |
+| `Running` nhưng thêm món báo `Could not save item.` | API khởi động trước Mongo và không nối lại — `kubectl rollout restart` Deployment đó |
 | `Running` nhưng giao diện lỗi | Xem mục dưới |
 
 ```bash
@@ -267,12 +617,21 @@ kubectl describe svc cafe-shop-web-service | Select-String -Pattern "Events:" -C
 
 | Event | Cách sửa |
 | --- | --- |
-| `sts:TagSession ... AccessDenied` | Trust policy của `eksClusterRole` — xem [8.11](/blog/k8s/deploy-to-cloud/creating-a-cluster-with-eks) |
-| `is not authorized to perform: ec2:…` | Role thiếu policy, gắn bốn policy của Auto Mode |
+| `sts:TagSession ... AccessDenied` | Chỉ gặp khi cụm **bật Auto Mode**: trust policy của `eksClusterRole` thiếu `sts:TagSession` — xem [8.5](/blog/k8s/deploy-to-cloud/iam-roles) |
+| `is not authorized to perform: …` | `eksClusterRole` thiếu policy. Auto Mode tắt: phải có `AmazonEKSClusterPolicy`. Auto Mode bật: thêm bốn policy ở lệnh dưới |
 | `could not find any suitable subnets` | Subnet public thiếu tag `kubernetes.io/role/elb` |
 | Không có event nào | Cụm không có node `Ready` |
 
 Chuỗi lỗi này đi **sâu dần**, nên mỗi lần đổi thông báo là một bước tiến.
+
+Kiểm role đang có những policy nào:
+
+```bash
+aws iam list-attached-role-policies --role-name eksClusterRole --query "AttachedPolicies[].PolicyName" --output text
+```
+
+Cụm của section này **tắt Auto Mode**, nên chỉ cần thấy `AmazonEKSClusterPolicy`. Lệnh gắn
+bốn policy dưới đây **chỉ dành cho cụm bật Auto Mode**:
 
 ```bash
 for p in AmazonEKSLoadBalancingPolicy AmazonEKSNetworkingPolicy AmazonEKSComputePolicy AmazonEKSBlockStoragePolicy; do aws iam attach-role-policy --role-name eksClusterRole --policy-arn arn:aws:iam::aws:policy/$p; done
@@ -340,6 +699,8 @@ volume.
 ## Self-check
 
 - [ ] Kể sáu thứ trong danh sách kiểm, và triệu chứng khi thiếu từng cái
+- [ ] Viết được sáu file manifest, và chỉ ra mỗi file khác nhau ở những trường nào
+- [ ] Biết vì sao phải chờ Mongo sẵn sàng rồi mới apply hai API
 - [ ] Nói được vì sao `imagePullPolicy: IfNotPresent` hỏng trên EKS
 - [ ] Biết `EXTERNAL-IP` trên EKS là tên miền, và lấy nó bằng `.hostname`
 - [ ] Nói được bốn bước bấm trên giao diện chứng minh những mắt xích nào

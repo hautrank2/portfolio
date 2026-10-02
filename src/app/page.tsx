@@ -1,14 +1,14 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import Experiences from "~/components/sections/experiences";
+import SectionHeadline from "~/components/sections/section-headline";
 import { Button } from "~/components/ui/button";
 import { Reveal } from "~/components/ui/reveal";
 import { featuredProjectData, projectData } from "~/data/projects";
-import AboutCta from "./components/AboutCta";
-import Experiences from "./components/Experiences";
-import Hero from "./components/Hero";
-import ProjectSection from "./components/ProjectSection";
-import QuickFacts from "./components/QuickFacts";
-import SectionHeadline from "./components/SectionHeadline";
+import AboutCta from "./_components/AboutCta";
+import Hero from "./_components/Hero";
+import ProjectSection from "./_components/ProjectSection";
+import QuickFacts from "./_components/QuickFacts";
 
 export default function Home() {
   const moreProjects = projectData.length - featuredProjectData.length;

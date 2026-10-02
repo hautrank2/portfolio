@@ -3,7 +3,10 @@ import { Globe } from "lucide-react";
 import type { IconType } from "react-icons";
 import { FaGithub, FaLinkedinIn } from "react-icons/fa6";
 import { CvContactActions } from "~/components/cv/cv-contact-actions";
-import { ResumeSidebar } from "~/components/resume/resume-sidebar";
+import { cvData } from "~/data/cv";
+import { profileData } from "~/data/site";
+import type { CvModel } from "~/types";
+import { ResumeSidebar } from "./_components/resume-sidebar";
 import {
   ResumeAbout,
   ResumeContact,
@@ -15,10 +18,7 @@ import {
   ResumeSection,
   ResumeSkills,
   type ResumeStats,
-} from "~/components/resume/resume-sections";
-import { cvData } from "~/data/cv";
-import { profileData } from "~/data/site";
-import type { CvModel } from "~/types";
+} from "./_components/resume-sections";
 
 export const metadata: Metadata = {
   title: "resume",

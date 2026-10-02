@@ -4,3 +4,4 @@ export * from "./site";
 export * from "./blog";
 export * from "./recipe";
 export * from "./cv";
+export * from "./worklog";

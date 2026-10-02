@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1180" viewBox="0 0 1440 1180" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="160" y1="45" x2="1270" y2="850" gradientUnits="userSpaceOnUse"><stop stop-color="#FFF9EF"/><stop offset="1" stop-color="#F0F6FF"/></linearGradient>
+    <linearGradient id="shop" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFF2D9"/><stop offset="1" stop-color="#FFE0AE"/></linearGradient>
+    <linearGradient id="admin" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#F0E9FF"/><stop offset="1" stop-color="#DBD1FF"/></linearGradient>
+    <linearGradient id="api" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#E8F4FF"/><stop offset="1" stop-color="#D5E9FF"/></linearGradient>
+    <linearGradient id="store" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#E6F8EF"/><stop offset="1" stop-color="#C9EED9"/></linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#24334A" flood-opacity=".10"/></filter>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M1 1l7 4-7 4" stroke="#4779B8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M1 1l7 4-7 4" stroke="#39966A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <style>
+      text{font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;fill:#24334A;stroke:none}
+      .title{font-size:34px;font-weight:750;letter-spacing:-.6px}.sub{font-size:16px;fill:#617087}
+      .card{filter:url(#shadow);stroke:#fff;stroke-width:2}.label{font-size:19px;font-weight:700}.small{font-size:14px;fill:#52647C}.tiny{font-size:12px;fill:#687A8F}
+      .chip{font-size:12px;font-weight:700;letter-spacing:.5px}.section{font-size:13px;font-weight:750;letter-spacing:1.4px;fill:#75849A}
+    </style>
+  </defs>
+  <rect width="1440" height="1180" rx="30" fill="url(#bg)"/>
+  <circle cx="1315" cy="84" r="105" fill="#FFE6BF" opacity=".42"/><circle cx="116" cy="800" r="130" fill="#D9EAFE" opacity=".48"/>
+  <text x="72" y="82" class="title">Cafe System · AWS EKS architecture</text>
+  <text x="74" y="115" class="sub">Public web entry points · private APIs · resilient cloud storage</text>
+
+  <text x="80" y="170" class="section">USERS</text>
+  <text x="362" y="170" class="section">LOAD BALANCERS · NODE PORTS</text>
+  <text x="680" y="170" class="section">INSIDE THE CLUSTER · CLUSTERIP</text>
+
+  <!-- visitors -->
+  <g transform="translate(94 220)"><circle cx="36" cy="28" r="19" fill="#FFD7A6"/><path d="M9 90c2-22 13-34 27-34s25 12 27 34" fill="#F2A65A"/><path d="M20 26c2-15 26-22 37-4-10-4-21-2-30 7z" fill="#6C4936"/><rect x="0" y="99" width="72" height="28" rx="14" fill="#fff"/><text x="36" y="118" text-anchor="middle" class="tiny">CUSTOMER</text></g>
+  <g transform="translate(94 440)"><circle cx="36" cy="28" r="19" fill="#E2D6FF"/><path d="M9 90c2-22 13-34 27-34s25 12 27 34" fill="#8C77D5"/><path d="M20 26c2-15 26-22 37-4-10-4-21-2-30 7z" fill="#51436E"/><rect x="-15" y="99" width="102" height="28" rx="14" fill="#fff"/><text x="36" y="118" text-anchor="middle" class="tiny">CAFE OWNER</text></g>
+
+  <!-- public frontend cards -->
+  <g class="card"><rect x="310" y="205" width="300" height="150" rx="22" fill="url(#shop)"/>
+    <circle cx="355" cy="253" r="25" fill="#fff" opacity=".88"/><path d="M343 253h24l-2 18h-20zM346 250c0-8 4-13 10-13s10 5 10 13M349 278h13" stroke="#C77736" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="395" y="246" class="label">shop-web</text><text x="395" y="272" class="small">Browse · place orders</text>
+    <rect x="334" y="306" width="116" height="27" rx="13.5" fill="#fff"/><text x="392" y="324" text-anchor="middle" class="chip" fill="#9B5B25">LoadBalancer</text>
+    <text x="468" y="324" class="small">:8210 → :80</text>
+  </g>
+  <g class="card"><rect x="310" y="425" width="300" height="150" rx="22" fill="url(#admin)"/>
+    <circle cx="355" cy="473" r="25" fill="#fff" opacity=".9"/><path d="M340 469l15-11 15 11v17h-30zM350 486v-11h10v11" stroke="#735CB5" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="395" y="466" class="label">admin-web</text><text x="395" y="492" class="small">Manage menu · upload images</text>
+    <rect x="334" y="526" width="116" height="27" rx="13.5" fill="#fff"/><text x="392" y="544" text-anchor="middle" class="chip" fill="#6651A3">LoadBalancer</text>
+    <text x="468" y="544" class="small">:8211 → :80</text>
+  </g>
+  <path d="M166 270h130" stroke="#D69A5B" stroke-width="3" stroke-linecap="round" marker-end="url(#arrowBlue)"/><path d="M181 490h115" stroke="#8873C5" stroke-width="3" stroke-linecap="round" marker-end="url(#arrowBlue)"/>
+
+  <!-- cluster boundary -->
+  <rect x="650" y="190" width="725" height="510" rx="28" fill="#FFFFFF" fill-opacity=".50" stroke="#B8C9DA" stroke-width="2" stroke-dasharray="8 9"/>
+  <rect x="674" y="174" width="190" height="32" rx="16" fill="#E7EEF6"/><text x="769" y="195" text-anchor="middle" class="chip" fill="#556A82">KUBERNETES CLUSTER</text>
+  <!-- nginx arrows from frontends to api -->
+  <path d="M610 269h44q25 0 25 25v82q0 24 24 24h26" stroke="#4779B8" stroke-width="3" stroke-linecap="round" fill="none" marker-end="url(#arrowBlue)"/>
+  <path d="M610 489h43q26 0 26-25v-93q0-22 24-22h26" stroke="#4779B8" stroke-width="3" stroke-linecap="round" fill="none" marker-end="url(#arrowBlue)"/>
+  <rect x="648" y="304" width="104" height="46" rx="12" fill="#fff" stroke="#DCE5EF"/><text x="700" y="323" text-anchor="middle" class="chip" fill="#4779B8">nginx</text><text x="700" y="340" text-anchor="middle" class="tiny">/api/* proxy</text>
+  <text x="775" y="226" class="section">API SERVICES · ALL LISTEN ON :3000</text>
+
+  <!-- APIs -->
+  <g class="card"><rect x="790" y="246" width="230" height="108" rx="19" fill="url(#api)"/><circle cx="826" cy="283" r="17" fill="#fff"/><path d="M818 283h16M826 275v16M821 278l10 10M831 278l-10 10" stroke="#4E8BC8" stroke-width="1.8" stroke-linecap="round"/><text x="855" y="281" class="label">menu-api</text><text x="815" y="316" class="small">ClusterIP · :3000</text><text x="815" y="338" class="tiny">catalog · item images</text></g>
+  <g class="card"><rect x="790" y="382" width="230" height="108" rx="19" fill="url(#api)"/><circle cx="826" cy="419" r="17" fill="#fff"/><path d="M818 419h16M826 411v16M821 414l10 10M831 414l-10 10" stroke="#4E8BC8" stroke-width="1.8" stroke-linecap="round"/><text x="855" y="417" class="label">order-api</text><text x="815" y="452" class="small">ClusterIP · :3000</text><text x="815" y="474" class="tiny">orders · price snapshot</text></g>
+  <g class="card"><rect x="790" y="518" width="230" height="108" rx="19" fill="url(#api)"/><circle cx="826" cy="555" r="17" fill="#fff"/><path d="M818 555h16M826 547v16M821 550l10 10M831 550l-10 10" stroke="#4E8BC8" stroke-width="1.8" stroke-linecap="round"/><text x="855" y="553" class="label">auth-api</text><text x="815" y="588" class="small">ClusterIP · :3000</text><text x="815" y="610" class="tiny">token verification</text></g>
+
+  <!-- internal dependencies -->
+  <path d="M1020 284h34q22 0 22 22v71q0 20 20 20h24" stroke="#4779B8" stroke-width="2.5" stroke-linecap="round" fill="none" marker-end="url(#arrowBlue)"/>
+  <path d="M1020 420h78" stroke="#4779B8" stroke-width="2.5" stroke-linecap="round" marker-end="url(#arrowBlue)"/>
+  <rect x="1042" y="304" width="91" height="25" rx="12" fill="#fff"/><text x="1087" y="321" text-anchor="middle" class="tiny">verify token</text>
+  <g class="card"><rect x="1170" y="344" width="170" height="152" rx="20" fill="url(#store)"/><ellipse cx="1255" cy="380" rx="33" ry="11" fill="#fff" stroke="#54A77A" stroke-width="2"/><path d="M1222 380v42c0 6 15 11 33 11s33-5 33-11v-42M1222 400c0 6 15 11 33 11s33-5 33-11" stroke="#54A77A" stroke-width="2"/><text x="1255" y="460" text-anchor="middle" class="label">MongoDB</text><text x="1255" y="481" text-anchor="middle" class="small">:27017 · PVC</text></g>
+  <text x="1093" y="528" class="tiny">menu &amp; order read/write</text>
+  <text x="1051" y="574" class="tiny">menu &amp; order → auth</text>
+
+  <!-- shared images volume -->
+  <path d="M905 354v84q0 24 24 24h38q24 0 24 24v112" stroke="#39966A" stroke-width="2.5" stroke-dasharray="6 6" stroke-linecap="round" fill="none" marker-end="url(#arrowGreen)"/>
+  <g class="card"><rect x="1040" y="566" width="286" height="100" rx="19" fill="url(#store)"/><rect x="1064" y="590" width="49" height="43" rx="8" fill="#fff"/><circle cx="1100" cy="601" r="5" fill="#F4BA65"/><path d="M1070 626l13-14 9 8 8-10 9 16z" fill="#75BD91"/><text x="1124" y="602" class="label" font-size="17">Shared image volume</text><text x="1124" y="626" class="small">ReadWriteMany · EFS</text><text x="1124" y="648" class="tiny">menu-api writes · all Pods read</text></g>
+
+  <!-- AWS and Kubernetes foundations covered across this learning section -->
+  <text x="80" y="738" class="section">CLOUD FOUNDATION · THE BUILDING BLOCKS BEHIND THE APP</text>
+  <g class="card"><rect x="80" y="758" width="300" height="220" rx="20" fill="#FFFFFF"/>
+    <rect x="101" y="778" width="40" height="40" rx="12" fill="#E8F1FF"/><path d="M111 801h20M114 795h14M117 789h8" stroke="#4779B8" stroke-width="2" stroke-linecap="round"/>
+    <text x="154" y="795" class="label" font-size="18">Network &amp; identity</text>
+    <text x="103" y="842" class="small">VPC · 2 Availability Zones</text>
+    <text x="103" y="865" class="small">Public + private subnets</text>
+    <text x="103" y="888" class="small">NAT gives private nodes egress</text>
+    <text x="103" y="923" class="tiny">IAM: cluster role · node role · access entry</text>
+    <text x="103" y="946" class="tiny">CloudFormation provisions the VPC</text>
+  </g>
+  <g class="card"><rect x="400" y="758" width="300" height="220" rx="20" fill="#FFFFFF"/>
+    <rect x="421" y="778" width="40" height="40" rx="12" fill="#F0E9FF"/><path d="M431 789h20v15h-20zM435 785h12M437 808h8" stroke="#735CB5" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <text x="474" y="795" class="label" font-size="18">Managed Kubernetes</text>
+    <text x="423" y="842" class="small">EKS control plane · billed hourly</text>
+    <text x="423" y="865" class="small">EC2 managed node group · private</text>
+    <text x="423" y="888" class="small">kubectl → EKS access entry</text>
+    <text x="423" y="923" class="tiny">Add-ons: VPC CNI · CoreDNS · kube-proxy</text>
+    <text x="423" y="946" class="tiny">Docker Hub images · ECR not used in this lab</text>
+  </g>
+  <g class="card"><rect x="720" y="758" width="300" height="220" rx="20" fill="#FFFFFF"/>
+    <rect x="741" y="778" width="40" height="40" rx="12" fill="#E6F8EF"/><ellipse cx="761" cy="789" rx="10" ry="4" fill="#fff" stroke="#39966A" stroke-width="1.5"/><path d="M751 789v14c0 2 5 4 10 4s10-2 10-4v-14" stroke="#39966A" stroke-width="1.5"/>
+    <text x="794" y="795" class="label" font-size="18">CSI storage paths</text>
+    <text x="743" y="842" class="small">Mongo → PVC → gp2 EBS · ReadWriteOnce</text>
+    <text x="743" y="865" class="small">StorageClass → PV → PVC</text>
+    <text x="743" y="888" class="small">EBS CSI · Pod Identity permissions</text>
+    <text x="743" y="923" class="tiny">Menu images → EFS · ReadWriteMany</text>
+    <text x="743" y="946" class="tiny">EFS CSI · mount targets across AZs</text>
+  </g>
+  <g class="card"><rect x="1040" y="758" width="320" height="220" rx="20" fill="#FFFFFF"/>
+    <rect x="1061" y="778" width="40" height="40" rx="12" fill="#FFF2D9"/><path d="M1071 806v-13l10-7 10 7v13h-7v-8h-6v8z" stroke="#C77736" stroke-width="1.8" stroke-linejoin="round"/>
+    <text x="1114" y="795" class="label" font-size="18">AWS resource lifecycle</text>
+    <text x="1063" y="842" class="small">2 Services → 2 internet-facing ELBs</text>
+    <text x="1063" y="865" class="small">Kubernetes provisions ELB + EBS</text>
+    <text x="1063" y="888" class="small">Subnet tags + annotations guide ELB</text>
+    <text x="1063" y="923" class="tiny">Budget alert · hourly costs · check region</text>
+    <text x="1063" y="946" class="tiny">Delete Services/PVCs before cluster</text>
+  </g>
+  <rect x="80" y="1000" width="1280" height="112" rx="22" fill="#FFFFFF" fill-opacity=".9" stroke="#E3EAF1"/>
+  <text x="110" y="1035" class="section">REQUEST &amp; DATA FLOWS</text>
+  <path d="M111 1067h70" stroke="#4779B8" stroke-width="3" marker-end="url(#arrowBlue)"/><text x="194" y="1072" class="small">Browser → LoadBalancer → nginx → ClusterIP API</text>
+  <path d="M648 1067h70" stroke="#39966A" stroke-width="3" stroke-dasharray="6 6" marker-end="url(#arrowGreen)"/><text x="731" y="1072" class="small">menu-api → shared EFS · menu/order → MongoDB</text>
+  <g transform="translate(1082 1023)"><rect width="240" height="48" rx="15" fill="#FFF2D9"/><circle cx="25" cy="24" r="7" fill="#E49A49"/><text x="43" y="29" class="small" font-weight="700">Only web apps are public</text></g>
+</svg>

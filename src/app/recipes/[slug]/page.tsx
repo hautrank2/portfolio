@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { RecipeView } from "~/components/recipes/recipe-view";
 import { getAllRecipes, getRecipe, recipePathTitle } from "~/lib/recipes";
 import type { RecipeModel } from "~/types";
+import { RecipeView } from "./_components/recipe-view";
 
 type PagePropsType = { params: Promise<{ slug: string }> };
 

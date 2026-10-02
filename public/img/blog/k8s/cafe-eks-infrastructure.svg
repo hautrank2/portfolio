@@ -1,0 +1,246 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 900" width="1280" height="900" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#333"/>
+    </marker>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1d4ed8"/>
+    </marker>
+    <marker id="arrowGray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#6b7280"/>
+    </marker>
+  </defs>
+
+  <rect width="1280" height="900" fill="#ffffff"/>
+
+  <!-- Title -->
+  <text x="40" y="38" font-size="24" font-weight="700" fill="#111827">Cafe System on AWS EKS — infrastructure view</text>
+  <text x="40" y="60" font-size="13" fill="#4b5563">Built in section 8 — region ap-southeast-2, cluster kub-cafe-demo, Auto Mode off</text>
+
+  <!-- Actors -->
+  <g font-size="13" fill="#111827">
+    <rect x="60" y="80" width="150" height="46" rx="8" fill="#f3f4f6" stroke="#6b7280"/>
+    <text x="135" y="100" text-anchor="middle" font-weight="600">Docker Hub</text>
+    <text x="135" y="117" text-anchor="middle" font-size="11" fill="#4b5563">image kub-cafe-*:1</text>
+
+    <rect x="300" y="80" width="150" height="46" rx="8" fill="#eff6ff" stroke="#1d4ed8"/>
+    <text x="375" y="100" text-anchor="middle" font-weight="600">Customer</text>
+    <text x="375" y="117" text-anchor="middle" font-size="11" fill="#4b5563">http://…elb…:8210</text>
+
+    <rect x="520" y="80" width="150" height="46" rx="8" fill="#eff6ff" stroke="#1d4ed8"/>
+    <text x="595" y="100" text-anchor="middle" font-weight="600">Cafe owner</text>
+    <text x="595" y="117" text-anchor="middle" font-size="11" fill="#4b5563">http://…elb…:8211</text>
+
+    <rect x="990" y="80" width="200" height="46" rx="8" fill="#f3f4f6" stroke="#6b7280"/>
+    <text x="1090" y="100" text-anchor="middle" font-weight="600">Your machine</text>
+    <text x="1090" y="117" text-anchor="middle" font-size="11" fill="#4b5563">kubectl · aws CLI (aws login)</text>
+  </g>
+
+  <!-- AWS region -->
+  <rect x="30" y="150" width="1220" height="730" rx="10" fill="#fffaf2" stroke="#ff9900" stroke-width="2"/>
+  <text x="44" y="172" font-size="13" font-weight="700" fill="#c2410c">AWS · ap-southeast-2</text>
+
+  <!-- VPC -->
+  <rect x="50" y="200" width="860" height="660" rx="10" fill="#faf5ff" stroke="#7c3aed" stroke-width="2"/>
+  <text x="575" y="222" font-size="13" font-weight="700" fill="#6d28d9">VPC 192.168.0.0/16 — CloudFormation stack (8.6)</text>
+
+  <!-- Internet Gateway -->
+  <rect x="405" y="183" width="150" height="30" rx="15" fill="#ffffff" stroke="#7c3aed" stroke-width="2"/>
+  <text x="480" y="203" text-anchor="middle" font-size="12" font-weight="600" fill="#6d28d9">Internet Gateway</text>
+
+  <!-- AZ labels -->
+  <text x="270" y="246" text-anchor="middle" font-size="12" font-weight="700" fill="#374151">Availability Zone a</text>
+  <text x="690" y="246" text-anchor="middle" font-size="12" font-weight="700" fill="#374151">Availability Zone b</text>
+  <line x1="480" y1="232" x2="480" y2="760" stroke="#c4b5fd" stroke-dasharray="6 5"/>
+
+  <!-- Public subnets -->
+  <rect x="70" y="256" width="400" height="124" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+  <rect x="490" y="256" width="400" height="124" rx="8" fill="#f0fdf4" stroke="#16a34a"/>
+  <text x="240" y="274" font-size="11" font-weight="700" fill="#15803d">PUBLIC subnet · PublicSubnet01</text>
+  <text x="502" y="274" font-size="11" font-weight="700" fill="#15803d">PUBLIC subnet · PublicSubnet02</text>
+
+  <!-- NAT -->
+  <rect x="86" y="316" width="128" height="50" rx="6" fill="#ffffff" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="150" y="337" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">NAT Gateway</text>
+  <text x="150" y="354" text-anchor="middle" font-size="10" fill="#b91c1c">billed hourly</text>
+
+  <!-- ELBs spanning both public subnets -->
+  <rect x="240" y="284" width="480" height="38" rx="6" fill="#fff7ed" stroke="#ea580c" stroke-width="1.5"/>
+  <text x="480" y="308" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">Classic ELB · cafe-shop-web-service · port 8210</text>
+  <rect x="240" y="330" width="480" height="38" rx="6" fill="#fff7ed" stroke="#ea580c" stroke-width="1.5"/>
+  <text x="480" y="354" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">Classic ELB · cafe-admin-web-service · port 8211</text>
+
+  <!-- Private subnets -->
+  <rect x="70" y="396" width="400" height="364" rx="8" fill="#ecfeff" stroke="#0891b2"/>
+  <rect x="490" y="396" width="400" height="364" rx="8" fill="#ecfeff" stroke="#0891b2"/>
+  <text x="250" y="414" font-size="11" font-weight="700" fill="#0e7490">PRIVATE subnet · PrivateSubnet01</text>
+  <text x="590" y="414" font-size="11" font-weight="700" fill="#0e7490">PRIVATE subnet · PrivateSubnet02</text>
+
+  <!-- Node A -->
+  <rect x="86" y="426" width="368" height="232" rx="8" fill="#ffffff" stroke="#ea580c" stroke-width="2"/>
+  <text x="170" y="446" font-size="12" font-weight="700" fill="#c2410c">EC2 worker node · node group (8.13)</text>
+  <text x="170" y="461" font-size="10" fill="#4b5563">kubelet · containerd · no public IP</text>
+
+  <!-- Node B -->
+  <rect x="506" y="426" width="368" height="232" rx="8" fill="#ffffff" stroke="#ea580c" stroke-width="2"/>
+  <text x="590" y="446" font-size="12" font-weight="700" fill="#c2410c">EC2 worker node · node group (8.13)</text>
+  <text x="590" y="461" font-size="10" fill="#4b5563">kubelet · containerd · no public IP</text>
+
+  <!-- Pods node A -->
+  <g font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle">
+    <rect x="100" y="474" width="104" height="40" rx="6" fill="#2563eb"/>
+    <text x="152" y="491">shop-web</text>
+    <text x="152" y="506" font-size="10" font-weight="400">nginx + React</text>
+
+    <rect x="216" y="474" width="104" height="40" rx="6" fill="#4f46e5"/>
+    <text x="268" y="491">auth-api</text>
+    <text x="268" y="506" font-size="10" font-weight="400">ClusterIP :3000</text>
+
+    <rect x="332" y="474" width="108" height="40" rx="6" fill="#4f46e5"/>
+    <text x="386" y="491">menu-api</text>
+    <text x="386" y="506" font-size="10" font-weight="400">ClusterIP :3000</text>
+
+    <rect x="100" y="528" width="104" height="40" rx="6" fill="#059669"/>
+    <text x="152" y="545">mongo</text>
+    <text x="152" y="560" font-size="10" font-weight="400">ClusterIP :27017</text>
+  </g>
+
+  <!-- Pods node B -->
+  <g font-size="12" font-weight="600" fill="#ffffff" text-anchor="middle">
+    <rect x="520" y="474" width="104" height="40" rx="6" fill="#2563eb"/>
+    <text x="572" y="491">admin-web</text>
+    <text x="572" y="506" font-size="10" font-weight="400">nginx + React</text>
+
+    <rect x="636" y="474" width="104" height="40" rx="6" fill="#4f46e5"/>
+    <text x="688" y="491">order-api</text>
+    <text x="688" y="506" font-size="10" font-weight="400">ClusterIP :3000</text>
+
+    <rect x="752" y="474" width="108" height="40" rx="6" fill="#4f46e5"/>
+    <text x="806" y="491">menu-api</text>
+    <text x="806" y="506" font-size="10" font-weight="400">second replica</text>
+  </g>
+
+  <!-- system pods strip -->
+  <rect x="216" y="528" width="220" height="40" rx="6" fill="#f3f4f6" stroke="#9ca3af"/>
+  <text x="326" y="545" text-anchor="middle" font-size="10" fill="#374151">System Pods: aws-node · kube-proxy</text>
+  <text x="326" y="559" text-anchor="middle" font-size="10" fill="#374151">coredns · ebs-csi · efs-csi · pod-identity</text>
+  <rect x="520" y="528" width="336" height="40" rx="6" fill="#f3f4f6" stroke="#9ca3af"/>
+  <text x="690" y="545" text-anchor="middle" font-size="10" fill="#374151">System Pods: aws-node · kube-proxy</text>
+  <text x="690" y="559" text-anchor="middle" font-size="10" fill="#374151">coredns · ebs-csi · efs-csi · pod-identity</text>
+
+  <!-- nginx proxy note -->
+  <text x="285" y="594" text-anchor="middle" font-size="11" fill="#1d4ed8">nginx proxy /api/* → auth, menu, order</text>
+  <text x="690" y="594" text-anchor="middle" font-size="11" fill="#1d4ed8">menu, order → mongo:27017 · menu, order → auth</text>
+  <text x="285" y="612" text-anchor="middle" font-size="11" fill="#4b5563">Each Pod gets a real subnet IP (VPC CNI)</text>
+  <text x="690" y="612" text-anchor="middle" font-size="11" fill="#4b5563">Up to 17–29 Pods per node, by instance type</text>
+
+  <!-- EBS -->
+  <rect x="100" y="676" width="170" height="44" rx="6" fill="#ffffff" stroke="#059669" stroke-width="2"/>
+  <text x="185" y="694" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">EBS gp2 · 2Gi</text>
+  <text x="185" y="710" text-anchor="middle" font-size="10" fill="#4b5563">PVC cafe-mongo-pvc · RWO · 1 AZ</text>
+
+  <!-- Mount targets -->
+  <rect x="300" y="676" width="154" height="44" rx="6" fill="#ffffff" stroke="#d97706" stroke-width="2"/>
+  <text x="377" y="694" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">EFS mount target</text>
+  <text x="377" y="710" text-anchor="middle" font-size="10" fill="#4b5563">SG eks-efs · port 2049</text>
+
+  <rect x="720" y="676" width="154" height="44" rx="6" fill="#ffffff" stroke="#d97706" stroke-width="2"/>
+  <text x="797" y="694" text-anchor="middle" font-size="12" font-weight="600" fill="#111827">EFS mount target</text>
+  <text x="797" y="710" text-anchor="middle" font-size="10" fill="#4b5563">SG eks-efs · port 2049</text>
+
+  <!-- EFS file system -->
+  <rect x="70" y="784" width="820" height="56" rx="8" fill="#fffbeb" stroke="#d97706" stroke-width="2"/>
+  <text x="480" y="808" text-anchor="middle" font-size="13" font-weight="700" fill="#111827">EFS file system — menu images, /app/data/images</text>
+  <text x="480" y="827" text-anchor="middle" font-size="11" fill="#4b5563">PV cafe-menu-images-pv · PVC cafe-menu-images-pvc · ReadWriteMany · shared across both AZs</text>
+
+  <!-- EKS control plane -->
+  <rect x="930" y="200" width="300" height="250" rx="10" fill="#ffffff" stroke="#ff9900" stroke-width="2"/>
+  <text x="946" y="224" font-size="13" font-weight="700" fill="#c2410c">EKS control plane (8.11)</text>
+  <text x="946" y="242" font-size="11" fill="#4b5563">AWS-managed · public + private endpoint</text>
+  <rect x="946" y="254" width="268" height="34" rx="6" fill="#fff7ed" stroke="#fdba74"/>
+  <text x="1080" y="276" text-anchor="middle" font-size="12" fill="#111827">API server · scheduler · etcd</text>
+  <rect x="946" y="296" width="268" height="34" rx="6" fill="#fff7ed" stroke="#fdba74"/>
+  <text x="1080" y="318" text-anchor="middle" font-size="12" fill="#111827">Cloud controller → creates the Classic ELBs</text>
+  <text x="946" y="352" font-size="11" font-weight="700" fill="#374151">Installed add-ons</text>
+  <text x="946" y="370" font-size="11" fill="#374151">Amazon VPC CNI · CoreDNS · kube-proxy</text>
+  <text x="946" y="388" font-size="11" fill="#374151">EBS CSI Driver → creates and attaches volumes</text>
+  <text x="946" y="406" font-size="11" fill="#374151">EFS CSI Driver → mounts NFS on the node</text>
+  <text x="946" y="424" font-size="11" fill="#374151">Pod Identity Agent</text>
+  <text x="946" y="441" font-size="10" fill="#b91c1c">billed hourly, even when the cluster is empty</text>
+
+  <!-- IAM -->
+  <rect x="930" y="470" width="300" height="170" rx="10" fill="#ffffff" stroke="#dc2626" stroke-width="2"/>
+  <text x="946" y="494" font-size="13" font-weight="700" fill="#b91c1c">IAM (8.5) — free</text>
+  <text x="946" y="516" font-size="11" font-weight="600" fill="#111827">eksClusterRole</text>
+  <text x="946" y="531" font-size="10" fill="#4b5563">assumed by the control plane · AmazonEKSClusterPolicy</text>
+  <text x="946" y="553" font-size="11" font-weight="600" fill="#111827">eksNodeRole</text>
+  <text x="946" y="568" font-size="10" fill="#4b5563">assumed by EC2 · WorkerNode, CNI, ECR ReadOnly</text>
+  <text x="946" y="590" font-size="11" font-weight="600" fill="#111827">Pod Identity role for the EBS driver</text>
+  <text x="946" y="605" font-size="10" fill="#4b5563">AmazonEBSCSIDriverPolicy → ebs-csi-controller-sa</text>
+  <text x="946" y="627" font-size="10" fill="#4b5563">Access entry: eksNodeRole, type EC2_LINUX</text>
+
+  <!-- Legend -->
+  <rect x="930" y="660" width="300" height="200" rx="10" fill="#ffffff" stroke="#9ca3af"/>
+  <text x="946" y="684" font-size="13" font-weight="700" fill="#111827">Legend</text>
+  <line x1="946" y1="704" x2="996" y2="704" stroke="#1d4ed8" stroke-width="2.5" marker-end="url(#arrowBlue)"/>
+  <text x="1006" y="708" font-size="11" fill="#111827">User requests</text>
+  <line x1="946" y1="728" x2="996" y2="728" stroke="#333" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <text x="1006" y="732" font-size="11" fill="#111827">Data reads and writes (EBS, EFS)</text>
+  <line x1="946" y1="752" x2="996" y2="752" stroke="#6b7280" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#arrowGray)"/>
+  <text x="1006" y="756" font-size="11" fill="#111827">Node egress and cluster control</text>
+  <rect x="946" y="772" width="18" height="12" fill="#f0fdf4" stroke="#16a34a"/>
+  <text x="972" y="783" font-size="11" fill="#111827">Public subnet — reachable from the internet</text>
+  <rect x="946" y="794" width="18" height="12" fill="#ecfeff" stroke="#0891b2"/>
+  <text x="972" y="805" font-size="11" fill="#111827">Private subnet — outbound only, via NAT</text>
+  <rect x="946" y="816" width="18" height="12" fill="#2563eb"/>
+  <text x="972" y="827" font-size="11" fill="#111827">Frontend</text>
+  <rect x="1040" y="816" width="18" height="12" fill="#4f46e5"/>
+  <text x="1066" y="827" font-size="11" fill="#111827">API</text>
+  <rect x="1110" y="816" width="18" height="12" fill="#059669"/>
+  <text x="1136" y="827" font-size="11" fill="#111827">Database</text>
+  <text x="946" y="850" font-size="10" fill="#4b5563">Created by Kubernetes: 2 ELBs, the EBS volume</text>
+
+  <!-- ===== Arrows ===== -->
+  <!-- users -> IGW -> ELB -->
+  <path d="M375,126 L375,150 L455,183" fill="none" stroke="#1d4ed8" stroke-width="2.5" marker-end="url(#arrowBlue)"/>
+  <path d="M595,126 L595,150 L510,183" fill="none" stroke="#1d4ed8" stroke-width="2.5" marker-end="url(#arrowBlue)"/>
+  <line x1="480" y1="213" x2="480" y2="282" stroke="#1d4ed8" stroke-width="2.5" marker-end="url(#arrowBlue)"/>
+
+  <!-- ELB shop -> shop-web ; ELB admin -> admin-web -->
+  <path d="M250,322 L232,322 L232,400 L152,400 L152,472" fill="none" stroke="#1d4ed8" stroke-width="2.5" marker-end="url(#arrowBlue)"/>
+  <path d="M700,368 L700,400 L572,400 L572,472" fill="none" stroke="#1d4ed8" stroke-width="2.5" marker-end="url(#arrowBlue)"/>
+  <text x="160" y="418" font-size="10" fill="#1d4ed8">NodePort</text>
+  <text x="610" y="394" font-size="10" fill="#1d4ed8">NodePort</text>
+
+  <!-- mongo -> EBS -->
+  <line x1="116" y1="568" x2="116" y2="674" stroke="#333" stroke-width="1.8" marker-end="url(#arrow)"/>
+
+  <!-- menu-api -> mount targets -->
+  <path d="M436,514 L447,524 L447,640 L400,674" fill="none" stroke="#333" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <path d="M856,514 L867,524 L867,640 L820,674" fill="none" stroke="#333" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <text x="443" y="634" font-size="10" fill="#333" transform="rotate(-90 443 634)">NFS 2049</text>
+
+  <!-- mount targets -> EFS -->
+  <line x1="377" y1="720" x2="377" y2="782" stroke="#333" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <line x1="797" y1="720" x2="797" y2="782" stroke="#333" stroke-width="1.8" marker-end="url(#arrow)"/>
+
+  <!-- node -> NAT -> IGW -> Docker Hub -->
+  <path d="M110,426 L110,368" fill="none" stroke="#6b7280" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#arrowGray)"/>
+  <path d="M150,316 L150,236 L403,202" fill="none" stroke="#6b7280" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#arrowGray)"/>
+  <path d="M430,183 L250,150 L212,120" fill="none" stroke="#6b7280" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#arrowGray)"/>
+  <text x="118" y="392" font-size="10" fill="#4b5563">pull images, AWS APIs</text>
+
+  <!-- node B -> NAT (route) -->
+  <text x="506" y="746" font-size="10" fill="#4b5563">egress via the NAT Gateway in AZ a</text>
+
+  <!-- control plane <-> nodes -->
+  <path d="M930,300 L900,300 L900,440 L876,440" fill="none" stroke="#6b7280" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#arrowGray)" marker-start="url(#arrowGray)"/>
+  <text x="904" y="290" font-size="10" fill="#4b5563" text-anchor="end">kubelet ↔ API</text>
+
+  <!-- laptop -> control plane -->
+  <line x1="1090" y1="126" x2="1090" y2="198" stroke="#6b7280" stroke-width="1.8" stroke-dasharray="6 4" marker-end="url(#arrowGray)"/>
+  <text x="1098" y="166" font-size="10" fill="#4b5563">kubectl apply</text>
+
+  <!-- control plane -> ELB (creates) -->
+  <path d="M946,313 L920,313 L920,303 L722,303" fill="none" stroke="#6b7280" stroke-width="1.4" stroke-dasharray="3 4" marker-end="url(#arrowGray)"/>
+</svg>

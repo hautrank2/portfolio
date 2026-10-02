@@ -44,6 +44,15 @@ tính tiền, và còn chặn bước 6.
 Mỗi bước dưới có lệnh, kết quả **Đúng**, và việc cần làm **Nếu không**. Bước nào chưa đúng
 thì đừng sang bước sau.
 
+Hai bước mất thời gian chờ là 3 và 4. Cái gì phải chờ cái gì:
+
+| Bước | Phải chờ xong | Làm song song được với |
+| --- | --- | --- |
+| 3. Node group | Bước 1 và 2 | Bước 5 |
+| 4. Cluster | **Bước 3 xong hẳn** — `DELETING` chưa tính | Bước 5 |
+| 5. EFS | Bước 2 — không còn Pod nào mount | Bước 3 và 4 |
+| 6. Stack VPC | **Cả bước 4 lẫn bước 5** | — |
+
 ## 0. Đứng đúng chỗ
 
 Region của CLI phải là region đã dựng mọi thứ:
@@ -163,7 +172,28 @@ aws eks delete-nodegroup --cluster-name kub-cafe-demo --nodegroup-name kub-cafe-
 aws eks wait nodegroup-deleted --cluster-name kub-cafe-demo --nodegroup-name kub-cafe-demo-node-group
 ```
 
-Mất khoảng 3–5 phút. Kiểm không còn EC2 nào của cụm:
+Mất khoảng 3–5 phút. Trong lúc đó node group ở trạng thái `DELETING`:
+
+```bash
+aws eks describe-nodegroup --cluster-name kub-cafe-demo --nodegroup-name kub-cafe-demo-node-group --query "nodegroup.status" --output text
+```
+
+> **`DELETING` chưa phải là đã xoá.** Đừng chạy bước 4 lúc này: cluster chỉ xoá được khi
+> node group đã biến mất hẳn. Chờ lệnh `wait` ở trên trả về, hoặc tới khi lệnh
+> `describe-nodegroup` báo `ResourceNotFoundException`.
+>
+> Không muốn ngồi chờ thì làm **bước 5** trong lúc này — EFS thuộc VPC, không thuộc cluster,
+> và sau bước 2 không còn Pod nào mount nó.
+
+Kiểm node group đã hết:
+
+```bash
+aws eks list-nodegroups --cluster-name kub-cafe-demo --output text
+```
+
+**Đúng:** không in ra gì.
+
+Kiểm không còn EC2 nào của cụm:
 
 ```bash
 aws ec2 describe-instances --filters "Name=tag:eks:cluster-name,Values=kub-cafe-demo" "Name=instance-state-name,Values=pending,running,stopping,stopped" --query "Reservations[].Instances[].InstanceId" --output text
@@ -194,8 +224,10 @@ aws eks list-clusters --output text
 
 **Đúng:** không còn `kub-cafe-demo`.
 
-**Nếu `delete-cluster` báo còn node group:** quay lại bước 3 — cluster không xoá được khi
-còn node group bên trong.
+**Nếu `delete-cluster` báo `ResourceInUseException: Cluster has nodegroups attached`:**
+node group chưa xoá xong — kể cả khi nó đang `DELETING`. Lệnh bị từ chối, không có gì hỏng
+và cũng chưa có gì bị xoá. Quay lại bước 3, chờ lệnh `wait nodegroup-deleted` trả về, rồi
+chạy lại `delete-cluster`.
 
 Từ đây `kubectl` không còn cụm nào để gọi. Context `eks` trong `~/.kube/config` vẫn còn, trỏ
 vào một địa chỉ đã chết — xoá cho khỏi nhầm:
@@ -275,37 +307,16 @@ aws cloudformation delete-stack --stack-name cafe-eks-vpc
 aws cloudformation wait stack-delete-complete --stack-name cafe-eks-vpc
 ```
 
-Mất khoảng 5 phút. Lệnh `wait` trả về im lặng là xong.
-
-**Nếu `wait` báo `Waiter StackDeleteComplete failed`:** stack đã sang `DELETE_FAILED`. Xem
-tài nguyên nào không xoá được:
+Mất khoảng 5 phút. Kiểm trạng thái cuối của stack:
 
 ```bash
-aws cloudformation describe-stack-events --stack-name cafe-eks-vpc --query "StackEvents[?ResourceStatus=='DELETE_FAILED'].{resource:LogicalResourceId,reason:ResourceStatusReason}" --output table
+aws cloudformation list-stacks --stack-status-filter DELETE_COMPLETE DELETE_FAILED DELETE_IN_PROGRESS --query "StackSummaries[?StackName=='cafe-eks-vpc'].{name:StackName,status:StackStatus,time:DeletionTime}" --output table
 ```
 
-Gần như luôn là **subnet hoặc VPC còn card mạng (ENI) bên trong**. Tìm xem card đó của ai —
-`<vpc-id>` lấy ở cột `reason` của lệnh trên, hoặc ở trang VPC trên Console:
+**Đúng:** dòng mới nhất là `DELETE_COMPLETE`, và lệnh `wait` trả về im lặng. VPC, subnet,
+NAT Gateway đều đã đi theo stack.
 
-```bash
-aws ec2 describe-network-interfaces --filters Name=vpc-id,Values=<vpc-id> --query "NetworkInterfaces[].{id:NetworkInterfaceId,type:InterfaceType,desc:Description}" --output table
-```
-
-| Cột `desc` chứa | Của ai | Quay lại |
-| --- | --- | --- |
-| `ELB …` | Load balancer mồ côi | Bước 1, xoá tay |
-| `EFS mount target …` | Mount target chưa xoá | Bước 5 |
-| `Amazon EKS …` | Cluster chưa xoá xong | Bước 4, chạy lại `wait` |
-
-Còn security group do controller tạo cho load balancer — tên dạng `k8s-elb-…` — cũng chặn
-VPC. Liệt kê security group còn trong VPC, trừ cái `default`:
-
-```bash
-aws ec2 describe-security-groups --filters Name=vpc-id,Values=<vpc-id> --query "SecurityGroups[?GroupName!='default'].{id:GroupId,name:GroupName}" --output table
-```
-
-Xoá từng cái bằng `aws ec2 delete-security-group --group-id <security-group-id>`. Dọn xong
-thì chạy lại `delete-stack` — CloudFormation thử lại phần còn dở.
+**Nếu ra `DELETE_IN_PROGRESS`:** chưa xong, chạy lại lệnh `wait`.
 
 ## 7. Đi tìm thứ sống sót
 
@@ -441,9 +452,9 @@ hoặc bạn tạo tay — và không ai dọn chúng thay bạn.
 
 - [ ] Nói được vì sao phải xoá Service và PVC **trước** node group và cluster
 - [ ] Kể những thứ đi theo cluster, và những thứ không
+- [ ] Biết bước nào phải chờ bước nào xong hẳn, và bước nào làm song song được
 - [ ] Biết xoá EFS theo thứ tự nào, và lỗi gì báo khi sai thứ tự
 - [ ] Biết vì sao xoá stack VPC chứ không xoá tay NAT Gateway
-- [ ] Đọc được `DELETE_FAILED` của stack và tìm ra card mạng nào đang chặn
 - [ ] Chạy được bảy lệnh kiểm ở bước 7 và biết mỗi dòng còn lại là khoản tiền gì
 - [ ] Biết vì sao Cost Explorer hôm sau mới là bằng chứng cuối cùng
 

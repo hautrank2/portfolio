@@ -33,6 +33,8 @@ export default defineConfig(({ mode }) => {
           target: env.ORDER_API_TARGET || 'http://localhost:8214',
           changeOrigin: true,
           rewrite: stripApi,
+          // Chuyển tiếp cả WebSocket /api/orders/ws.
+          ws: true,
         },
       },
     },
