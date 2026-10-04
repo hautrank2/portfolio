@@ -4,8 +4,14 @@ trigger: always_on
 
 # Global Rules — Portfolio & Learning Blog
 
-Personal portfolio for Hậu Trần, plus a learning-notes blog that grows into
-per-topic roadmaps (currently Kubernetes).
+Personal portfolio for Hậu Trần. Four parts share one Next.js app:
+
+- **Public site** — home, about, showcase, CV / resume.
+- **Blog** — learning notes that grow into per-topic roadmaps. Kubernetes is
+  live; Three.js exists but is hidden with `draft: true`.
+- **Recipes** — a flat shelf of food and coffee notes.
+- **Admin** — a private, signed-in area (`/admin`) for the owner's work log.
+  It is the only part backed by a database.
 
 ---
 
@@ -27,29 +33,40 @@ per-topic roadmaps (currently Kubernetes).
 | UI | React 19 |
 | Styling | **Tailwind CSS v4** — CSS-first config in `src/app/globals.css` |
 | Components | **shadcn/ui** (`new-york`), Radix primitives, `lucide-react` icons |
-| Content | Markdown files in `content/`, no CMS, no database |
+| Theme | `next-themes` — class on `<html>`, dark by default, toggle in the header |
+| Content | Markdown files in `content/` (blog, recipes), no CMS |
 | Markdown | `unified` — remark to rehype to **React elements** (`src/components/blog/markdown.tsx`) |
+| Database | **MongoDB** via the official `mongodb` driver — admin area only |
+| Auth | `jose` (HS256 JWT in an httpOnly cookie) + `bcryptjs` |
+| Forms & validation | `react-hook-form` + `zod` |
 | Package manager | **pnpm** |
 | Tests | none configured — do not invent a test command |
 
-There is no Vite, no MUI, no TanStack, no Zustand, no API layer, and no client
-data fetching. Pages are statically generated from files on disk.
+There is no Vite, no MUI, no TanStack, no Zustand, no ORM.
+
+Two halves with different rules:
+
+- **Public pages are static**, generated from files on disk. They never touch
+  the database and never fetch on the client. Keep it that way — a blog page
+  that needs MongoDB to render is a regression.
+- **`/admin` and `/api` are dynamic.** Route handlers under `src/app/api/` read
+  and write MongoDB; admin components call them with `fetch` from their
+  `hook.ts`. See *Admin, Auth & Database* below.
 
 ---
 
-## Tailwind v4 — read before touching styles
+## Source Code Rules
 
-- Theme lives in `src/app/globals.css` under `@theme inline` and `:root` /
-  `.dark`, **not** in a JS config. v4 does not auto-load `tailwind.config.ts`.
-- Colours are `oklch` custom properties. Use the semantic tokens
-  (`bg-card`, `text-foreground/70`, `border-border/60`), never raw hex.
-- Dark mode is the site default: `<body className="dark">` in the root layout.
-  There is no theme switcher and no `next-themes` provider.
-- Prose styling for rendered markdown is the `.prose-note` block in
-  `globals.css`. It is hand-written — `@tailwindcss/typography` is not used.
-- Watch specificity when adding prose rules. A bare `.prose-note code` outranks
-  the utility classes on a component and will silently replace them; scope by
-  structure instead, e.g. `.prose-note :not(pre) > code`.
+Coding conventions live in their own files. Read them before writing code:
+
+| File | Covers |
+| --- | --- |
+| `source-code-rule.md` | TypeScript, code style, file naming, components, hooks, the UI library, Tailwind |
+| `complex-component-rule.md` | the `index.tsx` / `hook.ts` / `type.ts` component split |
+| `dialog-form-rule.md` | forms inside a dialog |
+
+This file covers the project itself: what it is, content, admin, structure and
+how to verify.
 
 ---
 
@@ -66,189 +83,110 @@ data fetching. Pages are statically generated from files on disk.
 - Routing is one catch-all, `src/app/blog/[...slug]/page.tsx`. Adding a note
   never means adding a route file.
 - Document titles are path-style with a fixed prefix: `htk2 | blog | k8s`. The
-  prefix comes from `titlePrefix` in `src/data/site.ts` via the root layout's
-  `title.template` — pages only declare the part after it.
+  prefix comes from `titlePrefixData` in `src/data/site.ts` via the root
+  layout's `title.template` — pages only declare the part after it.
+- A new top-level track is a new folder plus a line in `content/blog/index.md`.
+  Its logo is optional and lives in `trackLogoData` (`src/data/blog.ts`).
+
+### Writing notes
+
+- Notes are written in Vietnamese, but **technical terms stay in English**:
+  object, manifest, Pod, Deployment, Service, volume, mount target, rollout.
+  Do not coin Vietnamese replacements ("bản khai" for a Kubernetes object) —
+  the reader will meet the English word in `kubectl` output and in the docs.
+- Use one term for one thing across a track. In the k8s notes, *object* is a
+  thing that exists in the cluster and *manifest* is the YAML file that
+  declares it; do not swap them.
+- Commands in a note must be ones that were actually run. When a step has a
+  wait between two commands (a rollout, a deletion), say so or add the wait.
+
+### Downloadable exercise code
+
+- Source for a note's exercise is a **folder** under `public/code/<name>/`.
+- `/code/<name>.zip` is built on demand by `src/app/code/[slug]/route.ts`.
+  Never commit a `.zip` beside the folder — a stale one would be served first.
+
+### Recipes
+
+- Recipes are `.md` files in `content/recipes/`, loaded by `src/lib/recipes.ts`.
+- They are a flat shelf, deliberately separate from the blog loader: no
+  `order:`, no planned nodes, no nesting. Do not merge the two loaders.
 
 ---
 
-## Components
+## Admin, Auth & Database
 
-`complex-component-rule.md` is the authority on how a component is structured —
-the `index.tsx` / `hook.ts` / `type.ts` split, arrow functions, and props
-inheritance. `dialog-form-rule.md` covers forms inside a dialog. This section
-only adds what is specific to Next.js and to files that arrive from a registry.
+The admin area is small and private. Its rules exist to keep secrets and the
+database out of everything else.
 
-- **Arrow functions** for components you write:
-  `export const Foo = (props: FooProps) => …`
-- Props type is `<ComponentName>Props` — `FooProps`, and `UseFooProps` for its
-  hook. Use `type`, never `interface`.
-- **Files generated by `npx shadcn add` are exempt from the two rules above.**
-  The CLI emits `function Foo()` declarations; leave them as generated so the
-  next `shadcn add` still merges cleanly. The convention governs components you
-  author, not vendored ones.
-- Prefer `React.ComponentProps<"div">` over hand-listing DOM props.
-- Compose classes with `cn()` from `~/lib/utils` so callers can override.
-- **Server Components by default.** Add `"use client"` only for state, effects,
-  refs, or browser APIs — and push it to the smallest leaf that needs it. A hook
-  in `hook.ts` makes its component a Client Component; keep the server/client
-  boundary in mind when splitting.
-- Import with the `~/` alias (`~/components/ui/table`), not deep relatives.
-- Data models in `src/types/` keep the `Model` suffix (`ProfileModel`).
+- **One way into MongoDB:** `getDb()` from `~/lib/db`. It caches the client on
+  `globalThis`; never call `new MongoClient` anywhere else in `src/`.
+- **Data access lives in `src/lib/<feature>.ts`** (`worklog.ts`), next to its
+  `zod` schemas. Route handlers stay thin: check the session, validate, call
+  the lib function, return JSON.
+- **There is no middleware.** Every admin page and every `/api` handler checks
+  `getSession()` from `~/lib/auth` itself — pages `redirect("/admin/login")`,
+  handlers return `401`. A new handler without that check is public.
+- **Validate every request body** with a `zod` schema via `safeParse`; read the
+  body as `unknown`. Reject with `400`, never let a bad shape reach the driver.
+- **Documents never leave the lib.** Map them to a `…Model` first: `_id`
+  becomes a string `id`, `Date` becomes an ISO string.
+- **Server only.** `~/lib/db`, `~/lib/auth` and anything importing `mongodb`
+  must not be imported from a Client Component.
+- Admin routes are `noindex` through `src/app/admin/layout.tsx`.
+- `PUT /api/cv` writes `src/data/cv.json` and answers `404` outside
+  development on purpose — the CV is published through git, not at runtime.
 
-Components written before this was documented use a `PropsType` suffix
-(`RevealPropsType`, `PageHeaderPropsType`). They are not being renamed
-retroactively — use `<ComponentName>Props` for anything new.
+### Environment
 
----
-
-## Hooks
-
-- Prefix every hook with `use`.
-- **The file is named exactly like the hook it exports**: `useOnClickOutside.ts`,
-  not `use-on-click-outside.ts`. The import and the filename should read the
-  same. This applies to hooks specifically — component files stay kebab-case
-  (see below).
-- Shared hooks live in `src/hooks/`, re-exported from `src/hooks/index.ts`.
-  Import them from the barrel: `import { useOnClickOutside } from "~/hooks"`.
-- A hook belonging to a single component stays beside it as `hook.ts` — that is
-  `complex-component-rule.md`'s territory, not this folder's.
-- One concern per hook. Memoize with `useMemo` / `useCallback` only when there
-  is a measured problem, not pre-emptively.
-
-## File naming
-
-| Kind | Case | Example |
+| Variable | Used by | Notes |
 | --- | --- | --- |
-| Hooks | camelCase, matching the export | `useOnClickOutside.ts` |
-| Components in `components/` | kebab-case | `status-badge.tsx` |
-| Route-local components in `app/**/_components/` | kebab-case | `recipe-card.tsx` |
-| Content, lib, types | kebab-case | `blog.ts`, `nen-tang/index.md` |
+| `MONGODB_URI` | `lib/db.ts`, seed script | required for admin |
+| `MONGODB_DB` | `lib/db.ts`, seed script | optional, defaults to `portfolio` |
+| `AUTH_SECRET` | `lib/auth.ts` | at least 32 characters |
+| `ADMIN_USERNAME`, `ADMIN_PASSWORD` | `scripts/seed-admin.mjs` only | never read by the app |
 
-Component files are kebab-case because that is what `npx shadcn add` writes;
-renaming them would break the next update. The PascalCase files under
-`app/_components/` and `app/showcase/_components/` predate this and are left
-alone.
-
-## Where a component lives
-
-- **Not reused → beside its route.** A component used by one route goes in a
-  `_components/` folder next to that route's `page.tsx`
-  (`app/recipes/_components/recipe-card.tsx`). The underscore keeps the folder
-  out of routing.
-- **Shared inside one route subtree → the nearest common segment.**
-  `app/blog/_components/` serves both `/blog` and `/blog/[...slug]`.
-- **Shared across unrelated routes → `src/components/`.** That is what
-  `components/sections/` (home + about) and `components/cv/cv-contact-actions`
-  (cv + resume) are. Move a component up only when the second user appears.
-- A page imports its own `./_components/…` relatively; anything further away
-  goes through the alias (`~/app/cv/_components/cv-document`).
-
----
-
-## UI Components — Reuse Before You Write
-
-This repo carries a local component library. **Search it before writing any new
-UI primitive.** Hand-rolling something that already exists is the default
-failure mode here.
-
-| Folder | Contains |
-| --- | --- |
-| `src/components/ui/` | shadcn/ui primitives + components pulled from registries |
-| `src/components/ai/` | chat/agent-oriented blocks (shadcn.io "AI" registry) |
-| `src/components/blog/` | the markdown pipeline only — shared by blog and recipes |
-| `src/components/sections/` | page sections used by more than one route |
-| `src/components/layouts/` | header, footer, page shell |
-| `src/app/**/_components/` | views that belong to a single route — not general purpose |
-
-1. **Look in `src/components/ui/` first.** Write a new component only when
-   nothing there fits, and say why in the task summary.
-2. **Install, do not transcribe.** Add missing primitives with
-   `npx shadcn@latest add <name>` so later updates stay mergeable. Only if the
-   registry is unreachable, write the file to match the official source exactly.
-3. **Never import a `Demo` export.** Registry files ship a
-   `export default function XxxDemo()` for previews. It is not production code —
-   ignore it, and delete it when the component is first used for real.
-4. **Extend by composition and `className`.** Do not fork or edit a registry
-   file to fit one screen; wrap it instead.
-5. **Vet a registry component before using it.** It was written for a generic
-   app, not this one. Check three things: does it use our theme tokens, does it
-   assume a `next-themes` provider we do not have, and what does it cost in
-   client JS.
-
-### Do not regress the blog pipeline
-
-Markdown in `content/` is highlighted **at build time** (`rehype-pretty-code` in
-`src/components/blog/markdown.tsx`), so the client downloads no highlighter. Several
-registry code components highlight in the browser with `shiki` inside
-`useEffect`. Using one of those in the blog would ship Shiki to every reader and
-add a flash of unstyled code. `src/components/ui/code-block.tsx` is what the
-pipeline maps `<pre>` to — keep it.
-
-### Health of what is installed
-
-Everything under `ui/` and `ai/` currently type-checks and lints clean. Keep it
-that way: `pnpm build` type-checks every file under `src/`, so a broken
-component that nothing imports still fails the build.
-
-Registry files arrive written for a generic app and usually need a pass before
-they compile here — missing local modules, `~/packages/*` import paths this repo
-does not use, and `props as any` casts that violate the TypeScript rules above.
-Fix them on the way in rather than leaving the build red.
-
-Two caveats to know before using one:
-
-- `ui/code-editor` calls `useTheme()` from `next-themes`, but the app has no
-  `ThemeProvider` and hardcodes `<body className="dark">`. It compiles; it will
-  pick the light theme until a provider exists.
-- `ui/code-tabs`, `ui/code-editor` and `ai/code-block` highlight in the browser
-  with a dynamic `import("shiki")`. That is fine for a landing page, and wrong
-  for the blog — see above.
-
-
----
-
-## TypeScript
-
-- `strict: true` always. No `any` — use `unknown` and narrow.
-- `type` only, never `interface`.
-- No non-null assertion (`!`) — handle `null` / `undefined` explicitly.
-- Shared types live in `src/types/`, re-exported from `src/types/index.ts`.
+- `.env*` is gitignored. Never commit a secret, print one, or paste one into a
+  note. Only the bcrypt hash of the admin password is stored.
+- `pnpm seed:admin` creates the admin user (or resets its password) and the
+  indexes.
+- The public site must still build and run with none of these set.
 
 ---
 
 ## Folder Structure
 
 ```
-content/blog/          # markdown notes — the blog's source of truth
+content/
+├── blog/              # markdown notes — the blog's source of truth
+└── recipes/           # flat shelf of recipe notes
 public/                # static assets served as-is (never put drafts here)
+└── code/<name>/       # exercise source, zipped on demand at /code/<name>.zip
+scripts/               # one-off Node scripts (seed-admin.mjs)
 src/
 ├── app/               # App Router: routes, layouts, globals.css
 │   ├── _components/   # sections used only by the home page
-│   └── <route>/_components/  # components used only by that route
+│   ├── <route>/_components/  # components used only by that route
+│   ├── admin/         # signed-in area: login, logtime
+│   ├── api/           # route handlers: auth, worklogs, cv
+│   └── code/[slug]/   # builds the exercise zip
+├── assets/fonts/
 ├── components/        # only what more than one route uses
 │   ├── ui/            # shadcn primitives + registry components
 │   ├── ai/            # AI-registry blocks
+│   ├── kibo-ui/       # Kibo UI registry blocks
 │   ├── blog/          # markdown pipeline
+│   ├── cv/            # CV pieces shared by /cv and /resume
 │   ├── sections/      # sections shared by several pages
-│   ├── layouts/       # header, footer, page header
+│   ├── layouts/       # header, footer, theme provider + toggle
 │   └── icons/
-├── data/              # static site content (profile, projects, experiences)
+├── data/              # static site content (profile, projects, cv.json)
 ├── hooks/             # shared hooks + barrel (useXxx.ts)
-├── lib/               # content loader, cn()
+├── lib/               # content loaders, db, auth, worklog, cn()
+├── styles/
 ├── types/             # shared types + barrel
 └── utils/
 ```
-
----
-
-## Code Style
-
-- Alphabetise imports in three groups: external, `~/` internal, relative.
-- No unused imports, variables, or exports.
-- `const` over `let`; never `var`.
-- Optional chaining (`?.`) and nullish coalescing (`??`) over verbose branches.
-- Comments explain **why**, not what. Match the density of the file you are in;
-  do not narrate obvious code.
 
 ---
 
@@ -266,7 +204,11 @@ pnpm build
 nothing imports still fails the build. Never report success without running it.
 
 For anything visible in the browser, verify in the preview and say what you
-observed — do not ask the user to check manually.
+observed — do not ask the user to check manually. Check light and dark.
+
+The dev server runs on port **8080** (`pnpm dev`). Admin and `/api` changes
+need a reachable MongoDB and the variables above; if they are not available,
+say the change is unverified instead of guessing.
 
 ---
 
@@ -275,10 +217,13 @@ observed — do not ask the user to check manually.
 - Adding a route file per note — the catch-all already handles any depth.
 - `dangerouslySetInnerHTML` for markdown — the pipeline returns React elements.
 - Numeric prefixes or `order:` frontmatter fields for sequencing content.
-- `defaultProps` and `PropTypes` — use default parameters and types.
 - Client-side syntax highlighting anywhere in the blog.
 - Putting drafts or notes in `public/` — everything there is publicly served.
-- Reaching for a new dependency before checking what is already installed.
+- Making a public page depend on MongoDB or on a client-side fetch.
+- An `/api` handler or admin page without a `getSession()` check.
+- Opening a second MongoDB connection instead of using `getDb()`.
+- Committing `.env*`, or a `.zip` under `public/code/`.
+- Translating established technical terms in notes into Vietnamese coinages.
 
 ---
 

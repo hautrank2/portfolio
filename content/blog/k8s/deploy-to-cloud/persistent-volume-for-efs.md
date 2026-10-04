@@ -307,7 +307,7 @@ kubectl apply -f kubernetes/menu-api.yaml
 kubectl exec deploy/cafe-menu-deployment -- ls -la /app/data/images
 ```
 
-Ảnh đã có trên EFS vẫn còn nguyên: cả quá trình chỉ xoá **bản khai** phía Kubernetes, không
+Ảnh đã có trên EFS vẫn còn nguyên: cả quá trình chỉ xoá **object** phía Kubernetes, không
 đụng tới file system.
 
 ## `Retain` và trạng thái `Released`
@@ -321,7 +321,7 @@ kubectl get pv
 ```
 
 Cách gỡ: xoá PV rồi apply lại — lúc này PVC đã không còn, nên PV xoá được ngay. (PVC vẫn
-còn thì làm theo mục ngay trên.) Ảnh trên EFS **không** mất, vì PV chỉ là một bản khai trỏ
+còn thì làm theo mục ngay trên.) Ảnh trên EFS **không** mất, vì PV chỉ là một object trỏ
 tới `FileSystemId`:
 
 ```bash

@@ -137,7 +137,7 @@ bình thường.
 | Thứ bị xoá | Chuyện gì xảy ra phía AWS |
 | --- | --- |
 | PVC `cafe-mongo-pvc` | StorageClass `gp2` có `reclaimPolicy: Delete` — driver EBS **xoá đĩa** |
-| PV `cafe-menu-images-pv` | `Retain`, và chỉ là bản khai — EFS **không** bị đụng tới, dọn ở bước 5 |
+| PV `cafe-menu-images-pv` | `Retain`, và chỉ là object phía Kubernetes — EFS **không** bị đụng tới, dọn ở bước 5 |
 
 Kiểm phía Kubernetes:
 
