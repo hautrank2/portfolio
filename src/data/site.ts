@@ -85,6 +85,7 @@ export const socialData: SocialModel[] = [
 export const navData: NavItemModel[] = [
   { title: "Home", href: "/" },
   { title: "Blog", href: "/blog" },
+  { title: "Demo", href: "/demo" },
   { title: "Showcase", href: "/showcase" },
   { title: "About", href: "/about" },
 ];

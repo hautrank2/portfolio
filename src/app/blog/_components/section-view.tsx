@@ -4,7 +4,7 @@ import PageHeader from "~/components/layouts/page-header";
 import { Reveal } from "~/components/ui/reveal";
 import { Typography } from "~/components/ui/typography";
 import { trackLogoData } from "~/data/blog";
-import { flattenDocs } from "~/lib/blog";
+import { flattenDocs } from "~/utils/blog";
 import { cn } from "~/lib/utils";
 import type { BlogNodeContextType, BlogNodeType } from "~/types";
 import { BlogBreadcrumb } from "./breadcrumb";

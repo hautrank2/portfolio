@@ -108,7 +108,7 @@ how to verify.
 
 ### Recipes
 
-- Recipes are `.md` files in `content/recipes/`, loaded by `src/lib/recipes.ts`.
+- Recipes are `.md` files in `content/recipes/`, loaded by `src/utils/recipes.ts`.
 - They are a flat shelf, deliberately separate from the blog loader: no
   `order:`, no planned nodes, no nesting. Do not merge the two loaders.
 
@@ -121,17 +121,73 @@ database out of everything else.
 
 - **One way into MongoDB:** `getDb()` from `~/lib/db`. It caches the client on
   `globalThis`; never call `new MongoClient` anywhere else in `src/`.
-- **Data access lives in `src/lib/<feature>.ts`** (`worklog.ts`), next to its
-  `zod` schemas. Route handlers stay thin: check the session, validate, call
-  the lib function, return JSON.
-- **There is no middleware.** Every admin page and every `/api` handler checks
-  `getSession()` from `~/lib/auth` itself — pages `redirect("/admin/login")`,
-  handlers return `401`. A new handler without that check is public.
+- **Data access lives in `src/lib/<feature>.ts`** (`task.ts`, `logtime.ts`,
+  `label.ts`), next to its `zod` schemas. Route handlers stay thin: check the
+  session, validate, call the lib function, return JSON — using `requireAdmin`
+  and `readBody` from `~/utils/api`.
+- **Models live in `src/types/`** (`WorkProjectModel`, `TaskModel`,
+  `LogtimeModel`, `LabelModel`)
+  and are the one shape shared by the lib, the handlers and the admin UI. Each
+  has an `…InputModel` for what a client may send.
+- **Categories and tags are one thing twice.** They share `LabelModel`,
+  `lib/label.ts` and the handlers in `utils/label-routes.ts`; a `LabelKindType`
+  picks the collection. Do not fork them until their shapes really diverge.
+- **Relations are stored as ids** and resolved in the lib. Deleting a category
+  or tag also removes the references to it.
+- **Tasks and projects are never deleted.** There is no `DELETE` endpoint and
+  no delete button for them; they are closed by changing their status, so the
+  logtimes pointing at them keep their history. Logtimes, categories and tags
+  can still be deleted.
+- **Every status has one colour**, in `taskStatusColorData` and
+  `workProjectStatusColorData` (`~/data/admin`), shown through `StatusSelect` /
+  `StatusDot`. Do not pick a colour for a status anywhere else.
+- **`lib/` is only for code that talks to something outside the app:** MongoDB
+  (`db`, `task`, `logtime`, `project`, `label`) and HTTP (`api-client`).
+  Everything else — content loaders, auth, schemas, date and paging helpers,
+  route-handler helpers — lives in `utils/`. The one exception is
+  `lib/utils.ts` (`cn`), which stays put because shadcn's CLI writes imports
+  to `~/lib/utils`.
+- **`localStorage` keys are declared in `localKeys`** (`~/utils/local`) and read
+  and written through `readLocal` / `writeLocal`, never by a bare string.
+- **Admin dates are pinned to one time zone** in `~/utils/admin-time` so the
+  server and the browser agree on which day an entry belongs to.
+- **Admin UI text is English.** Signed-in pages sit in `app/admin/(panel)/`,
+  which provides the sidebar; its links come from `adminNavData`.
+- **The whole admin UI is Client Components.** Every `page.tsx`, the
+  `(panel)` layout and every `_components` file starts with `"use client"` and
+  never imports a lib that touches MongoDB. The only server file under
+  `app/admin/` is the root `layout.tsx`, which exports `metadata` (title and
+  `noindex`) — a client file cannot. Do not add a layout just to set a title.
+  The public site is the opposite — keep that RSC by default.
+- **Content width is set once**, in `app/admin/(panel)/layout.tsx`. Pages and
+  boards fill it; they do not set a `max-w-*` of their own.
+- **`technologies` is a plain `string[]`** on tasks and logtimes. How a name
+  looks (colour, logo) is client config in `src/data/technology-style.ts`; a
+  name with no entry renders as plain text. Never store colour or logo in the
+  database.
+- **A logtime is a title, a day and a duration.** `durationMinutes` is stored
+  in minutes; the form takes hours. There is no start / end time, and `note` is
+  optional and usually empty.
+- **Admin pages read through `useApiQuery`** (`~/hooks`) and write through
+  `requestJson` (`~/lib/api-client`). After a write, `refreshApiQueries()`
+  refetches what is on screen; lists with add / edit / delete get all of that
+  from `useResourceDialog`.
+- **Admin lists are tables paged by the API.** The page, page size and filters
+  live in the URL (`?page=`, `?pageSize=`, `?status=`, `?project=`, `?month=`);
+  the page reads them with `useSearchParams` + `parsePageQuery` (inside a
+  `<Suspense>`), passes them on to the list endpoint and gets a `PageModel`
+  back. Client code changes them through `useQueryParams`, never local state.
+  A list endpoint answers with one page when `?page=` is present and with the
+  whole list otherwise.
+- **There is no middleware, and the UI is not the lock.** Every `/api` handler
+  checks the session itself (`requireAdmin`) and returns `401`; a new handler
+  without that check is public. The `(panel)` layout only hides the pages until
+  `/api/auth/me` answers, and `useApiQuery` sends a `401` to the login page.
 - **Validate every request body** with a `zod` schema via `safeParse`; read the
   body as `unknown`. Reject with `400`, never let a bad shape reach the driver.
 - **Documents never leave the lib.** Map them to a `…Model` first: `_id`
   becomes a string `id`, `Date` becomes an ISO string.
-- **Server only.** `~/lib/db`, `~/lib/auth` and anything importing `mongodb`
+- **Server only.** `~/lib/db`, `~/utils/auth` and anything importing `mongodb`
   must not be imported from a Client Component.
 - Admin routes are `noindex` through `src/app/admin/layout.tsx`.
 - `PUT /api/cv` writes `src/data/cv.json` and answers `404` outside
@@ -143,13 +199,18 @@ database out of everything else.
 | --- | --- | --- |
 | `MONGODB_URI` | `lib/db.ts`, seed script | required for admin |
 | `MONGODB_DB` | `lib/db.ts`, seed script | optional, defaults to `portfolio` |
-| `AUTH_SECRET` | `lib/auth.ts` | at least 32 characters |
+| `AUTH_SECRET` | `utils/auth.ts` | at least 32 characters |
 | `ADMIN_USERNAME`, `ADMIN_PASSWORD` | `scripts/seed-admin.mjs` only | never read by the app |
 
 - `.env*` is gitignored. Never commit a secret, print one, or paste one into a
   note. Only the bcrypt hash of the admin password is stored.
 - `pnpm seed:admin` creates the admin user (or resets its password) and the
   indexes.
+- `pnpm seed:k8s` rebuilds the Kubernetes course project, one task per section
+  of `content/blog/k8s` and one logtime a day; `--dry` only prints the plan.
+  It replaces only the documents it created itself (`seed: "k8s-course"`).
+- An admin project is `WorkProjectModel` — `ProjectModel` is the public
+  showcase entry and has nothing to do with the database.
 - The public site must still build and run with none of these set.
 
 ---
@@ -162,13 +223,13 @@ content/
 └── recipes/           # flat shelf of recipe notes
 public/                # static assets served as-is (never put drafts here)
 └── code/<name>/       # exercise source, zipped on demand at /code/<name>.zip
-scripts/               # one-off Node scripts (seed-admin.mjs)
+scripts/               # one-off Node scripts (seed-admin, seed-k8s-course)
 src/
 ├── app/               # App Router: routes, layouts, globals.css
 │   ├── _components/   # sections used only by the home page
 │   ├── <route>/_components/  # components used only by that route
-│   ├── admin/         # signed-in area: login, logtime
-│   ├── api/           # route handlers: auth, worklogs, cv
+│   ├── admin/         # login, plus the (panel) group: sidebar, logtime, tasks, projects
+│   ├── api/           # route handlers: auth, projects, tasks, logtimes, categories, tags, cv
 │   └── code/[slug]/   # builds the exercise zip
 ├── assets/fonts/
 ├── components/        # only what more than one route uses
@@ -182,10 +243,10 @@ src/
 │   └── icons/
 ├── data/              # static site content (profile, projects, cv.json)
 ├── hooks/             # shared hooks + barrel (useXxx.ts)
-├── lib/               # content loaders, db, auth, worklog, cn()
+├── lib/               # talks to the outside: db, api-client, task, logtime, project, label (+ cn)
 ├── styles/
 ├── types/             # shared types + barrel
-└── utils/
+└── utils/             # everything else: content loaders, auth, schema, admin-time, local, …
 ```
 
 ---

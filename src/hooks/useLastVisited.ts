@@ -5,7 +5,7 @@ import {
   readServerVisited,
   readVisited,
   subscribeVisited,
-} from "~/lib/visited";
+} from "~/utils/visited";
 import type { VisitedEntryType } from "~/types";
 
 export type UseLastVisitedProps = {

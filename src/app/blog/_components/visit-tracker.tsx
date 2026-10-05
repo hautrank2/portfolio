@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { recordVisit } from "~/lib/visited";
+import { recordVisit } from "~/utils/visited";
 import type { VisitedEntryType } from "~/types";
 
 export type BlogVisitTrackerProps = Omit<VisitedEntryType, "visitedAt">;

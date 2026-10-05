@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import PageHeader from "~/components/layouts/page-header";
-import { getAllRecipes, recipeCategoryLabels, recipePathTitle } from "~/lib/recipes";
+import { getAllRecipes, recipeCategoryLabels, recipePathTitle } from "~/utils/recipes";
 import type { RecipeCategoryType } from "~/types";
 import { RecipeCard } from "./_components/recipe-card";
 

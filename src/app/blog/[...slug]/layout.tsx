@@ -1,4 +1,4 @@
-import { getBlogNode, toSidebarTree } from "~/lib/blog";
+import { getBlogNode, toSidebarTree } from "~/utils/blog";
 import { BlogSidebar, BlogTrackNavMobile } from "../_components/sidebar";
 
 type LayoutPropsType = {

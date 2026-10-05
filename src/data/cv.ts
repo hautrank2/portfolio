@@ -1,4 +1,4 @@
-import { normalizeCv } from "~/lib/cv";
+import { normalizeCv } from "~/utils/cv";
 import type { CvModel } from "~/types";
 import cvJson from "./cv.json";
 

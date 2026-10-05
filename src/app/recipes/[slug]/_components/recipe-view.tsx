@@ -3,7 +3,7 @@ import Link from "next/link";
 import { RecipeMeta } from "~/app/recipes/_components/recipe-meta";
 import { renderMarkdown } from "~/components/blog/markdown";
 import { Typography } from "~/components/ui/typography";
-import { recipeCategoryLabels } from "~/lib/recipes";
+import { recipeCategoryLabels } from "~/utils/recipes";
 import type { RecipeModel } from "~/types";
 
 export type RecipeViewProps = {

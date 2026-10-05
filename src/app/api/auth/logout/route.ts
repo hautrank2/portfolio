@@ -1,4 +1,4 @@
-import { clearSession } from "~/lib/auth";
+import { clearSession } from "~/utils/auth";
 
 export async function POST() {
   await clearSession();

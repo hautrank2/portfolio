@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 export const loginFormSchema = z.object({
-  username: z.string().trim().min(1, "Bắt buộc"),
-  password: z.string().min(1, "Bắt buộc"),
+  username: z.string().trim().min(1, "Required"),
+  password: z.string().min(1, "Required"),
 });
 
 export type LoginFormValues = z.infer<typeof loginFormSchema>;

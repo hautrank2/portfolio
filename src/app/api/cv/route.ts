@@ -1,6 +1,6 @@
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
-import { normalizeCv, tidyCv } from "~/lib/cv";
+import { normalizeCv, tidyCv } from "~/utils/cv";
 
 const CV_FILE = path.join(process.cwd(), "src", "data", "cv.json");
 

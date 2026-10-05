@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { blogPathTitle, getAllBlogPaths, getBlogNode } from "~/lib/blog";
+import { blogPathTitle, getAllBlogPaths, getBlogNode } from "~/utils/blog";
 import { DocView } from "../_components/doc-view";
 import { SectionView } from "../_components/section-view";
 

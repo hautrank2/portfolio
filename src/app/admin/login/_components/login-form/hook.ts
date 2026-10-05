@@ -26,13 +26,13 @@ export const useLoginForm = ({ redirectTo }: UseLoginFormProps) => {
       });
       if (!response.ok) {
         const body: { error?: string } = await response.json().catch(() => ({}));
-        setError(body.error ?? "Đăng nhập thất bại.");
+        setError(body.error ?? "Sign-in failed.");
         return;
       }
       router.replace(redirectTo);
       router.refresh();
     } catch {
-      setError("Không kết nối được máy chủ.");
+      setError("Could not reach the server.");
     }
   };
 

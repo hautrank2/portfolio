@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { blogPathTitle, getBlogTree } from "~/lib/blog";
+import { blogPathTitle, getBlogTree } from "~/utils/blog";
 import { SectionView } from "./_components/section-view";
 
 export const metadata: Metadata = {

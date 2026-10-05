@@ -17,7 +17,7 @@ export const LoginForm = (props: LoginFormProps) => {
       className="space-y-5"
     >
       <div className="space-y-2">
-        <Label htmlFor="username">Tên đăng nhập</Label>
+        <Label htmlFor="username">Username</Label>
         <Input
           id="username"
           autoComplete="username"
@@ -31,7 +31,7 @@ export const LoginForm = (props: LoginFormProps) => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password">Mật khẩu</Label>
+        <Label htmlFor="password">Password</Label>
         <Input
           id="password"
           type="password"
@@ -51,7 +51,7 @@ export const LoginForm = (props: LoginFormProps) => {
       )}
 
       <Button type="submit" className="w-full" disabled={isSubmitting}>
-        {isSubmitting ? "Đang đăng nhập…" : "Đăng nhập"}
+        {isSubmitting ? "Signing in…" : "Sign in"}
       </Button>
     </form>
   );

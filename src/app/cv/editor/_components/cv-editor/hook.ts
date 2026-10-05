@@ -1,13 +1,13 @@
 import { useRouter } from "next/navigation";
 import * as React from "react";
-import { normalizeCv, tidyCv } from "~/lib/cv";
+import { normalizeCv, tidyCv } from "~/utils/cv";
 import {
   clearCvDraft,
   readCvDraft,
   readServerCvDraft,
   subscribeCvDraft,
   writeCvDraft,
-} from "~/lib/cv-draft";
+} from "~/utils/cv-draft";
 import type { CvModel } from "~/types";
 import type {
   CvListItem,

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getAllRecipes, getRecipe, recipePathTitle } from "~/lib/recipes";
+import { getAllRecipes, getRecipe, recipePathTitle } from "~/utils/recipes";
 import type { RecipeModel } from "~/types";
 import { RecipeView } from "./_components/recipe-view";
 

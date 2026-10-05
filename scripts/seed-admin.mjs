@@ -27,7 +27,8 @@ try {
   const users = db.collection("users");
 
   await users.createIndex({ username: 1 }, { unique: true });
-  await db.collection("worklogs").createIndex({ date: -1, createdAt: -1 });
+  await db.collection("logtimes").createIndex({ loggedAt: -1, createdAt: -1 });
+  await db.collection("tasks").createIndex({ createdAt: -1 });
 
   const { upsertedCount } = await users.updateOne(
     { username: ADMIN_USERNAME },
