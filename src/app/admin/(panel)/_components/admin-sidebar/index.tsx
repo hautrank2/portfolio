@@ -1,6 +1,13 @@
 "use client";
 
-import { Clock, FolderKanban, ListTodo, LogOut, type LucideIcon } from "lucide-react";
+import {
+  Clock,
+  FolderKanban,
+  LayoutDashboard,
+  ListTodo,
+  LogOut,
+  type LucideIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { Button } from "~/components/ui/button";
 import { adminNavData } from "~/data/admin";
@@ -9,6 +16,7 @@ import { useAdminSidebar } from "./hook";
 import type { AdminSidebarProps } from "./type";
 
 const NAV_ICONS: Record<string, LucideIcon> = {
+  "/admin/dashboard": LayoutDashboard,
   "/admin/projects": FolderKanban,
   "/admin/logtime": Clock,
   "/admin/tasks": ListTodo,

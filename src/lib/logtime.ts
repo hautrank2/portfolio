@@ -1,6 +1,13 @@
 import type { ObjectId, WithId } from "mongodb";
 import { z } from "zod";
-import { dayOf, daysOfMonth, monthRange, today } from "~/utils/admin-time";
+import {
+  dayOf,
+  daysOfMonth,
+  monthRange,
+  shiftDay,
+  today,
+  toIso,
+} from "~/utils/admin-time";
 import {
   collectionNames,
   findPage,
@@ -84,6 +91,27 @@ const monthFilter = (month?: string) => {
 export const listLogtimes = async (month?: string): Promise<LogtimeModel[]> => {
   const collection = await getCollection();
   const docs = await collection.find(monthFilter(month)).sort(NEWEST_FIRST).toArray();
+  return docs.map(toModel);
+};
+
+/**
+ * Every logtime between two days (`YYYY-MM-DD`, both inclusive), newest first.
+ * Either end can be left out — the dashboard's "all time" uses neither.
+ */
+export const listLogtimesInRange = async (
+  from?: string,
+  to?: string
+): Promise<LogtimeModel[]> => {
+  const collection = await getCollection();
+  const loggedAt = {
+    ...(from ? { $gte: new Date(toIso(from)) } : {}),
+    // `to` is inclusive, so stop just before the following day starts.
+    ...(to ? { $lt: new Date(toIso(shiftDay(to, 1))) } : {}),
+  };
+  const docs = await collection
+    .find(from || to ? { loggedAt } : {})
+    .sort(NEWEST_FIRST)
+    .toArray();
   return docs.map(toModel);
 };
 

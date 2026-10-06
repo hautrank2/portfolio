@@ -7,6 +7,7 @@ import type {
 } from "~/types";
 
 export const adminNavData: NavItemModel[] = [
+  { title: "Dashboard", href: "/admin/dashboard" },
   { title: "Logtime", href: "/admin/logtime" },
   { title: "Task", href: "/admin/tasks" },
   { title: "Project", href: "/admin/projects" },

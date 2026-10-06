@@ -65,6 +65,23 @@ export const monthRange = (month: string) => {
   };
 };
 
+/** `YYYY-MM-DD` moved by `delta` days. */
+export const shiftDay = (day: string, delta: number) =>
+  new Date(Date.parse(`${day}T00:00:00Z`) + delta * 86_400_000)
+    .toISOString()
+    .slice(0, 10);
+
+/** Every day from `from` to `to`, both inclusive, in order. */
+export const daysInRange = (from: string, to: string) => {
+  const days: string[] = [];
+  for (let day = from; day <= to; day = shiftDay(day, 1)) days.push(day);
+  return days;
+};
+
+/** 0 is Monday, 6 is Sunday. */
+export const weekdayOf = (day: string) =>
+  (new Date(`${day}T00:00:00Z`).getUTCDay() + 6) % 7;
+
 /** Every day of `month` (`YYYY-MM`) as `YYYY-MM-DD`, in order. */
 export const daysOfMonth = (month: string) => {
   const [year, monthIndex] = month.split("-").map(Number);

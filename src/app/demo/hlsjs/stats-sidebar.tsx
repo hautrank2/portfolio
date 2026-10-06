@@ -1,18 +1,6 @@
 "use client";
 
-import {
-  CircleCheck,
-  CircleX,
-  Minus,
-  PanelRightClose,
-  PanelRightOpen,
-  TriangleAlert,
-  Wifi,
-  WifiHigh,
-  WifiLow,
-  WifiOff,
-  WifiZero,
-} from "lucide-react";
+import { CircleCheck, CircleX, Minus, TriangleAlert, X } from "lucide-react";
 import { useState } from "react";
 import { HISTORY_SIZE, type DemoSample } from "./hook";
 
@@ -116,7 +104,11 @@ const STATUS: Record<
   safe: { label: "An toàn", Icon: CircleCheck, className: "text-emerald-500" },
   warn: { label: "Cảnh báo", Icon: TriangleAlert, className: "text-amber-500" },
   danger: { label: "Nguy hiểm", Icon: CircleX, className: "text-red-500" },
-  idle: { label: "Chưa có dữ liệu", Icon: Minus, className: "text-foreground/40" },
+  idle: {
+    label: "Chưa có dữ liệu",
+    Icon: Minus,
+    className: "text-foreground/40",
+  },
 };
 
 const SEVERITY: Status[] = ["idle", "safe", "warn", "danger"];
@@ -141,39 +133,29 @@ const getGroupStatus = (group: Group, sample: DemoSample | undefined) =>
     .map((metric) => getStatus(metric, sample))
     .reduce((a, b) => (SEVERITY.indexOf(b) > SEVERITY.indexOf(a) ? b : a));
 
-
-export function StatsSidebar({ history }: { history: DemoSample[] }) {
-  const [open, setOpen] = useState(true);
+export function StatsSidebar({
+  history,
+  onClose,
+}: {
+  history: DemoSample[];
+  onClose?: () => void;
+}) {
+  const [] = useState(true);
   const latest = history.at(-1);
-
-  if (!open) {
-    return (
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        aria-expanded={false}
-        className="order-first flex shrink-0 items-center gap-2 rounded-md border border-foreground/15 px-3 py-2 text-sm text-foreground/70 transition-colors hover:text-primary lg:sticky lg:top-20 lg:order-last"
-      >
-        <PanelRightOpen size={16} />
-        Thông số
-      </button>
-    );
-  }
 
   return (
     <aside className="order-first w-full shrink-0 lg:sticky lg:top-20 lg:order-last lg:max-h-[calc(100vh-6rem)] lg:w-80 lg:overflow-y-auto">
-      <div className="z-10 flex items-center justify-between gap-2 border-b border-foreground/10 bg-background/90 py-2 backdrop-blur lg:sticky lg:top-0">
+      <div className=" px-2 z-10 flex items-center justify-between gap-2 border-b border-foreground/10 bg-background/90 py-2 backdrop-blur lg:sticky lg:top-0">
         <h2 className="text-sm font-semibold">Thông số</h2>
         <div className="flex items-center gap-2">
-          <ConnectionIndicator sample={latest} />
           <button
             type="button"
-            onClick={() => setOpen(false)}
+            onClick={() => onClose?.()}
             aria-expanded
             aria-label="Đóng thông số"
             className="rounded-md p-1.5 text-foreground/60 transition-colors hover:text-primary"
           >
-            <PanelRightClose size={16} />
+            <X size={16} />
           </button>
         </div>
       </div>
@@ -205,52 +187,6 @@ export function StatsSidebar({ history }: { history: DemoSample[] }) {
         );
       })}
     </aside>
-  );
-}
-
-// Số vạch sóng suy ra từ ping và tốc độ mà trình duyệt ước lượng
-function ConnectionIndicator({ sample }: { sample: DemoSample | undefined }) {
-  if (!sample) return null;
-
-  if (!sample.online) {
-    return (
-      <span className="flex items-center gap-1 text-xs text-foreground/70">
-        <WifiOff size={16} className="text-red-500" />
-        Mất kết nối
-      </span>
-    );
-  }
-  if (!sample.connection) {
-    return (
-      <span className="flex items-center gap-1 text-xs text-foreground/50">
-        <Wifi size={16} className="text-foreground/40" />
-        Không đo được
-      </span>
-    );
-  }
-
-  const { type, pingMs, speedMbps } = sample.connection;
-  let Icon = WifiZero;
-  let className = "text-red-500";
-  if (pingMs < 100 && speedMbps >= 5) {
-    Icon = Wifi;
-    className = "text-emerald-500";
-  } else if (pingMs < 300 && speedMbps >= 1.5) {
-    Icon = WifiHigh;
-    className = "text-emerald-500";
-  } else if (pingMs < 1000 && speedMbps >= 0.5) {
-    Icon = WifiLow;
-    className = "text-amber-500";
-  }
-
-  return (
-    <span
-      className="flex items-center gap-1.5 text-xs tabular-nums text-foreground/70"
-      title="Loại kết nối · ping · tốc độ (trình duyệt ước lượng)"
-    >
-      <Icon size={16} className={className} />
-      {type.toUpperCase()} · {pingMs} ms · {speedMbps} Mbps
-    </span>
   );
 }
 

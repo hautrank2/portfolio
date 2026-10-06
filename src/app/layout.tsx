@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
+import { ClickBurst } from "~/components/layouts/click-burst";
 import Footer from "~/components/layouts/footer";
 import Header from "~/components/layouts/header";
 import { ThemeProvider } from "~/components/layouts/theme-provider";
@@ -43,6 +44,8 @@ export default function RootLayout({
           <Header />
           <main className="pt-16 print:pt-0">{children}</main>
           <Footer />
+          {/* Sparks on every click, site-wide. */}
+          <ClickBurst />
         </ThemeProvider>
       </body>
     </html>
