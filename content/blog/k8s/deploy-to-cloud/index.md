@@ -21,6 +21,7 @@ order:
   - { slug: persistent-volume-for-efs, title: "8.17 Tạo Persistent Volume cho EFS" }
   - { slug: using-the-efs-volume, title: "8.18 Dùng EFS Volume" }
   - { slug: cleaning-up, title: "8.19 Dọn dẹp — tắt hết để không mất phí" }
+  - { slug: video-demo, title: "8.20 Video demo — cả section trong một lần quay" }
 ---
 
 ## Dự án của section này
@@ -85,11 +86,18 @@ Danh sách kiểm đầy đủ nằm ở [8.14](/blog/k8s/deploy-to-cloud/applyi
 tường lửa — tầng mà lab một node che hết. Đó cũng là thứ đáng giá nhất khi bạn thật sự
 bật một cụm cloud lên.
 
-## Dọn dẹp: note cuối, và là note phải làm
+## Dọn dẹp: note phải làm
 
 Mọi thứ ở trên tính tiền theo giờ cho tới khi bạn xoá, và một nửa trong số đó **không** đi
 theo cluster. [8.19](/blog/k8s/deploy-to-cloud/cleaning-up) xoá theo đúng thứ tự ngược lúc
 dựng, kiểm từng bước bằng lệnh, rồi đi tìm những thứ hay sống sót.
+
+## Video demo
+
+Tôi quay lại một lần dựng trọn section này, từ lúc test bằng Docker tới lúc dọn sạch AWS:
+[xem trên YouTube](https://www.youtube.com/watch?v=lu44QnNLekI), hoặc ở trang
+[demo](/demo/k8s-aws). [8.20](/blog/k8s/deploy-to-cloud/video-demo) là mục lục của video —
+mỗi mốc thời gian trỏ về note tương ứng.
 
 ## Thực hành trên k3d nếu không muốn trả tiền
 

@@ -10,7 +10,7 @@ tags: [k8s, aws, eks, cleanup, cost, efs, ebs, elb, nat]
 > Tiếp [8.18](/blog/k8s/deploy-to-cloud/using-the-efs-volume). Cafe System đang chạy trên
 > EKS, ảnh nằm trên EFS, dữ liệu nằm trên EBS — và mọi thứ vẫn đang tính tiền theo giờ.
 
-Note cuối của section, và là note **phải làm** nếu bạn không định giữ cụm chạy tiếp. Ước
+Note dọn dẹp của section, và là note **phải làm** nếu bạn không định giữ cụm chạy tiếp. Ước
 tính ở [8.4](/blog/k8s/deploy-to-cloud/services-and-cost): quên một ngày khoảng $7, quên một
 tháng hơn $200.
 

@@ -6,7 +6,7 @@ export const demoData: DemoModel[] = [
     title: "Cafe System trên AWS EKS",
     description:
       "Một quán cà phê nhỏ — ba API, hai frontend và một MongoDB — chạy trên cluster Kubernetes thật của AWS.",
-    youtubeUrl: "",
+    youtubeUrl: "https://www.youtube.com/watch?v=lu44QnNLekI",
     highlights: [
       "Cluster EKS với hai EC2 worker node, mỗi node nằm ở một Availability Zone.",
       "Chỉ hai Service kiểu LoadBalancer ra internet; nginx trong mỗi frontend proxy /api xuống ba API bên trong cluster.",
@@ -33,6 +33,11 @@ export const demoData: DemoModel[] = [
         title: "Xem bài viết chi tiết",
         kind: "article",
         href: "/blog/k8s/deploy-to-cloud",
+      },
+      {
+        title: "Mục lục video theo từng note",
+        kind: "article",
+        href: "/blog/k8s/deploy-to-cloud/video-demo",
       },
       {
         title: "Tải source",
