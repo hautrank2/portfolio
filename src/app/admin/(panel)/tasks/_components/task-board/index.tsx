@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { Clock, Plus } from "lucide-react";
 import { DataTableShell } from "~/app/admin/_components/data-table-shell";
 import { LabelChip } from "~/app/admin/_components/label-chip";
 import { RowActions } from "~/app/admin/_components/row-actions";
@@ -36,6 +36,7 @@ import {
 import { dayOf, formatDay } from "~/utils/admin-time";
 import { cn } from "~/lib/utils";
 import type { TaskPriorityType, TaskStatusType } from "~/types";
+import { LogFormDialog } from "~/app/admin/(panel)/logtime/_components/log-form";
 import { TaskFormDialog } from "../task-form";
 import { ALL_PROJECTS, useTaskBoard } from "./hook";
 import type { TaskBoardProps } from "./type";
@@ -67,6 +68,8 @@ export const TaskBoard = (props: TaskBoardProps) => {
     formKey,
     formError,
     listError,
+    logDialog,
+    handleLogtime,
     statusOptions,
     projectById,
     isOverdue,
@@ -235,7 +238,17 @@ export const TaskBoard = (props: TaskBoardProps) => {
                     </div>
                   </TableCell>
                   <TableCell className="pr-4">
-                    <RowActions noun="task" onEdit={() => openForm(task)} />
+                    <RowActions noun="task" onEdit={() => openForm(task)}>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label="Log time on task"
+                        title="Logtime"
+                        onClick={() => handleLogtime(task)}
+                      >
+                        <Clock />
+                      </Button>
+                    </RowActions>
                   </TableCell>
                 </TableRow>
               );
@@ -254,6 +267,18 @@ export const TaskBoard = (props: TaskBoardProps) => {
         error={formError}
         projects={props.projects}
         tags={props.tags}
+        categories={props.categories}
+      />
+
+      <LogFormDialog
+        key={`log-${logDialog.formKey}`}
+        open={logDialog.open}
+        onOpenChange={logDialog.setOpen}
+        isEdit={false}
+        defaultValues={logDialog.defaultValues}
+        onSubmit={logDialog.handleSubmit}
+        error={logDialog.formError}
+        tasks={tasks.items}
         categories={props.categories}
       />
     </div>

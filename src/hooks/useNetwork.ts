@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 
 /** Connection type estimated by the Network Information API */
 export type EffectiveType = "slow-2g" | "2g" | "3g" | "4g" | "unknown";
@@ -130,6 +136,18 @@ export interface UseWifiOptions {
  *   - `speedTier` → coarse bucket derived from `downlink`
  *   - `signal`    → 0–4 bars for the UI
  */
+const subscribeToOnline = (onChange: () => void) => {
+  window.addEventListener("online", onChange);
+  window.addEventListener("offline", onChange);
+  return () => {
+    window.removeEventListener("online", onChange);
+    window.removeEventListener("offline", onChange);
+  };
+};
+
+// Whether the Network Information API exists never changes after load.
+const subscribeToNothing = () => () => undefined;
+
 export function useNetwork(options: UseWifiOptions = {}): NetworkInfoModel {
   const {
     // `import.meta.env` is a Vite thing and is undefined under Next.js, so
@@ -139,8 +157,19 @@ export function useNetwork(options: UseWifiOptions = {}): NetworkInfoModel {
     pingOnMount = true,
   } = options;
 
-  const [online, setOnline] = useState<boolean>(
-    typeof navigator === "undefined" ? true : navigator.onLine,
+  // Read through useSyncExternalStore so the server render and the first
+  // client render agree. A plain `useState(navigator.onLine)` does not: Node
+  // has a global `navigator` whose `onLine` is undefined, so the server would
+  // render "offline" and hydration would then fail against an online browser.
+  const online = useSyncExternalStore(
+    subscribeToOnline,
+    () => navigator.onLine,
+    () => true,
+  );
+  const supported = useSyncExternalStore(
+    subscribeToNothing,
+    () => getConnection() !== null,
+    () => false,
   );
   const [effectiveType, setEffectiveType] = useState<EffectiveType>("unknown");
   const [downlink, setDownlink] = useState<number | null>(null);
@@ -149,9 +178,6 @@ export function useNetwork(options: UseWifiOptions = {}): NetworkInfoModel {
   const [latency, setLatency] = useState<number | null>(null);
 
   const connection = useRef<NavigatorConnection | null>(null);
-  // Whether the API exists never changes, so it is read once — as state, not
-  // a ref, because it is returned from render.
-  const [supported] = useState(() => getConnection() !== null);
 
   // Measure latency manually by timing a fetch round-trip
   const refresh = useCallback(async () => {
@@ -190,19 +216,11 @@ export function useNetwork(options: UseWifiOptions = {}): NetworkInfoModel {
     return () => connection.current?.removeEventListener?.("change", sync);
   }, []);
 
-  // Track online / offline transitions
+  // A measured latency means nothing once the connection is gone.
   useEffect(() => {
-    const onOnline = () => setOnline(true);
-    const onOffline = () => {
-      setOnline(false);
-      setLatency(null);
-    };
-    window.addEventListener("online", onOnline);
+    const onOffline = () => setLatency(null);
     window.addEventListener("offline", onOffline);
-    return () => {
-      window.removeEventListener("online", onOnline);
-      window.removeEventListener("offline", onOffline);
-    };
+    return () => window.removeEventListener("offline", onOffline);
   }, []);
 
   // Run the latency probe on mount and on a recurring interval

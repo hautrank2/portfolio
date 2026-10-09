@@ -29,6 +29,8 @@ export async function GET() {
     headers: {
       "Content-Type": "application/pdf",
       "Content-Disposition": `attachment; filename="${fileName}"`,
+      // Unlisted, like the `/cv` page: keep the file out of search results.
+      "X-Robots-Tag": "noindex, nofollow",
     },
   });
 }

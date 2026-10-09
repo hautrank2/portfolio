@@ -29,12 +29,14 @@ export const CvContactActions = (props: CvContactActionsProps) => {
             Contact me
           </a>
         </Button>
-        <Button asChild size={size} variant="outline" className="rounded-full">
-          <a href={props.pdfHref} download>
-            <Download />
-            Download PDF
-          </a>
-        </Button>
+        {props.pdfHref && (
+          <Button asChild size={size} variant="outline" className="rounded-full">
+            <a href={props.pdfHref} download>
+              <Download />
+              Download PDF
+            </a>
+          </Button>
+        )}
         <Button
           type="button"
           size={size}

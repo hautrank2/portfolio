@@ -4,7 +4,6 @@ import type { IconType } from "react-icons";
 import { FaGithub, FaLinkedinIn } from "react-icons/fa6";
 import { CvContactActions } from "~/components/cv/cv-contact-actions";
 import { cvData } from "~/data/cv";
-import { profileData } from "~/data/site";
 import type { CvModel } from "~/types";
 import { ResumeSidebar } from "./_components/resume-sidebar";
 import {
@@ -12,7 +11,6 @@ import {
   ResumeContact,
   ResumeEducation,
   ResumeExperience,
-  ResumePaperLink,
   ResumeProfile,
   ResumeProjects,
   ResumeSection,
@@ -81,7 +79,6 @@ export default function ResumePage() {
       name={cv.name}
       phone={cv.phone}
       email={cv.email}
-      pdfHref={profileData.cv}
     />
   );
 
@@ -97,7 +94,6 @@ export default function ResumePage() {
                 name={cv.name}
                 phone={cv.phone}
                 email={cv.email}
-                pdfHref={profileData.cv}
                 showCopy={false}
                 size="sm"
               />
@@ -106,7 +102,6 @@ export default function ResumePage() {
         }
         footer={
           <div className="space-y-4">
-            <ResumePaperLink href="/cv" />
             <div className="flex flex-wrap items-center gap-2">
               {cv.links
                 .filter((link) => link.url.trim())

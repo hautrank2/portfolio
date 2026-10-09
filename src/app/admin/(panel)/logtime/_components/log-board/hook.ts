@@ -8,7 +8,7 @@ import type { LogViewType, UseLogBoardProps } from "./type";
 /** What the duration field starts at for a new entry. */
 const DEFAULT_HOURS = 4;
 
-const emptyValues = (): LogFormValues => ({
+export const emptyValues = (): LogFormValues => ({
   title: "",
   date: today(),
   hours: DEFAULT_HOURS,
@@ -18,7 +18,7 @@ const emptyValues = (): LogFormValues => ({
   note: "",
 });
 
-const toValues = (logtime: LogtimeModel): LogFormValues => ({
+export const toValues = (logtime: LogtimeModel): LogFormValues => ({
   title: logtime.title,
   date: dayOf(logtime.loggedAt),
   hours: logtime.durationMinutes / 60,
@@ -28,7 +28,7 @@ const toValues = (logtime: LogtimeModel): LogFormValues => ({
   note: logtime.note ?? "",
 });
 
-const toInput = (values: LogFormValues): LogtimeInputModel => ({
+export const toInput = (values: LogFormValues): LogtimeInputModel => ({
   title: values.title.trim(),
   note: values.note.trim() || undefined,
   taskId: values.taskId || undefined,

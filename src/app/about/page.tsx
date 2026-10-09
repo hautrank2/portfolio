@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ArrowRight, FileText, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -40,17 +40,6 @@ export default function AboutPage() {
                 size={16}
                 className="transition-transform group-hover:translate-x-1"
               />
-            </Link>
-          </Button>
-          <Button
-            asChild
-            size="lg"
-            variant="outline"
-            className="h-12 rounded-full px-6 text-base"
-          >
-            <Link href="/cv">
-              <FileText className="size-5" />
-              Printable CV
             </Link>
           </Button>
         </div>

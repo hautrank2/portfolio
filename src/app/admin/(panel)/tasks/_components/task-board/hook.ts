@@ -5,9 +5,21 @@ import {
 } from "~/data/admin";
 import { useQueryParams, useResourceDialog } from "~/hooks";
 import { splitList } from "~/lib/api-client";
-import type { TaskInputModel, TaskModel, TaskStatusType } from "~/types";
+import type {
+  LogtimeInputModel,
+  LogtimeModel,
+  TaskInputModel,
+  TaskModel,
+  TaskStatusType,
+} from "~/types";
 import { dayOf, today, toIso } from "~/utils/admin-time";
 import { localKeys, writeLocal } from "~/utils/local";
+import {
+  emptyValues as emptyLogValues,
+  toInput as toLogInput,
+  toValues as toLogValues,
+} from "~/app/admin/(panel)/logtime/_components/log-board/hook";
+import type { LogFormValues } from "~/app/admin/(panel)/logtime/_components/log-form/type";
 import type { TaskFormValues } from "../task-form/type";
 import type { TaskStatusOption, UseTaskBoardProps } from "./type";
 
@@ -69,6 +81,23 @@ export const useTaskBoard = ({
     toInput,
   });
 
+  // A second dialog on the same page: time logged against a task, without
+  // going to the logtime page for it.
+  const logDialog = useResourceDialog<LogtimeModel, LogFormValues, LogtimeInputModel>({
+    endpoint: "/api/logtimes",
+    emptyValues: emptyLogValues,
+    toValues: toLogValues,
+    toInput: toLogInput,
+  });
+
+  /** Opens the logtime form for a new entry that starts out as this task's. */
+  const handleLogtime = (task: TaskModel) =>
+    logDialog.openForm(null, {
+      taskId: task.id,
+      categoryIds: task.categories.slice(0, 1).map((category) => category.id),
+      technologies: task.technologies.join(", "),
+    });
+
   /** Changes only the status, straight from the table. */
   const handleStatusChange = (task: TaskModel, status: TaskStatusType) =>
     handleReplace(task, { ...toInput(toValues(task)), status });
@@ -108,6 +137,8 @@ export const useTaskBoard = ({
 
   return {
     ...dialog,
+    logDialog,
+    handleLogtime,
     statusOptions,
     projectById: new Map(projects.map((project) => [project.id, project])),
     isOverdue,

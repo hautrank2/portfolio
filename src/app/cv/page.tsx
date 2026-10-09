@@ -8,6 +8,9 @@ import { CvDocument } from "./_components/cv-document";
 export const metadata: Metadata = {
   title: "cv",
   description: `${cvData.name} — ${cvData.title}. Experience, projects and skills.`,
+  // Unlisted: reachable only by its link, which is shared by hand. Nothing on
+  // the site points here, and search engines are asked to stay out too.
+  robots: { index: false, follow: false },
 };
 
 export default function CvPage() {

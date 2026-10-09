@@ -9,13 +9,26 @@ export type RowActionsProps = {
   onEdit: () => void;
   /** Leave out for rows that cannot be deleted (tasks, projects). */
   onDelete?: () => void;
+  /** Extra buttons of this row, shown before edit. */
+  children?: React.ReactNode;
 };
 
 /** The buttons at the end of an admin table row: edit, and delete if allowed. */
-export const RowActions = ({ noun, onEdit, onDelete }: RowActionsProps) => {
+export const RowActions = ({
+  noun,
+  onEdit,
+  onDelete,
+  children,
+}: RowActionsProps) => {
   return (
     <div className="flex items-center justify-end gap-1">
-      <Button variant="ghost" size="icon" aria-label={`Edit ${noun}`} onClick={onEdit}>
+      {children}
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label={`Edit ${noun}`}
+        onClick={onEdit}
+      >
         <Pencil />
       </Button>
       {onDelete && (

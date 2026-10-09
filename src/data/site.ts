@@ -73,13 +73,8 @@ export const socialData: SocialModel[] = [
     href: "mailto:hautrantrung.02@gmail.com",
     handle: "hautrantrung.02@gmail.com",
   },
-  {
-    title: "CV",
-    // Cùng một file với `profileData.cv` — trỏ thẳng vào đó để hai chỗ không
-    // trôi khỏi nhau khi đổi đường dẫn.
-    href: profileData.cv,
-    handle: "Download PDF",
-  },
+  // Không có mục CV ở đây: trang `/cv` và file PDF chỉ được chia sẻ bằng link
+  // trực tiếp, không có đường dẫn nào trên site trỏ tới.
 ];
 
 export const navData: NavItemModel[] = [
