@@ -32,6 +32,36 @@
       "specialty": "Software Engineering"
     }
   ],
+  "certifications": [
+    {
+      "name": "Docker & Kubernetes: The Practical Guide",
+      "issuer": "Udemy",
+      "date": "",
+      "url": "https://www.udemy.com/certificate/UC-cf26e32b-3d9a-4ef5-9045-a2c3fa7395d1/",
+      "demoUrl": "/demo/k8s-aws"
+    },
+    {
+      "name": "Build ASP.NET Core Web API",
+      "issuer": "Udemy",
+      "date": "",
+      "url": "https://www.udemy.com/certificate/UC-5b8207d8-df6e-4d63-b4fe-872b8337d3b1/",
+      "demoUrl": ""
+    },
+    {
+      "name": "React Native - The Practical Guide",
+      "issuer": "Udemy",
+      "date": "",
+      "url": "https://www.udemy.com/certificate/UC-c7d1bf0b-ca04-4c69-98cd-951940a06a05/",
+      "demoUrl": ""
+    },
+    {
+      "name": "Nodejs",
+      "issuer": "Udemy",
+      "date": "",
+      "url": "https://www.udemy.com/certificate/UC-f65c03e2-cdb2-4923-9266-80e81f026f6d/",
+      "demoUrl": ""
+    }
+  ],
   "skills": [
     {
       "label": "Languages",

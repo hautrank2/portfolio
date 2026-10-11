@@ -18,6 +18,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import React from "react";
 import type { CvModel } from "~/types";
+import { isInternalUrl } from "~/utils/cv";
 
 /*
  * The downloadable CV. react-pdf cannot read our Tailwind classes, so this is a
@@ -163,6 +164,18 @@ const trimmed = (items: string[]) =>
 
 const displayUrl = (url: string) =>
   url.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
+
+/**
+ * A PDF is opened from disk, so a site path like `/demo/k8s-aws` has nothing to
+ * resolve against — it is hung on the CV's own "Portfolio" link. Without that
+ * link the path is dropped rather than printed as a dead one.
+ */
+const absoluteUrl = (url: string, origin: string | undefined) => {
+  const value = url.trim();
+  if (!value) return null;
+  if (!isInternalUrl(value)) return value;
+  return origin ? `${origin.replace(/\/$/, "")}${value}` : null;
+};
 
 /**
  * A path under `public/` is read from disk — the PDF is rendered on the server
@@ -320,6 +333,9 @@ export const CvPdf = ({ cv }: CvPdfProps) => {
   ).filter((contact) => hasText(contact.value));
   const links = cv.links.filter((link) => hasText(link.url));
   const objective = trimmed(cv.objective);
+  const siteOrigin = cv.links
+    .find((link) => link.label.trim().toLowerCase() === "portfolio")
+    ?.url.trim();
 
   return (
     <Document
@@ -410,6 +426,39 @@ export const CvPdf = ({ cv }: CvPdfProps) => {
                 </Text>
               </View>
             ))}
+          </Section>
+        )}
+
+        {cv.certifications.length > 0 && (
+          <Section title="Certifications">
+            {cv.certifications.map((cert, index) => {
+              const certLinks = [cert.demoUrl, cert.url]
+                .map((url) => absoluteUrl(url, siteOrigin))
+                .filter((url) => url !== null);
+              return (
+                <View key={index} style={styles.item} wrap={false}>
+                  <View style={styles.itemHead}>
+                    <Text style={styles.itemName}>{cert.name}</Text>
+                    <Text style={styles.itemDate}>{cert.date}</Text>
+                  </View>
+                  {hasText(cert.issuer) && (
+                    <Text style={styles.line}>{cert.issuer}</Text>
+                  )}
+                  {certLinks.length > 0 && (
+                    <View style={[styles.metaRow, { marginTop: 2 }]}>
+                      {certLinks.map((url) => (
+                        <View key={url} style={styles.metaItem}>
+                          <Icon name="link" />
+                          <Link src={url} style={styles.metaLink}>
+                            {displayUrl(url)}
+                          </Link>
+                        </View>
+                      ))}
+                    </View>
+                  )}
+                </View>
+              );
+            })}
           </Section>
         )}
 

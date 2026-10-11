@@ -1,180 +1,170 @@
 import type { Metadata } from "next";
-import { ArrowRight, Sparkles } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import React from "react";
-import PageHeader from "~/components/layouts/page-header";
-import Experiences from "~/components/sections/experiences";
-import SectionHeadline from "~/components/sections/section-headline";
-import { Button } from "~/components/ui/button";
-import { Reveal } from "~/components/ui/reveal";
-import { Typography } from "~/components/ui/typography";
-import { experienceData } from "~/data/experiences";
-import { profileData, stackData } from "~/data/site";
-
-const current = experienceData[0];
+import { Globe } from "lucide-react";
+import type { IconType } from "react-icons";
+import { FaGithub, FaLinkedinIn } from "react-icons/fa6";
+import { CvContactActions } from "~/components/cv/cv-contact-actions";
+import { cvData } from "~/data/cv";
+import type { CvModel } from "~/types";
+import { ResumeSidebar } from "./_components/resume-sidebar";
+import {
+  ResumeAbout,
+  ResumeCertifications,
+  ResumeContact,
+  ResumeEducation,
+  ResumeExperience,
+  ResumeProfile,
+  ResumeProjects,
+  ResumeSection,
+  ResumeSkills,
+  type ResumeStats,
+} from "./_components/resume-sections";
 
 export const metadata: Metadata = {
   title: "about",
-  description: profileData.bio,
+  description: `${cvData.name} — ${cvData.title}. An interactive resume: experience, projects and the stack behind them.`,
+};
+
+const MONTHS = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
+
+/**
+ * Years since the earliest "Mon YYYY" in the experience entries (the internship
+ * note counts), rounded down to the half year: 3.5 → "3.5+". Computed at build
+ * time, so it ticks over on the next deploy rather than on its own.
+ */
+const yearsOfExperience = (cv: CvModel) => {
+  const dates = cv.experiences
+    .flatMap(
+      (exp) => `${exp.period} ${exp.note}`.match(/[A-Z][a-z]{2} \d{4}/g) ?? []
+    )
+    .map((text) => {
+      const [month, year] = text.split(" ");
+      return new Date(Number(year), MONTHS.indexOf(month ?? ""), 1);
+    })
+    .filter((date) => !Number.isNaN(date.getTime()));
+  if (dates.length === 0) return null;
+
+  const start = Math.min(...dates.map((date) => date.getTime()));
+  const years = (Date.now() - start) / (365.25 * 24 * 60 * 60 * 1000);
+  return Math.floor(years * 2) / 2;
+};
+
+/** Icon for a CV link by its label; anything else gets a globe. */
+const linkIcons: Record<string, IconType> = {
+  github: FaGithub,
+  linkedin: FaLinkedinIn,
 };
 
 export default function AboutPage() {
+  const cv = cvData;
+  const years = yearsOfExperience(cv);
+  const technologies = new Set(
+    cv.skills.flatMap((group) => group.items.map((item) => item.trim()))
+  );
+  const stats: ResumeStats = [
+    ...(years ? [{ label: "Years building", value: `${years}+` }] : []),
+    { label: "Projects", value: String(cv.projects.length) },
+    { label: "Technologies", value: String(technologies.size) },
+  ];
+
+  const contactActions = (
+    <CvContactActions
+      name={cv.name}
+      phone={cv.phone}
+      email={cv.email}
+    />
+  );
+
+  // One list drives both the sidebar and the page, so a section with nothing
+  // in it (no certificates yet) drops out of both and the numbering closes up.
+  const sections = [
+    {
+      id: "about",
+      label: "About",
+      content: <ResumeAbout cv={cv} stats={stats} />,
+    },
+    {
+      id: "education",
+      label: "Education",
+      content: <ResumeEducation cv={cv} />,
+    },
+    ...(cv.certifications.length > 0
+      ? [
+          {
+            id: "certifications",
+            label: "Certifications",
+            content: <ResumeCertifications cv={cv} />,
+          },
+        ]
+      : []),
+    { id: "skills", label: "Skills", content: <ResumeSkills cv={cv} /> },
+    {
+      id: "experience",
+      label: "Experience",
+      content: <ResumeExperience cv={cv} />,
+    },
+    { id: "projects", label: "Projects", content: <ResumeProjects cv={cv} /> },
+    {
+      id: "contact",
+      label: "Contact",
+      content: <ResumeContact>{contactActions}</ResumeContact>,
+    },
+  ];
+
   return (
-    <div className="pb-24">
-      <PageHeader
-        kicker="About"
-        title={`Hi, I am ${profileData.name}`}
-        description={profileData.tagline}
-      >
-        <div className="mt-8 flex flex-wrap items-center gap-3">
-          <Button
-            asChild
-            size="lg"
-            className="group h-12 rounded-full px-7 text-base shadow-lg shadow-primary/30"
-          >
-            <Link href="/resume">
-              <Sparkles className="size-5" />
-              Explore my resume
-              <ArrowRight
-                size={16}
-                className="transition-transform group-hover:translate-x-1"
+    <div className="grid w-full grid-cols-[minmax(0,1fr)] lg:grid-cols-[18rem_minmax(0,1fr)]">
+      <ResumeSidebar
+        items={sections.map(({ id, label }) => ({ id, label }))}
+        header={
+          <ResumeProfile
+            cv={cv}
+            actions={
+              <CvContactActions
+                name={cv.name}
+                phone={cv.phone}
+                email={cv.email}
+                showCopy={false}
+                size="sm"
               />
-            </Link>
-          </Button>
-        </div>
-      </PageHeader>
-
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-24 px-4 py-16 sm:px-8 sm:gap-32 lg:px-16">
-        <section className="grid gap-10 lg:grid-cols-[auto_minmax(0,1fr)] lg:gap-16">
-          <Reveal>
-            <div className="relative mx-auto w-fit">
-              <div
-                aria-hidden
-                className="absolute -inset-6 rounded-3xl bg-primary/20 blur-3xl"
-              />
-              <Image
-                className="relative size-56 rounded-3xl border border-border/60 object-cover sm:size-64"
-                src={profileData.avatar}
-                alt={profileData.name}
-                width={320}
-                height={320}
-                priority
-              />
+            }
+          />
+        }
+        footer={
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-center gap-2">
+              {cv.links
+                .filter((link) => link.url.trim())
+                .map((link) => {
+                  const Icon = linkIcons[link.label.toLowerCase()] ?? Globe;
+                  return (
+                    <a
+                      key={link.url}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={link.label}
+                      title={link.label}
+                      className="grid size-9 place-items-center rounded-full border border-border/60 text-foreground/70 transition-all hover:-translate-y-0.5 hover:border-primary/60 hover:text-primary"
+                    >
+                      <Icon className="size-4" />
+                    </a>
+                  );
+                })}
             </div>
-          </Reveal>
-
-          <Reveal delay={100} className="space-y-5">
-            <Typography variant="h2" className="pb-0 text-2xl sm:text-3xl">
-              A frontend developer from Ho Chi Minh City
-            </Typography>
-            <Typography variant="p" className="text-lg text-foreground/80">
-              I studied software engineering at Ho Chi Minh City University of
-              Technology and Education{" "}
-              <Link
-                href={profileData.university.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary hover:underline"
-              >
-                (HCMUTE)
-              </Link>
-              . During those four years I joined the media group and received
-              the Prize for Student of 5 merits.
-            </Typography>
-            <Typography variant="p" className="text-lg text-foreground/80">
-              Since {current.duration.split(" - ")[0]} I have been a{" "}
-              {current.role.toLowerCase()} at{" "}
-              <Link
-                href={current.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary hover:underline"
-              >
-                {current.company}
-              </Link>
-              , working on UI/UX design and website development. Sitting on both
-              sides means I get to care about how a screen feels, not only
-              whether it renders.
-            </Typography>
-            <Typography variant="p" className="text-lg text-foreground/80">
-              Outside of work I build small side projects to try things out —
-              a weather app in Angular, a fan page for Kevin De Bruyne in
-              Next.js, and this portfolio.
-            </Typography>
-          </Reveal>
-        </section>
-
-        <section id="stack" className="scroll-mt-24">
-          <Reveal>
-            <SectionHeadline
-              index="01"
-              title="What I work with"
-              href="stack"
-              description="The tools I reach for, grouped by the part of the product they touch."
-            />
-          </Reveal>
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
-            {stackData.map((stack, index) => (
-              <Reveal key={stack.title} delay={index * 90}>
-                <div className="surface h-full rounded-2xl border border-border/60 p-6 transition-colors hover:border-primary/50">
-                  <Typography variant="h3" className="text-xl">
-                    {stack.title}
-                  </Typography>
-                  <Typography variant="p" className="mt-2 text-muted-foreground">
-                    {stack.desc}
-                  </Typography>
-                  {stack.tools.length > 0 && (
-                    <div className="mt-5 flex flex-wrap gap-2">
-                      {stack.tools.map((tool) => (
-                        <span
-                          key={tool.title}
-                          className="flex items-center gap-2 rounded-full border border-border/60 py-1 pe-3 ps-1 text-sm"
-                        >
-                          <Image
-                            src={tool.logoUrl}
-                            alt=""
-                            width={20}
-                            height={20}
-                            className="size-5 rounded-full bg-foreground/80 p-px"
-                          />
-                          {tool.title}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </Reveal>
-            ))}
           </div>
-        </section>
+        }
+      />
 
-        <section id="journey" className="scroll-mt-24">
-          <Reveal>
-            <SectionHeadline
-              index="02"
-              title="Journey"
-              href="journey"
-              description="School, then work — with a few photos from along the way."
-            />
-          </Reveal>
-          <Experiences />
-        </section>
-
-        <Reveal className="flex flex-wrap items-center gap-3">
-          <Button asChild size="lg" className="group rounded-full">
-            <Link href="/showcase">
-              See what I built
-              <ArrowRight
-                size={16}
-                className="transition-transform group-hover:translate-x-1"
-              />
-            </Link>
-          </Button>
-          <Button asChild size="lg" variant="outline" className="rounded-full">
-            <Link href={`mailto:${profileData.email}`}>Say hello</Link>
-          </Button>
-        </Reveal>
+      <div className="mx-auto w-full max-w-4xl min-w-0 space-y-28 px-4 pt-16 pb-24 sm:space-y-36 sm:px-8 lg:px-12 lg:py-12">
+        {sections.map((section, index) => (
+          <ResumeSection
+            key={section.id}
+            id={section.id}
+            index={index + 1}
+            title={section.label}
+          >
+            {section.content}
+          </ResumeSection>
+        ))}
       </div>
     </div>
   );

@@ -12,6 +12,8 @@ export type DataTableShellProps = TablePaginationProps & {
    * row and the last column (the row actions) in view.
    */
   scrollable?: boolean;
+  /** Shown between the table and the paging: the bar for the ticked rows. */
+  footer?: React.ReactNode;
   className?: string;
   /** The `<Table>` itself. */
   children: React.ReactNode;
@@ -36,6 +38,7 @@ export const DataTableShell = ({
   emptyMessage,
   isEmpty,
   scrollable = false,
+  footer,
   className,
   children,
   ...pagination
@@ -55,6 +58,7 @@ export const DataTableShell = ({
       ) : (
         children
       )}
+      {footer}
       <TablePagination {...pagination} />
     </div>
   );

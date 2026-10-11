@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { useCvEditor } from "./hook";
 import {
   BasicsSection,
+  CertificationsSection,
   EducationSection,
   ExperienceSection,
   ObjectiveSection,
@@ -33,6 +34,11 @@ const sections: {
   { value: "basics", label: "Basics", Section: BasicsSection },
   { value: "objective", label: "Objective", Section: ObjectiveSection },
   { value: "education", label: "Education", Section: EducationSection },
+  {
+    value: "certifications",
+    label: "Certifications",
+    Section: CertificationsSection,
+  },
   { value: "skills", label: "Skills", Section: SkillsSection },
   { value: "experience", label: "Experience", Section: ExperienceSection },
   { value: "projects", label: "Projects", Section: ProjectsSection },

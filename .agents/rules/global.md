@@ -237,7 +237,7 @@ src/
 │   ├── ai/            # AI-registry blocks
 │   ├── kibo-ui/       # Kibo UI registry blocks
 │   ├── blog/          # markdown pipeline
-│   ├── cv/            # CV pieces shared by /cv and /resume
+│   ├── cv/            # CV pieces shared by /cv and /about
 │   ├── sections/      # sections shared by several pages
 │   ├── layouts/       # header, footer, theme provider + toggle
 │   └── icons/

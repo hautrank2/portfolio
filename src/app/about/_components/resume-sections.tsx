@@ -1,13 +1,16 @@
 import {
   ArrowRight,
   ArrowUpRight,
+  Award,
   CalendarDays,
   GraduationCap,
   MapPin,
+  Play,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import { Button } from "~/components/ui/button";
 import {
   Carousel,
   CarouselContent,
@@ -19,10 +22,11 @@ import {
 import { Reveal } from "~/components/ui/reveal";
 import { cn } from "~/lib/utils";
 import type { CvModel } from "~/types";
+import { isInternalUrl } from "~/utils/cv";
 import { TechIcon, techColor } from "./tech-icon";
 
 /*
- * The sections of `/resume`. Server Components: the interactive pieces are
+ * The sections of the resume on `/about`. Server Components: the interactive pieces are
  * the scroll-spy sidebar and the projects carousel, so nothing else here ships
  * to the client beyond the <Reveal> wrappers that fade blocks in.
  */
@@ -203,7 +207,82 @@ export const ResumeEducation = ({ cv }: { cv: CvModel }) => (
 
 // ---------------------------------------------------------------------------
 
-export const ResumeSkills = ({ cv }: { cv: CvModel }) => (
+/**
+ * Each certificate can carry its proof: the demo built with what it taught,
+ * and the issuer's credential page.
+ */
+export const ResumeCertifications = ({ cv }: { cv: CvModel }) => (
+  <div className="space-y-6">
+    {cv.certifications.map((cert, index) => {
+      const demoUrl = cert.demoUrl.trim();
+      const demoLabel = (
+        <>
+          <Play aria-hidden />
+          View demo
+        </>
+      );
+      return (
+        <Reveal key={index} delay={index * 80}>
+          <div className="surface group relative overflow-hidden rounded-3xl border border-border/60 p-6 transition-colors hover:border-primary/50 sm:p-8">
+            <Award
+              aria-hidden
+              className="absolute -right-6 -bottom-8 size-44 text-primary/10 transition-transform duration-500 group-hover:-rotate-12 group-hover:scale-110"
+            />
+            {hasText(cert.date) && (
+              <p className="flex items-center gap-2 text-sm font-medium text-primary">
+                <CalendarDays size={16} aria-hidden />
+                {cert.date}
+              </p>
+            )}
+            <h3 className="relative mt-3 text-xl font-bold sm:text-2xl">
+              {cert.name}
+            </h3>
+            {hasText(cert.issuer) && (
+              <p className="relative mt-1 text-lg font-semibold text-primary">
+                {cert.issuer}
+              </p>
+            )}
+            {(demoUrl || hasText(cert.url)) && (
+              <div className="relative mt-5 flex flex-wrap gap-3">
+                {demoUrl && (
+                  <Button asChild className="rounded-full">
+                    {isInternalUrl(demoUrl) ? (
+                      <Link href={demoUrl}>{demoLabel}</Link>
+                    ) : (
+                      <a
+                        href={demoUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {demoLabel}
+                      </a>
+                    )}
+                  </Button>
+                )}
+                {hasText(cert.url) && (
+                  <Button asChild variant="outline" className="rounded-full">
+                    <a
+                      href={cert.url.trim()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Credential
+                      <ArrowUpRight aria-hidden />
+                    </a>
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
+        </Reveal>
+      );
+    })}
+  </div>
+);
+
+// ---------------------------------------------------------------------------
+
+export const ResumeSkills =({ cv }: { cv: CvModel }) => (
   <div className="space-y-10">
     {cv.skills.map((group, groupIndex) => (
       <div key={groupIndex}>

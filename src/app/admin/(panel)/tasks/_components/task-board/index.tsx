@@ -4,6 +4,8 @@ import { Clock, Plus } from "lucide-react";
 import { DataTableShell } from "~/app/admin/_components/data-table-shell";
 import { LabelChip } from "~/app/admin/_components/label-chip";
 import { RowActions } from "~/app/admin/_components/row-actions";
+import { RowCheckbox } from "~/app/admin/_components/row-checkbox";
+import { SelectionBar } from "~/app/admin/_components/selection-bar";
 import {
   StatusDot,
   type StatusOption,
@@ -68,6 +70,8 @@ export const TaskBoard = (props: TaskBoardProps) => {
     formKey,
     formError,
     listError,
+    selection,
+    selectedJson,
     logDialog,
     handleLogtime,
     statusOptions,
@@ -155,11 +159,20 @@ export const TaskBoard = (props: TaskBoardProps) => {
         emptyMessage={
           tasks.total === 0 ? "No tasks match these filters." : "No tasks on this page."
         }
+        footer={<SelectionBar rows={selectedJson} onClear={selection.clear} />}
       >
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="pl-4">Title</TableHead>
+              <TableHead className="w-0 pl-4">
+                <RowCheckbox
+                  aria-label="Select all tasks on this page"
+                  checked={selection.allSelected}
+                  indeterminate={selection.someSelected}
+                  onChange={selection.toggleAll}
+                />
+              </TableHead>
+              <TableHead>Title</TableHead>
               <TableHead>Project</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Priority</TableHead>
@@ -179,8 +192,18 @@ export const TaskBoard = (props: TaskBoardProps) => {
                 : undefined;
 
               return (
-                <TableRow key={task.id}>
-                  <TableCell className="min-w-56 max-w-sm whitespace-normal pl-4">
+                <TableRow
+                  key={task.id}
+                  data-state={selection.isSelected(task.id) ? "selected" : undefined}
+                >
+                  <TableCell className="pl-4">
+                    <RowCheckbox
+                      aria-label={`Select ${task.title}`}
+                      checked={selection.isSelected(task.id)}
+                      onChange={() => selection.toggle(task.id)}
+                    />
+                  </TableCell>
+                  <TableCell className="min-w-56 max-w-sm whitespace-normal">
                     <p
                       className={cn(
                         "font-medium",

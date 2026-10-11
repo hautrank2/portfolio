@@ -4,6 +4,8 @@ import { Plus } from "lucide-react";
 import Link from "next/link";
 import { DataTableShell } from "~/app/admin/_components/data-table-shell";
 import { RowActions } from "~/app/admin/_components/row-actions";
+import { RowCheckbox } from "~/app/admin/_components/row-checkbox";
+import { SelectionBar } from "~/app/admin/_components/selection-bar";
 import {
   type StatusOption,
   StatusSelect,
@@ -44,6 +46,8 @@ export const ProjectBoard = (props: ProjectBoardProps) => {
     formKey,
     formError,
     listError,
+    selection,
+    selectedJson,
     progressById,
     openForm,
     handleSubmit,
@@ -75,11 +79,20 @@ export const ProjectBoard = (props: ProjectBoardProps) => {
         emptyMessage={
           projects.total === 0 ? "No projects yet." : "No projects on this page."
         }
+        footer={<SelectionBar rows={selectedJson} onClear={selection.clear} />}
       >
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="pl-4">Title</TableHead>
+              <TableHead className="w-0 pl-4">
+                <RowCheckbox
+                  aria-label="Select all projects on this page"
+                  checked={selection.allSelected}
+                  indeterminate={selection.someSelected}
+                  onChange={selection.toggleAll}
+                />
+              </TableHead>
+              <TableHead>Title</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Started</TableHead>
               <TableHead>Completed</TableHead>
@@ -98,8 +111,18 @@ export const ProjectBoard = (props: ProjectBoardProps) => {
                   : Math.round((progress.done / progress.total) * 100);
 
               return (
-                <TableRow key={project.id}>
-                  <TableCell className="min-w-56 max-w-md whitespace-normal pl-4">
+                <TableRow
+                  key={project.id}
+                  data-state={selection.isSelected(project.id) ? "selected" : undefined}
+                >
+                  <TableCell className="pl-4">
+                    <RowCheckbox
+                      aria-label={`Select ${project.title}`}
+                      checked={selection.isSelected(project.id)}
+                      onChange={() => selection.toggle(project.id)}
+                    />
+                  </TableCell>
+                  <TableCell className="min-w-56 max-w-md whitespace-normal">
                     <p className="flex items-center gap-2 font-medium">
                       <span
                         aria-hidden

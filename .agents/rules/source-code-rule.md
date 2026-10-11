@@ -96,7 +96,7 @@ retroactively — use `<ComponentName>Props` for anything new.
   `app/blog/_components/` serves both `/blog` and `/blog/[...slug]`.
 - **Shared across unrelated routes → `src/components/`.** That is what
   `components/sections/` (home + about) and `components/cv/cv-contact-actions`
-  (cv + resume) are. Move a component up only when the second user appears.
+  (cv + about) are. Move a component up only when the second user appears.
 - A page imports its own `./_components/…` relatively; anything further away
   goes through the alias (`~/app/cv/_components/cv-document`).
 
@@ -130,7 +130,7 @@ failure mode here.
 | `src/components/ai/` | chat/agent-oriented blocks (shadcn.io "AI" registry) |
 | `src/components/kibo-ui/` | Kibo UI registry blocks — `code-block` only, not imported anywhere yet |
 | `src/components/blog/` | the markdown pipeline only — shared by blog and recipes |
-| `src/components/cv/` | CV pieces shared by `/cv` and `/resume` |
+| `src/components/cv/` | CV pieces shared by `/cv` and `/about` |
 | `src/components/sections/` | page sections used by more than one route |
 | `src/components/layouts/` | header, footer, page shell |
 | `src/app/**/_components/` | views that belong to a single route — not general purpose |

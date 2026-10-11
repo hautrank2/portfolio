@@ -5,7 +5,7 @@ import { useResumeSidebar } from "./hook";
 import type { ResumeSidebarProps } from "./type";
 
 /**
- * The left column of `/resume`. On desktop it is a fixed-width panel flush with
+ * The left column of `/about`. On desktop it is a fixed-width panel flush with
  * the left edge of the window, pinned to the viewport: the
  * profile header on top, the section list with a reading-progress rail in the
  * middle, the footer at the bottom — while the content scrolls beside it.

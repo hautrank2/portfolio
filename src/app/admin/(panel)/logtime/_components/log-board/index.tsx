@@ -4,6 +4,8 @@ import { CalendarDays, Plus, Rows3, type LucideIcon } from "lucide-react";
 import { DataTableShell } from "~/app/admin/_components/data-table-shell";
 import { LabelChip } from "~/app/admin/_components/label-chip";
 import { RowActions } from "~/app/admin/_components/row-actions";
+import { RowCheckbox } from "~/app/admin/_components/row-checkbox";
+import { SelectionBar } from "~/app/admin/_components/selection-bar";
 import {
   TechnologyBadge,
   TechnologyList,
@@ -17,6 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
+import { useRowSelection } from "~/hooks";
 import { dayOf, formatDay, formatDuration } from "~/utils/admin-time";
 import { cn } from "~/lib/utils";
 import type {
@@ -192,6 +195,15 @@ const LogTable = ({
   // The whole month is already here, so a page is just a slice of it.
   const start = (paging.page - 1) * paging.pageSize;
   const rows = logtimes.slice(start, start + paging.pageSize);
+  const selection = useRowSelection(rows);
+  // Copied out with the task and category by name, not only by id.
+  const selectedJson = selection.selected.map((logtime) => ({
+    ...logtime,
+    taskTitle: logtime.taskId ? taskById.get(logtime.taskId)?.title : undefined,
+    categoryTitle: logtime.categoryId
+      ? categoryById.get(logtime.categoryId)?.title
+      : undefined,
+  }));
 
   return (
       <DataTableShell
@@ -205,11 +217,20 @@ const LogTable = ({
             ? "Nothing logged this month yet."
             : "No logtimes on this page."
         }
+        footer={<SelectionBar rows={selectedJson} onClear={selection.clear} />}
       >
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="pl-4">Date</TableHead>
+              <TableHead className="w-0 pl-4">
+                <RowCheckbox
+                  aria-label="Select all logtimes on this page"
+                  checked={selection.allSelected}
+                  indeterminate={selection.someSelected}
+                  onChange={selection.toggleAll}
+                />
+              </TableHead>
+              <TableHead>Date</TableHead>
               <TableHead>Title</TableHead>
               <TableHead className="text-right">Duration</TableHead>
               <TableHead>Task</TableHead>
@@ -228,8 +249,18 @@ const LogTable = ({
                 : undefined;
 
               return (
-                <TableRow key={logtime.id}>
-                  <TableCell className="pl-4 tabular-nums">
+                <TableRow
+                  key={logtime.id}
+                  data-state={selection.isSelected(logtime.id) ? "selected" : undefined}
+                >
+                  <TableCell className="pl-4">
+                    <RowCheckbox
+                      aria-label={`Select ${logtime.title}`}
+                      checked={selection.isSelected(logtime.id)}
+                      onChange={() => selection.toggle(logtime.id)}
+                    />
+                  </TableCell>
+                  <TableCell className="tabular-nums">
                     {formatDay(dayOf(logtime.loggedAt))}
                   </TableCell>
                   <TableCell className="min-w-56 max-w-sm whitespace-normal">

@@ -153,6 +153,46 @@ export const CvDocument = ({ cv, className, ...props }: CvDocumentProps) => {
         </CvSection>
       )}
 
+      {cv.certifications.length > 0 && (
+        <CvSection title="Certifications">
+          <div className="space-y-3">
+            {cv.certifications.map((cert, index) => {
+              const certLinks = [
+                { label: "Demo", url: cert.demoUrl },
+                { label: "Credential", url: cert.url },
+              ].filter((link) => hasText(link.url));
+              return (
+                <div key={index} className="break-inside-avoid">
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-3">
+                    <p className="font-bold">{cert.name}</p>
+                    <p className="text-xs text-muted-foreground">{cert.date}</p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                    {hasText(cert.issuer) && (
+                      <p className="text-foreground/85">{cert.issuer}</p>
+                    )}
+                    {certLinks.map((link) => (
+                      // `<a>`, not `<Link>`: the URL is typed by hand and may
+                      // point on-site or off it.
+                      <a
+                        key={link.label}
+                        href={link.url.trim()}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 font-medium text-primary hover:underline"
+                      >
+                        <Link2 aria-hidden className="size-3.5 shrink-0" />
+                        {link.label}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </CvSection>
+      )}
+
       {cv.skills.length > 0 && (
         <CvSection title="Skills">
           <dl className="space-y-2">

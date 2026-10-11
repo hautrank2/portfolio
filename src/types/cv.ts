@@ -11,6 +11,20 @@ export type CvEducationModel = {
   specialty: string;
 };
 
+export type CvCertificationModel = {
+  name: string;
+  issuer: string;
+  /** When it was issued, as free text: `Aug 2026`. */
+  date: string;
+  /** The issuer's credential page, for anyone who wants to verify it. */
+  url: string;
+  /**
+   * Something built with what the certificate taught — a path on this site
+   * (`/demo/k8s-aws`) or a full URL. Empty hides the demo button.
+   */
+  demoUrl: string;
+};
+
 /** One row of the skills table: `Frontend` → `React, Angular, Next.js`. */
 export type CvSkillGroupModel = {
   label: string;
@@ -49,6 +63,7 @@ export type CvModel = {
   /** One entry per paragraph. */
   objective: string[];
   education: CvEducationModel[];
+  certifications: CvCertificationModel[];
   skills: CvSkillGroupModel[];
   experiences: CvExperienceModel[];
   projects: CvProjectModel[];

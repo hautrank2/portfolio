@@ -3,7 +3,7 @@ import {
   taskStatusData,
   taskStatusLabelData,
 } from "~/data/admin";
-import { useQueryParams, useResourceDialog } from "~/hooks";
+import { useQueryParams, useResourceDialog, useRowSelection } from "~/hooks";
 import { splitList } from "~/lib/api-client";
 import type {
   LogtimeInputModel,
@@ -54,11 +54,13 @@ const isOpen = (status: TaskStatusType) =>
   status === "TODO" || status === "IN_PROGRESS";
 
 export const useTaskBoard = ({
+  tasks,
   filter,
   statusCounts,
   projects,
 }: UseTaskBoardProps) => {
   const { setParams } = useQueryParams();
+  const selection = useRowSelection(tasks.items);
   const { handleReplace, ...dialog } = useResourceDialog<
     TaskModel,
     TaskFormValues,
@@ -135,12 +137,22 @@ export const useTaskBoard = ({
     isOpen(task.status) &&
     dayOf(task.dueDate) < currentDay;
 
+  const projectById = new Map(projects.map((project) => [project.id, project]));
+
+  /** The ticked rows as they are copied out: the project by name, not only id. */
+  const selectedJson = selection.selected.map((task) => ({
+    ...task,
+    projectTitle: task.projectId ? projectById.get(task.projectId)?.title : undefined,
+  }));
+
   return {
     ...dialog,
+    selection,
+    selectedJson,
     logDialog,
     handleLogtime,
     statusOptions,
-    projectById: new Map(projects.map((project) => [project.id, project])),
+    projectById,
     isOverdue,
     handleStatusChange,
     handleStatusFilter,

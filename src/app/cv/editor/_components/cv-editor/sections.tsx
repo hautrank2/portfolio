@@ -301,7 +301,76 @@ export const EducationSection = ({ editor }: CvSectionProps) => {
   );
 };
 
-export const SkillsSection = ({ editor }: CvSectionProps) => {
+export const CertificationsSection = ({ editor }: CvSectionProps) => {
+  const { cv, updateItem } = editor;
+  return (
+    <div className="space-y-4">
+      {cv.certifications.map((cert, index) => (
+        <ItemCard
+          key={index}
+          editor={editor}
+          listKey="certifications"
+          index={index}
+          count={cv.certifications.length}
+          title={cert.name}
+        >
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field
+              label="Name"
+              className="sm:col-span-2"
+              value={cert.name}
+              onValueChange={(v) =>
+                updateItem("certifications", index, { name: v })
+              }
+            />
+            <Field
+              label="Issuer"
+              placeholder="Udemy"
+              value={cert.issuer}
+              onValueChange={(v) =>
+                updateItem("certifications", index, { issuer: v })
+              }
+            />
+            <Field
+              label="Issued"
+              placeholder="Aug 2026"
+              value={cert.date}
+              onValueChange={(v) =>
+                updateItem("certifications", index, { date: v })
+              }
+            />
+            <Field
+              label="Credential URL"
+              type="url"
+              className="sm:col-span-2"
+              placeholder="https://"
+              hint="The issuer's page that verifies the certificate."
+              value={cert.url}
+              onValueChange={(v) =>
+                updateItem("certifications", index, { url: v })
+              }
+            />
+            <Field
+              label="Demo URL"
+              className="sm:col-span-2"
+              placeholder="/demo/k8s-aws"
+              hint="A path on this site or a full URL. Leave empty to hide the demo button."
+              value={cert.demoUrl}
+              onValueChange={(v) =>
+                updateItem("certifications", index, { demoUrl: v })
+              }
+            />
+          </div>
+        </ItemCard>
+      ))}
+      <AddButton editor={editor} listKey="certifications">
+        Add certification
+      </AddButton>
+    </div>
+  );
+};
+
+export const SkillsSection =({ editor }: CvSectionProps) => {
   const { cv, updateItem } = editor;
   return (
     <div className="space-y-4">

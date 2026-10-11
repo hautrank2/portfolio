@@ -1,4 +1,5 @@
 import type {
+  CvCertificationModel,
   CvEducationModel,
   CvExperienceModel,
   CvLinkModel,
@@ -47,6 +48,16 @@ export const normalizeCv = (value: unknown): CvModel | null => {
       major: str(item.major),
       specialty: str(item.specialty),
     })),
+    certifications: recordList<CvCertificationModel>(
+      value.certifications,
+      (item) => ({
+        name: str(item.name),
+        issuer: str(item.issuer),
+        date: str(item.date),
+        url: str(item.url),
+        demoUrl: str(item.demoUrl),
+      })
+    ),
     skills: recordList<CvSkillGroupModel>(value.skills, (item) => ({
       label: str(item.label),
       items: strList(item.items),
@@ -68,6 +79,9 @@ export const normalizeCv = (value: unknown): CvModel | null => {
     })),
   };
 };
+
+/** A link typed in the editor that points at this site rather than off it. */
+export const isInternalUrl = (url: string) => url.trim().startsWith("/");
 
 /**
  * The editor keeps list fields exactly as typed — a trailing comma or space is

@@ -1,5 +1,5 @@
 import { labelColorData } from "~/data/admin";
-import { useResourceDialog } from "~/hooks";
+import { useResourceDialog, useRowSelection } from "~/hooks";
 import type {
   WorkProjectInputModel,
   WorkProjectModel,
@@ -29,7 +29,8 @@ const toInput = (values: ProjectFormValues): WorkProjectInputModel => ({
   color: values.color,
 });
 
-export const useProjectBoard = ({ tasks }: UseProjectBoardProps) => {
+export const useProjectBoard = ({ projects, tasks }: UseProjectBoardProps) => {
+  const selection = useRowSelection(projects.items);
   const { handleReplace, ...dialog } = useResourceDialog<
     WorkProjectModel,
     ProjectFormValues,
@@ -56,5 +57,11 @@ export const useProjectBoard = ({ tasks }: UseProjectBoardProps) => {
     progressById.set(task.projectId, progress);
   }
 
-  return { ...dialog, progressById, handleStatusChange };
+  /** The ticked rows as they are copied out: each with its task counts. */
+  const selectedJson = selection.selected.map((project) => ({
+    ...project,
+    tasks: progressById.get(project.id) ?? { total: 0, done: 0 },
+  }));
+
+  return { ...dialog, selection, selectedJson, progressById, handleStatusChange };
 };

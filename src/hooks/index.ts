@@ -3,4 +3,5 @@ export * from "./useLastVisited";
 export * from "./useOnClickOutside";
 export * from "./useQueryParams";
 export * from "./useResourceDialog";
+export * from "./useRowSelection";
 export * from "./useNetwork";
