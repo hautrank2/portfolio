@@ -4,7 +4,7 @@ import { SectionView } from "./_components/section-view";
 
 export const metadata: Metadata = {
   title: blogPathTitle(),
-  description: "Note trong lúc học, ghép dần thành roadmap theo từng chủ đề.",
+  description: "Note trong lúc học — bài ngắn nhóm theo tag, chủ đề lớn thành roadmap.",
   // Link previews still deserve the human name, not the path.
   openGraph: { title: "Blog" },
 };

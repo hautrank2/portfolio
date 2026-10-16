@@ -1,13 +1,13 @@
 import Image from "next/image";
-import { renderMarkdown } from "~/components/blog/markdown";
-import PageHeader from "~/components/layouts/page-header";
+import { readingTime, renderMarkdown } from "~/components/blog/markdown";
 import { Reveal } from "~/components/ui/reveal";
 import { Typography } from "~/components/ui/typography";
 import { trackLogoData } from "~/data/blog";
-import { flattenDocs } from "~/utils/blog";
+import { flattenDocs, getPosts } from "~/utils/blog";
 import { cn } from "~/lib/utils";
 import type { BlogNodeContextType, BlogNodeType } from "~/types";
 import { BlogBreadcrumb } from "./breadcrumb";
+import { BlogExplorer } from "./blog-explorer";
 import { NodeCard } from "./node-card";
 import { NoteList } from "./note-list";
 import { BlogProgress } from "./progress";
@@ -26,6 +26,16 @@ const sectionLabels = (track: BlogNodeType) => {
   }
   return labels;
 };
+
+type ZoneHeadingProps = { title: string; hint: string };
+
+/** Heading for one of the two zones at `/blog`: Roadmap and Bài lẻ. */
+const ZoneHeading = ({ title, hint }: ZoneHeadingProps) => (
+  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+    <h2 className="text-xl font-semibold tracking-tight">{title}</h2>
+    <p className="text-sm text-foreground/45">{hint}</p>
+  </div>
+);
 
 type SectionViewProps = BlogNodeContextType & {
   /**
@@ -50,22 +60,65 @@ const SectionView = async ({ node, trail, standalone }: SectionViewProps) => {
   const showResume = standalone || isTrackRoot;
   const logo = isTrackRoot ? trackLogoData[node.slug] : undefined;
 
-  // Gốc `/blog`: con của nó là các track, mỗi track một card lớn có logo.
+  // Gốc `/blog`: folder là track (card lớn có logo), file `.md` là bài lẻ —
+  // chúng xuống feed riêng bên dưới thay vì giả làm một track.
   const isBlogRoot = node.path.length === 0;
+  const children = isBlogRoot
+    ? node.children.filter((child) => child.kind !== "doc")
+    : node.children;
+  const posts = isBlogRoot
+    ? getPosts().map((post) => ({
+        href: post.href,
+        title: post.title,
+        description: post.description,
+        status: post.status,
+        date: post.created ?? post.updated,
+        minutes: readingTime(post.body),
+        tags: post.tags,
+      }))
+    : [];
 
-  const cards = node.children.map((child, index) => (
+  const cards = children.map((child, index) => (
     <Reveal key={child.slug} delay={Math.min(index, 6) * 60}>
       {isBlogRoot ? <TrackCard node={child} /> : <NodeCard node={child} />}
     </Reveal>
   ));
 
+  // `/blog` gets a deliberately flat hero — the cards are the page, so the
+  // header only has to say where you are, not fill a viewport like PageHeader.
   const header = standalone ? (
-    <PageHeader kicker={kicker} title={node.title} description={node.description}>
-      <div className="mt-8 flex flex-col gap-4">
-        {trail.length > 0 && <BlogBreadcrumb trail={trail} />}
-        <BlogProgress done={node.progress.done} total={node.progress.total} />
+    <section className="relative overflow-hidden border-b border-border/60">
+      <div
+        aria-hidden
+        className="bg-grid pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_at_top_left,black,transparent_75%)]"
+      />
+      <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-8 sm:flex-row sm:items-end sm:justify-between sm:px-8 lg:px-16 lg:py-10">
+        <div>
+          <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+            {kicker}
+            <span aria-hidden className="h-px w-10 bg-primary/40" />
+          </p>
+          <div className="mt-2 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <Typography
+              variant="h1"
+              className="text-gradient text-3xl font-extrabold leading-tight sm:text-4xl"
+            >
+              {node.title}
+            </Typography>
+            {node.description && (
+              <Typography variant="p" className="text-sm text-foreground/60">
+                {node.description}
+              </Typography>
+            )}
+          </div>
+        </div>
+        <BlogProgress
+          done={node.progress.done}
+          total={node.progress.total}
+          className="shrink-0 sm:mb-1.5"
+        />
       </div>
-    </PageHeader>
+    </section>
   ) : (
     <header className="border-b border-border/60 pb-8">
       <BlogBreadcrumb trail={trail} />
@@ -114,7 +167,12 @@ const SectionView = async ({ node, trail, standalone }: SectionViewProps) => {
 
       {standalone && header}
 
-      <div className="mx-auto w-full max-w-4xl px-4 py-12 sm:px-8 lg:py-16">
+      <div
+        className={cn(
+          "mx-auto w-full max-w-4xl px-4 sm:px-8",
+          standalone ? "py-8 lg:py-10" : "py-12 lg:py-16"
+        )}
+      >
         {!standalone && header}
 
         {showResume && (
@@ -130,8 +188,25 @@ const SectionView = async ({ node, trail, standalone }: SectionViewProps) => {
           </Reveal>
         )}
 
-        {node.children.length > 0 &&
-          (isTrackRoot ? (
+        {isBlogRoot ? (
+          <div className={intro ? "mt-14" : "mt-10"}>
+            <BlogExplorer
+              posts={posts}
+              roadmap={
+                cards.length > 0 && (
+                  <section>
+                    <ZoneHeading
+                      title="Roadmap"
+                      hint="chuỗi note dài theo chủ đề, đọc theo thứ tự — node xám là phần chưa viết"
+                    />
+                    <div className="mt-5 grid gap-5 sm:grid-cols-2">{cards}</div>
+                  </section>
+                )
+              }
+            />
+          </div>
+        ) : node.children.length > 0 ? (
+          isTrackRoot ? (
             <div className={intro ? "mt-14" : "mt-10"}>
               <TrackTabs
                 noteCount={notes.length}
@@ -142,17 +217,11 @@ const SectionView = async ({ node, trail, standalone }: SectionViewProps) => {
               />
             </div>
           ) : (
-            <div
-              className={cn(
-                intro ? "mt-14" : "mt-10",
-                isBlogRoot
-                  ? "grid gap-5 sm:grid-cols-2"
-                  : "space-y-4"
-              )}
-            >
+            <div className={cn(intro ? "mt-14" : "mt-10", "space-y-4")}>
               {cards}
             </div>
-          ))}
+          )
+        ) : null}
 
         {node.children.length === 0 && !intro && (
           <p className="text-foreground/50">Chưa có gì ở đây.</p>

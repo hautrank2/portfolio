@@ -1,6 +1,15 @@
-- Quy định về tạo Form trong Dialog cho tính năng A
+---
+trigger: model_decision
+description: Áp dụng khi tạo hoặc sửa một form nằm trong dialog (shadcn Dialog + react-hook-form + zod).
+---
+
+# Form trong Dialog
+
+> **Reusable** (phụ thuộc stack shadcn/ui) — copy sang dự án khác nếu dự án đó
+> cũng dùng shadcn; dự án MUI thì xem bảng đối chiếu bên dưới theo chiều ngược lại.
+
 - Áp dụng chung với `complex-component-rule.md`: vẫn tách `index.tsx` / `hook.ts` / `type.ts`
-- Phải có ít nhất 2 component đặt vào file `index.tsx`
+- Phải có ít nhất 2 component đặt vào file `index.tsx`: vỏ Dialog và Form (xem dưới)
 
 > Stack ở repo này là **shadcn/ui + Tailwind**, không phải MUI. Dialog lấy từ
 > `~/components/ui/dialog`, và không có `sx` — style bằng `className`.
@@ -105,7 +114,7 @@ export type AFormDialogProps = AFormProps & {
   onOpenChange: (open: boolean) => void;
 };
 
-export type UseAFormProps = AFormProps & {};
+export type UseAFormProps = Pick<AFormProps, "defaultValues" | "onSubmit">;
 ```
 
 - Props bắt buộc: **`isEdit`** và **`defaultValues`**.
@@ -134,9 +143,11 @@ export const useAForm = ({ defaultValues, onSubmit }: UseAFormProps) => {
 };
 ```
 
-## Thư viện cần cài
+## Thư viện
 
-Repo hiện **chưa có** các gói dưới đây. Cài khi làm form đầu tiên:
+Pattern này cần `react-hook-form`, `zod`, `@hookform/resolvers` — **repo này đã
+cài đủ**, không cần cài lại. Ở một dự án mới chưa có thì cài khi làm form đầu
+tiên:
 
 ```bash
 pnpm add react-hook-form zod @hookform/resolvers

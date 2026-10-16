@@ -114,12 +114,14 @@ export function extractHeadings(markdown: string) {
     headings.push({
       depth: match[1].length,
       text,
-      // Mirrors github-slugger, which is what rehype-slug uses.
+      // Mirrors github-slugger, which is what rehype-slug uses: strip the
+      // specials, then turn EACH space into a hyphen. No collapsing — a
+      // heading like `Prompt 1 — mơ hồ` really does get a double hyphen.
       id: text
         .toLowerCase()
-        .replace(/[^\p{L}\p{N}\s-]/gu, "")
         .trim()
-        .replace(/\s+/g, "-"),
+        .replace(/[^\p{L}\p{N}\s-]/gu, "")
+        .replace(/\s/g, "-"),
     });
   }
 

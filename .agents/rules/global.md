@@ -59,14 +59,79 @@ Two halves with different rules:
 
 Coding conventions live in their own files. Read them before writing code:
 
-| File | Covers |
-| --- | --- |
-| `source-code-rule.md` | TypeScript, code style, file naming, components, hooks, the UI library, Tailwind |
-| `complex-component-rule.md` | the `index.tsx` / `hook.ts` / `type.ts` component split |
-| `dialog-form-rule.md` | forms inside a dialog |
+| File | Covers | Portability |
+| --- | --- | --- |
+| `source-code-rule.md` | TypeScript, code style, file naming, components, hooks, reuse, styling | Reusable — copy between projects |
+| `complex-component-rule.md` | the `index.tsx` / `hook.ts` / `type.ts` component split | Reusable |
+| `dialog-form-rule.md` | forms inside a dialog | Reusable (assumes shadcn/ui) |
 
-This file covers the project itself: what it is, content, admin, structure and
-how to verify.
+Those three files are project-independent. **This file is the project-specific
+half**: what the project is, its stack, content, admin, structure, this repo's
+UI library and theme, legacy exceptions, and how to verify. For a new project,
+copy the three convention files unchanged and rewrite this one, keeping its
+outline.
+
+---
+
+## UI Library in This Repo
+
+What is installed and where — the reuse rules themselves are in
+`source-code-rule.md`:
+
+| Folder | Contains |
+| --- | --- |
+| `src/components/ui/` | shadcn/ui primitives + components pulled from registries |
+| `src/components/ai/` | chat/agent-oriented blocks (shadcn.io "AI" registry) |
+| `src/components/kibo-ui/` | Kibo UI registry blocks — `code-block` only, not imported anywhere yet |
+| `src/components/blog/` | the markdown pipeline only — shared by blog and recipes |
+| `src/components/cv/` | CV pieces shared by `/cv` and `/about` |
+| `src/components/sections/` | page sections used by more than one route |
+| `src/components/layouts/` | header, footer, theme provider + toggle |
+| `src/app/**/_components/` | views that belong to a single route — not general purpose |
+
+Everything under `ui/` and `ai/` currently type-checks and lints clean — keep
+it that way (`pnpm build` type-checks every file under `src/`).
+
+One caveat to know before using a component: `ui/code-tabs`, `ui/code-editor`,
+`ai/code-block` and `kibo-ui/code-block` highlight in the browser with `shiki`.
+That is fine for a landing page, and wrong for the blog:
+
+### Do not regress the blog pipeline
+
+Markdown in `content/` is highlighted **at build time** (`rehype-pretty-code`
+in `src/components/blog/markdown.tsx`), so the client downloads no highlighter.
+Using a browser-`shiki` registry component in the blog would ship Shiki to
+every reader and add a flash of unstyled code. `src/components/ui/code-block.tsx`
+is what the pipeline maps `<pre>` to — keep it.
+
+---
+
+## Theme & Tailwind in This Repo
+
+- Theme lives in `src/app/globals.css` under `@theme inline` and `:root` /
+  `.dark`. Colours are `oklch` custom properties.
+- The root layout wraps the app in `ThemeProvider`
+  (`~/components/layouts/theme-provider`, `next-themes`): `attribute="class"`,
+  `defaultTheme="dark"`, `enableSystem={false}`. `ThemeToggle` in the header
+  switches it. The `dark:` variant is declared in `globals.css` as
+  `@custom-variant dark (&:is(.dark *))`.
+- `suppressHydrationWarning` on `<html>` is deliberate — `next-themes` writes
+  the class before React hydrates. Do not remove it.
+- Prose styling for rendered markdown is the `.prose-note` block in
+  `globals.css`. It is hand-written — `@tailwindcss/typography` is not used.
+
+---
+
+## Legacy Exceptions
+
+Code that predates a convention and is deliberately **not** being renamed:
+
+- PascalCase component files under `app/_components/` and
+  `app/showcase/_components/` — components are otherwise kebab-case.
+- Components with a `PropsType` suffix (`RevealPropsType`,
+  `PageHeaderPropsType`) — use `<ComponentName>Props` for anything new.
+- `UseXxxProps = XxxProps & {}` empty extensions in existing `type.ts` files —
+  harmless; new hooks derive their props per `complex-component-rule.md`.
 
 ---
 

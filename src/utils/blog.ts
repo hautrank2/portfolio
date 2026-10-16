@@ -195,14 +195,39 @@ export const getBlogTree = cache((): BlogNodeType => {
     node.children.forEach((child, i) => number(child, [...path, i + 1]));
   };
   root.numberPath = [];
-  root.children.forEach((track, i) => {
-    track.numberPath = [i + 1];
-    track.children.forEach((child, j) => number(child, [j + 1]));
-  });
+  // Only tracks get numbered — a single post at the root is not a stop on any
+  // roadmap, so it would only shift the track numbers around as posts land.
+  root.children
+    .filter((child) => child.kind !== "doc")
+    .forEach((track, i) => {
+      track.numberPath = [i + 1];
+      track.children.forEach((child, j) => number(child, [j + 1]));
+    });
   return root;
 });
 
-/** Depth-first, in reading order. Planned nodes are skipped — nothing to open. */
+/** Top-level tracks: the folders under `content/blog/`. */
+export const getTracks = cache((): BlogNodeType[] =>
+  getBlogTree().children.filter((child) => child.kind !== "doc")
+);
+
+/**
+ * Single posts: `.md` files sitting directly under `content/blog/`, newest
+ * first. A post belongs to no roadmap — loose grouping happens through tags.
+ */
+export const getPosts = cache((): BlogNodeType[] =>
+  [...getBlogTree().children]
+    .filter((child) => child.kind === "doc")
+    .sort((a, b) =>
+      (b.created ?? b.updated ?? "").localeCompare(a.created ?? a.updated ?? "")
+    )
+);
+
+/**
+ * Depth-first, in reading order. Planned nodes are skipped — nothing to open.
+ * Covers tracks only: posts have no reading order, their prev/next run through
+ * the date-sorted feed instead (see `getBlogNode`).
+ */
 export const getReadingOrder = cache((): BlogNodeType[] => {
   const out: BlogNodeType[] = [];
   const walk = (node: BlogNodeType) => {
@@ -212,7 +237,11 @@ export const getReadingOrder = cache((): BlogNodeType[] => {
       walk(child);
     }
   };
-  walk(getBlogTree());
+  for (const track of getTracks()) {
+    if (track.kind === "planned") continue;
+    out.push(track);
+    walk(track);
+  }
   return out;
 });
 
@@ -230,6 +259,19 @@ export const getBlogNode = cache(
       node = next;
     }
 
+    // A top-level post: neighbours come from the feed, not a roadmap — jumping
+    // from a post into the middle of the k8s track would make no sense.
+    if (node.kind === "doc" && node.path.length === 1) {
+      const posts = getPosts();
+      const at = posts.findIndex((post) => post.href === node.href);
+      return {
+        node,
+        trail: [],
+        prev: at > 0 ? posts[at - 1] : undefined,
+        next: at >= 0 && at < posts.length - 1 ? posts[at + 1] : undefined,
+      };
+    }
+
     const flat = getReadingOrder();
     const at = flat.findIndex((item) => item.href === node.href);
 
@@ -244,7 +286,7 @@ export const getBlogNode = cache(
 
 /** Every routable path, for `generateStaticParams`. */
 export function getAllBlogPaths(): string[][] {
-  return getReadingOrder().map((node) => node.path);
+  return [...getPosts(), ...getReadingOrder()].map((node) => node.path);
 }
 
 /** Flattens to docs only — used by the "all notes" listing. */
