@@ -307,7 +307,9 @@ const Section = ({ title, children, keepWithFirst = true }: SectionProps) => {
 const Bullets = ({ items }: { items: string[] }) => (
   <>
     {trimmed(items).map((item, index) => (
-      <View key={index} style={styles.bulletRow}>
+      // `wrap={false}`: a block that may break across pages must not leave the
+      // dot of a bullet stranded at the foot of one with its text on the next.
+      <View key={index} style={styles.bulletRow} wrap={false} minPresenceAhead={28}>
         <Text style={styles.bulletDot}>•</Text>
         <Text style={styles.bulletText}>{item}</Text>
       </View>
@@ -420,6 +422,7 @@ export const CvPdf = ({ cv }: CvPdfProps) => {
                   {[
                     hasText(edu.major) ? `Major: ${edu.major}` : "",
                     hasText(edu.specialty) ? `Specialty: ${edu.specialty}` : "",
+                    hasText(edu.gpa) ? `GPA: ${edu.gpa}` : "",
                   ]
                     .filter(Boolean)
                     .join("  ·  ")}
@@ -432,9 +435,15 @@ export const CvPdf = ({ cv }: CvPdfProps) => {
         {cv.certifications.length > 0 && (
           <Section title="Certifications">
             {cv.certifications.map((cert, index) => {
-              const certLinks = [cert.demoUrl, cert.url]
-                .map((url) => absoluteUrl(url, siteOrigin))
-                .filter((url) => url !== null);
+              const certLinks = [
+                { label: "Demo", url: cert.demoUrl },
+                { label: "Certificate", url: cert.url },
+              ]
+                .map(({ label, url }) => {
+                  const href = absoluteUrl(url, siteOrigin);
+                  return href ? { label, url: href } : null;
+                })
+                .filter((link) => link !== null);
               return (
                 <View key={index} style={styles.item} wrap={false}>
                   <View style={styles.itemHead}>
@@ -446,11 +455,12 @@ export const CvPdf = ({ cv }: CvPdfProps) => {
                   )}
                   {certLinks.length > 0 && (
                     <View style={[styles.metaRow, { marginTop: 2 }]}>
-                      {certLinks.map((url) => (
-                        <View key={url} style={styles.metaItem}>
+                      {certLinks.map((link) => (
+                        <View key={link.url} style={styles.metaItem}>
                           <Icon name="link" />
-                          <Link src={url} style={styles.metaLink}>
-                            {displayUrl(url)}
+                          <Text style={styles.metaText}>{link.label}:</Text>
+                          <Link src={link.url} style={styles.metaLink}>
+                            {displayUrl(link.url)}
                           </Link>
                         </View>
                       ))}
@@ -504,10 +514,12 @@ export const CvPdf = ({ cv }: CvPdfProps) => {
             {cv.projects.map((project, index) => {
               const stack = trimmed(project.stack);
               return (
-                // Each project stays on one page; a page break moves the
-                // whole block rather than splitting it mid-bullet.
-                <View key={index} style={styles.item} wrap={false}>
-                  <View style={styles.itemHead}>
+                // Projects are the long blocks, so these may split across a
+                // page rather than jumping whole and leaving a third of the
+                // previous page empty. `minPresenceAhead` keeps a title from
+                // being stranded at the foot of a page on its own.
+                <View key={index} style={styles.item} minPresenceAhead={64}>
+                  <View style={styles.itemHead} wrap={false}>
                     <Text style={styles.itemName}>{project.name}</Text>
                     <Text style={styles.itemDate}>
                       {[project.kind, project.period]

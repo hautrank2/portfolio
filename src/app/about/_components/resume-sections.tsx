@@ -198,6 +198,11 @@ export const ResumeEducation = ({ cv }: { cv: CvModel }) => (
                 {edu.specialty}
               </span>
             )}
+            {hasText(edu.gpa) && (
+              <span className="rounded-full bg-primary/10 px-4 py-1.5">
+                GPA {edu.gpa}
+              </span>
+            )}
           </div>
         </div>
       </Reveal>

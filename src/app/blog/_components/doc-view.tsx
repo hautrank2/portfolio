@@ -5,7 +5,9 @@ import { Reveal } from "~/components/ui/reveal";
 import { Typography } from "~/components/ui/typography";
 import { cn } from "~/lib/utils";
 import type { BlogNodeContextType } from "~/types";
+import { docMarkdown } from "~/utils/blog-copy";
 import { BlogBreadcrumb } from "./breadcrumb";
+import { BlogCopyPage } from "./copy-page";
 import { DocNav } from "./doc-nav";
 import { StatusBadge } from "./status-badge";
 import { BlogToc } from "./toc";
@@ -24,7 +26,7 @@ const DocView = async ({ node, trail, prev, next }: DocViewProps) => {
   const isPost = node.path.length === 1;
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-12 sm:px-8 lg:py-16">
+    <div className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-8 lg:py-16">
       <BlogVisitTracker
         href={node.href}
         title={node.title}
@@ -32,32 +34,52 @@ const DocView = async ({ node, trail, prev, next }: DocViewProps) => {
         track={node.path[0]}
         trail={trail.map((item) => item.title).join(" · ")}
       />
-      {isPost ? (
-        <BackToBlog className="xl:hidden" />
-      ) : (
-        <BlogBreadcrumb trail={trail} />
-      )}
+      {!isPost && <BlogBreadcrumb trail={trail} />}
 
       <div
         className={cn(
           "gap-12 xl:grid",
           isPost
-            ? "mt-6 xl:mt-10 xl:grid-cols-[13rem_minmax(0,1fr)]"
-            : "mt-10 xl:grid-cols-[minmax(0,1fr)_14rem]"
+            ? "xl:grid-cols-[14rem_minmax(0,1fr)]"
+            : "mt-8 xl:grid-cols-[minmax(0,1fr)_16rem] xl:grid-rows-[auto_minmax(0,1fr)] xl:gap-y-8"
         )}
       >
-        {isPost && (
-          <aside className="hidden xl:block">
-            <div className="sticky top-24">
-              <BackToBlog />
-              <div className="mt-8">
+        {isPost ? (
+          // The rail head. Below xl there is no rail, so it falls back to being
+          // the row above the note — the same single instance either way.
+          <aside className="xl:col-start-1 xl:row-start-1">
+            <div className="xl:sticky xl:top-24">
+              <div className="flex flex-wrap items-center gap-3 xl:flex-col xl:items-start xl:gap-4">
+                <BackToBlog />
+                <BlogCopyPage
+                  title={node.title}
+                  markdown={docMarkdown(node, trail)}
+                />
+              </div>
+              <div className="mt-8 hidden xl:block">
                 <BlogToc headings={headings} plain />
               </div>
             </div>
           </aside>
+        ) : (
+          // Same idea, right-hand rail: it heads the TOC column at xl and sits
+          // above the note below it. Grid placement, so it stays one instance.
+          <div className="mb-6 flex justify-end xl:col-start-2 xl:row-start-1 xl:mb-0 xl:justify-start">
+            <BlogCopyPage
+              title={node.title}
+              markdown={docMarkdown(node, trail)}
+            />
+          </div>
         )}
 
-        <article className="min-w-0">
+        <article
+          className={cn(
+            "min-w-0",
+            isPost
+              ? "xl:col-start-2 xl:row-start-1"
+              : "xl:col-start-1 xl:row-span-2 xl:row-start-1"
+          )}
+        >
           <header className="border-b border-border/60 pb-8">
             <Typography
               variant="h1"
@@ -106,7 +128,13 @@ const DocView = async ({ node, trail, prev, next }: DocViewProps) => {
           <DocNav prev={prev} next={next} />
         </article>
 
-        {!isPost && <BlogToc headings={headings} />}
+        {!isPost && (
+          <aside className="hidden xl:col-start-2 xl:row-start-2 xl:block">
+            <div className="sticky top-24">
+              <BlogToc headings={headings} plain />
+            </div>
+          </aside>
+        )}
       </div>
     </div>
   );

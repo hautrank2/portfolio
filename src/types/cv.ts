@@ -9,6 +9,8 @@ export type CvEducationModel = {
   period: string;
   major: string;
   specialty: string;
+  /** Free text, so the scale travels with it: `3.2/4`. */
+  gpa: string;
 };
 
 export type CvCertificationModel = {

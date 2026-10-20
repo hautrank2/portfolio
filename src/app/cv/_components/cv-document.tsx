@@ -143,6 +143,7 @@ export const CvDocument = ({ cv, className, ...props }: CvDocumentProps) => {
                   {[
                     hasText(edu.major) ? `Major: ${edu.major}` : "",
                     hasText(edu.specialty) ? `Specialty: ${edu.specialty}` : "",
+                    hasText(edu.gpa) ? `GPA: ${edu.gpa}` : "",
                   ]
                     .filter(Boolean)
                     .join(" · ")}

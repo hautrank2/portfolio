@@ -18,7 +18,7 @@ import type {
 
 const emptyItems: { [K in CvListKey]: CvListItem<K> } = {
   links: { label: "", url: "" },
-  education: { school: "", period: "", major: "", specialty: "" },
+  education: { school: "", period: "", major: "", specialty: "", gpa: "" },
   certifications: { name: "", issuer: "", date: "", url: "", demoUrl: "" },
   skills: { label: "", items: [] },
   experiences: { company: "", role: "", period: "", note: "", highlights: [] },

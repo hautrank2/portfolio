@@ -6,8 +6,10 @@ import { trackLogoData } from "~/data/blog";
 import { flattenDocs, getPosts } from "~/utils/blog";
 import { cn } from "~/lib/utils";
 import type { BlogNodeContextType, BlogNodeType } from "~/types";
+import { sectionMarkdown } from "~/utils/blog-copy";
 import { BlogBreadcrumb } from "./breadcrumb";
 import { BlogExplorer } from "./blog-explorer";
+import { BlogCopyPage } from "./copy-page";
 import { NodeCard } from "./node-card";
 import { NoteList } from "./note-list";
 import { BlogProgress } from "./progress";
@@ -60,6 +62,12 @@ const SectionView = async ({ node, trail, standalone }: SectionViewProps) => {
   const showResume = standalone || isTrackRoot;
   const logo = isTrackRoot ? trackLogoData[node.slug] : undefined;
 
+  // A folder page is its listing, so what gets copied is the intro plus the
+  // reading order underneath it — see `sectionMarkdown`.
+  const copyButton = (
+    <BlogCopyPage title={node.title || "Blog"} markdown={sectionMarkdown(node, trail)} />
+  );
+
   // Gốc `/blog`: folder là track (card lớn có logo), file `.md` là bài lẻ —
   // chúng xuống feed riêng bên dưới thay vì giả làm một track.
   const isBlogRoot = node.path.length === 0;
@@ -92,7 +100,7 @@ const SectionView = async ({ node, trail, standalone }: SectionViewProps) => {
         aria-hidden
         className="bg-grid pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_at_top_left,black,transparent_75%)]"
       />
-      <div className="relative mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-8 sm:flex-row sm:items-end sm:justify-between sm:px-8 lg:px-16 lg:py-10">
+      <div className="relative mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-8 sm:flex-row sm:items-end sm:justify-between sm:px-8 lg:px-16 lg:py-10">
         <div>
           <p className="flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
             {kicker}
@@ -112,16 +120,18 @@ const SectionView = async ({ node, trail, standalone }: SectionViewProps) => {
             )}
           </div>
         </div>
-        <BlogProgress
-          done={node.progress.done}
-          total={node.progress.total}
-          className="shrink-0 sm:mb-1.5"
-        />
+        <div className="flex shrink-0 flex-wrap items-center gap-3 sm:mb-1.5">
+          <BlogProgress done={node.progress.done} total={node.progress.total} />
+          {copyButton}
+        </div>
       </div>
     </section>
   ) : (
     <header className="border-b border-border/60 pb-8">
-      <BlogBreadcrumb trail={trail} />
+      <div className="flex items-center justify-between gap-4">
+        <BlogBreadcrumb trail={trail} />
+        {copyButton}
+      </div>
       <div className="mt-5 flex items-center gap-3">
         {logo && (
           <Image
@@ -169,7 +179,7 @@ const SectionView = async ({ node, trail, standalone }: SectionViewProps) => {
 
       <div
         className={cn(
-          "mx-auto w-full max-w-4xl px-4 sm:px-8",
+          "mx-auto w-full max-w-6xl px-4 sm:px-8",
           standalone ? "py-8 lg:py-10" : "py-12 lg:py-16"
         )}
       >

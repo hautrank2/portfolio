@@ -285,11 +285,16 @@ export const EducationSection = ({ editor }: CvSectionProps) => {
             />
             <Field
               label="Specialty"
-              className="sm:col-span-2"
               value={edu.specialty}
               onValueChange={(v) =>
                 updateItem("education", index, { specialty: v })
               }
+            />
+            <Field
+              label="GPA"
+              placeholder="3.2/4"
+              value={edu.gpa}
+              onValueChange={(v) => updateItem("education", index, { gpa: v })}
             />
           </div>
         </ItemCard>

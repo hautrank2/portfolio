@@ -47,6 +47,7 @@ export const normalizeCv = (value: unknown): CvModel | null => {
       period: str(item.period),
       major: str(item.major),
       specialty: str(item.specialty),
+      gpa: str(item.gpa),
     })),
     certifications: recordList<CvCertificationModel>(
       value.certifications,
