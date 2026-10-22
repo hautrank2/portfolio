@@ -1,0 +1,138 @@
+.gamesPage {
+  --game-lilac: oklch(0.51 0.17 295);
+  --game-peach: oklch(0.52 0.12 35);
+  --game-blue: oklch(0.47 0.12 245);
+  --game-rose: oklch(0.51 0.15 350);
+  padding-bottom: 25px;
+}
+
+:global(.dark) .gamesPage {
+  --game-lilac: oklch(0.81 0.11 295);
+  --game-peach: oklch(0.82 0.11 55);
+  --game-blue: oklch(0.8 0.09 245);
+  --game-rose: oklch(0.81 0.11 350);
+}
+
+.header { border-bottom: 1px solid var(--border); }
+.back { display: inline-flex; align-items: center; gap: 9px; font-size: 12px; font-weight: 500; color: var(--primary); }
+.headerLabel { color: var(--muted-foreground); font-size: 10px; letter-spacing: 1.2px; }
+.container { width: min(1180px, calc(100% - 64px)); margin: auto; }
+.hero { display: grid; grid-template-columns: 1.2fr .8fr; align-items: center; gap: 30px; padding: 55px 10px 50px; }
+.heroCopy > p:first-child { display: flex; align-items: center; gap: 9px; }
+.hero h1 { font-size: clamp(48px, 5.5vw, 72px); line-height: 1.3; font-weight: 500; letter-spacing: -3.5px; margin: 19px 0 20px; }
+.hero h1 em { background: linear-gradient(110deg, var(--primary), var(--trip-rose)); background-clip: text; color: transparent; }
+.heroCopy > p:not(:first-child) { font-size: 13px; color: var(--muted-foreground); line-height: 2; }
+.heroTags { display: flex; flex-wrap: wrap; gap: 10px 18px; margin-top: 23px; }
+.heroTags > span { display: inline-flex; align-items: center; gap: 7px; font-size: 10px; color: var(--primary); }
+.heroArt { position: relative; width: 100%; height: 290px; display: grid; place-items: center; }
+.playCard { position: absolute; width: 175px; height: 233px; border: 1px solid var(--border); border-radius: 23px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 25px; box-shadow: 0 18px 45px var(--trip-shadow); }
+.playCard > span:not(.cardCorner):not(.cardSpark) { font-size: 8px; letter-spacing: 1.6px; font-weight: 500; }
+.playCardBack { transform: rotate(-17deg) translate(-46px, -10px); color: var(--game-rose); background: color-mix(in oklch, var(--trip-party) 80%, var(--card)); }
+.playCardFront { transform: rotate(12deg) translate(37px, 6px); color: var(--primary); background: linear-gradient(140deg, var(--card), var(--secondary)); }
+.cardCorner { position: absolute; top: 15px; left: 16px; display: flex; flex-direction: column; gap: 3px; font-size: 15px; }
+.cardSpark { position: absolute; right: -25px; bottom: 16px; font-size: 50px; color: var(--trip-rose); }
+.gameMenu { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; position: sticky; top: 10px; z-index: 10; padding: 7px; margin: 0 -7px 30px; border: 1px solid var(--border); border-radius: 24px; background: color-mix(in oklch, var(--background) 88%, transparent); backdrop-filter: blur(20px); box-shadow: 0 8px 30px var(--trip-shadow); }
+.gameMenu a { min-width: 0; display: flex; align-items: center; gap: 10px; padding: 15px 12px; border: 1px solid var(--border); border-radius: 17px; background: var(--card); transition: background .2s; }
+.gameMenu a:hover { background: var(--accent); }
+.menuIcon { display: grid; place-items: center; height: 36px; width: 33px; flex-shrink: 0; border-radius: 12px; color: var(--primary); background: var(--muted); }
+.gameMenu a > span:nth-child(2) { min-width: 0; flex: 1; }
+.gameMenu small { display: block; font-size: 8px; color: var(--muted-foreground); }
+.gameMenu strong { display: block; font-size: 11px; font-weight: 500; margin-top: 3px; }
+.gameMenu a > svg { flex-shrink: 0; color: var(--primary); }
+.gameGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: start; }
+/* The shared html already adds 6rem of scroll padding. */
+.game { --game-accent: var(--primary); min-width: 0; border: 1px solid var(--border); border-radius: 30px; padding: 30px; scroll-margin-top: calc(125px - 6rem); background: linear-gradient(150deg, color-mix(in oklch, var(--game-accent) 6%, var(--card)), var(--card) 50%); }
+.never { --game-accent: var(--game-lilac); }
+.imposter { --game-accent: var(--game-peach); }
+.who { --game-accent: var(--game-blue); }
+.writer { --game-accent: var(--game-rose); }
+.gameTop { display: flex; align-items: center; justify-content: space-between; margin-bottom: 23px; }
+.gameIcon { display: grid; place-items: center; width: 53px; height: 53px; border-radius: 18px; color: var(--game-accent); background: color-mix(in oklch, var(--game-accent) 11%, var(--card)); }
+.gameNumber { font-size: 44px; line-height: 1; letter-spacing: -2px; font-weight: 500; color: color-mix(in oklch, var(--game-accent) 23%, var(--card)); }
+.game > p:first-of-type { color: var(--game-accent); }
+.game h2 { font-size: 30px; line-height: 1.6; font-weight: 500; letter-spacing: -1.1px; margin: 5px 0 8px; }
+.gameIntro { font-size: 12px; line-height: 1.9; color: var(--muted-foreground); }
+.meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.meta > span { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border); border-radius: 100px; padding: 5px 9px; color: var(--game-accent); font-size: 9px; }
+.subheading { margin-top: 27px; margin-bottom: 16px; font-size: 12px; font-weight: 600; }
+.rules { list-style: none; counter-reset: rule; display: grid; gap: 15px; }
+.rules li { counter-increment: rule; position: relative; font-size: 12px; line-height: 1.95; color: var(--muted-foreground); padding-left: 33px; }
+.rules li::before { content: counter(rule); position: absolute; top: 1px; left: 0; display: grid; place-items: center; width: 23px; height: 23px; border: 1px solid var(--border); border-radius: 8px; font-size: 10px; color: var(--game-accent); background: color-mix(in oklch, var(--game-accent) 6%, var(--card)); }
+.rules strong { font-weight: 500; color: var(--foreground); }
+.exampleBox { margin-top: 27px; background: color-mix(in oklch, var(--game-accent) 6%, var(--card)); border: 1px solid var(--border); border-radius: 19px; padding: 18px; }
+.exampleBox h3 { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 500; color: var(--game-accent); margin-bottom: 14px; }
+.promptList { list-style: none; display: grid; gap: 10px; }
+.promptList li { position: relative; padding-left: 13px; font-size: 11px; line-height: 1.9; color: var(--muted-foreground); }
+.promptList li::before { content: ""; position: absolute; left: 0; top: 9px; width: 4px; height: 4px; border-radius: 50%; background: var(--game-accent); opacity: .7; }
+.tableScroll { overflow-x: auto; }
+.tableScroll table { width: 100%; border-collapse: collapse; text-align: left; font-size: 10px; line-height: 1.9; }
+.tableScroll th, .tableScroll td { padding: 10px 7px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.tableScroll thead th { padding-top: 0; font-size: 9px; font-weight: 500; color: var(--game-accent); }
+.tableScroll tbody th { font-weight: 500; color: var(--foreground); width: 29%; }
+.tableScroll tbody td { color: var(--muted-foreground); }
+.tableScroll tbody tr:last-child > * { border-bottom: 0; padding-bottom: 0; }
+.secretWord { color: var(--game-accent); border-bottom: 1px dashed currentColor; font-weight: 500; white-space: nowrap; }
+.gameTip { display: flex; align-items: flex-start; gap: 9px; padding-top: 20px; font-size: 11px; line-height: 1.9; color: var(--muted-foreground); }
+.gameTip > svg { flex-shrink: 0; margin-top: 3px; color: var(--game-accent); }
+.footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px; margin-top: 45px; padding-block: 25px; border-top: 1px solid var(--border); color: var(--muted-foreground); font-size: 11px; }
+.footer > span, .footer a { display: inline-flex; align-items: center; gap: 8px; }
+.footer a { color: var(--primary); }
+.mobileBack { display: none; }
+.srOnly { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+
+@media (max-width: 1000px) {
+  .gameMenu a { padding-inline: 9px; gap: 7px; }
+  .gameMenu small { font-size: 7px; }
+  .gameMenu strong { font-size: 10px; }
+  .gameMenu a > svg { display: none; }
+  .game { padding: 24px; }
+}
+
+@media (max-width: 760px) {
+  .gamesPage { padding-bottom: calc(90px + env(safe-area-inset-bottom)); }
+  .headerLabel { display: none; }
+  .container { width: calc(100% - 36px); }
+  .hero { padding: 30px 4px 32px; gap: 10px; grid-template-columns: 1fr; }
+  .hero h1 { font-size: clamp(44px, 10vw, 65px); letter-spacing: -2.4px; margin-top: 16px; }
+  .heroCopy > p:not(:first-child) { font-size: 12px; }
+  .heroTags { margin-top: 20px; }
+  .heroTags > span { font-size: 9px; }
+  .heroArt { height: 210px; margin-top: 22px; }
+  .playCard { width: 128px; height: 174px; gap: 15px; border-radius: 19px; }
+  .playCard > span:not(.cardCorner):not(.cardSpark) { font-size: 6px; letter-spacing: 1px; }
+  .playCard > svg { width: 43px; height: 43px; }
+  .playCardBack { transform: rotate(-17deg) translate(-39px, -6px); }
+  .playCardFront { transform: rotate(12deg) translate(35px, 5px); }
+  .cardCorner { top: 11px; left: 12px; font-size: 12px; }
+  .cardSpark { right: -18px; bottom: 13px; font-size: 38px; }
+  .gameMenu { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; padding: 5px; margin-inline: 0; margin-bottom: 22px; top: 6px; border-radius: 21px; }
+  .gameMenu a { padding: 10px 8px; gap: 8px; border-radius: 15px; min-height: 68px; }
+  .menuIcon { width: 28px; height: 32px; border-radius: 10px; }
+  .menuIcon > svg { width: 18px; }
+  .gameMenu small { font-size: 7px; }
+  .gameMenu strong { font-size: 10px; line-height: 1.7; margin-top: 2px; }
+  .gameGrid { grid-template-columns: 1fr; gap: 19px; }
+  .game { padding: 24px 20px; border-radius: 26px; scroll-margin-top: calc(165px - 6rem); }
+  .game h2 { font-size: 27px; }
+  .gameTop { margin-bottom: 20px; }
+  .gameIcon { width: 46px; height: 46px; border-radius: 16px; }
+  .gameNumber { font-size: 38px; }
+  .gameIntro { font-size: 12px; }
+  .meta { gap: 6px; margin-top: 16px; }
+  .meta > span { font-size: 9px; padding: 5px 8px; }
+  .subheading { margin-top: 23px; font-size: 12px; }
+  .rules li { font-size: 12px; line-height: 2; }
+  .rules { gap: 14px; }
+  .exampleBox { padding: 15px 13px; margin-top: 23px; }
+  .promptList li { font-size: 11px; }
+  .tableScroll th, .tableScroll td { padding-inline: 5px; }
+  .tableScroll tbody th { width: 30%; }
+  .gameTip { font-size: 11px; }
+  .footer { margin-top: 30px; font-size: 10px; justify-content: center; text-align: center; padding-inline: 10px; }
+  .mobileBack { position: fixed; bottom: calc(12px + env(safe-area-inset-bottom)); left: 18px; right: 18px; z-index: 20; display: flex; align-items: center; gap: 10px; min-height: 53px; padding: 12px 18px; border: 1px solid var(--border); border-radius: 20px; background: color-mix(in oklch, var(--card) 90%, transparent); backdrop-filter: blur(20px); box-shadow: 0 8px 35px var(--trip-shadow); color: var(--primary); font-size: 11px; font-weight: 500; }
+  .mobileBack > svg:last-child { margin-left: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gameMenu a { transition: none; }
+}

@@ -17,6 +17,9 @@
   --trip-rose: oklch(0.56 0.16 355);
   --trip-haze: oklch(0.89 0.065 295);
   --trip-party: oklch(0.94 0.035 330);
+  --trip-warning: oklch(0.48 0.105 65);
+  --trip-warning-bg: oklch(0.97 0.025 80);
+  --trip-warning-border: oklch(0.85 0.065 80);
   --trip-photo-ink: oklch(0.22 0.045 290);
   --trip-photo-text: oklch(0.99 0.005 295);
   --trip-shadow: color-mix(in oklch, var(--primary) 9%, transparent);
@@ -43,6 +46,9 @@
   --trip-rose: oklch(0.8 0.115 350);
   --trip-haze: oklch(0.3 0.09 295);
   --trip-party: oklch(0.275 0.055 320);
+  --trip-warning: oklch(0.85 0.12 80);
+  --trip-warning-bg: oklch(0.265 0.035 65);
+  --trip-warning-border: oklch(0.43 0.055 70);
   --trip-shadow: color-mix(in oklch, var(--trip-photo-ink) 30%, transparent);
 }
 .trip :global(h1), .trip :global(h2), .trip :global(h3), .trip :global(h4), .trip :global(button), .trip :global(input) { font-family: inherit; }
@@ -88,6 +94,18 @@
 .trip :global(.dalat-trip-strip small) { display: block; font-size: 10px; color: var(--muted-foreground); margin-top: 4px; }
 .trip :global(.dalat-trip-strip > a > svg) { margin-left: auto; flex-shrink: 0; color: var(--primary); }
 .trip :global(.dalat-itinerary) { padding-top: 85px; }
+.trip :global(.dalat-traffic-note) { margin-top: 35px; padding: 25px; border: 1px solid var(--trip-warning-border); border-radius: 26px; background: var(--trip-warning-bg); scroll-margin-top: 25px; }
+.trip :global(.dalat-traffic-heading) { display: flex; align-items: center; gap: 13px; }
+.trip :global(.dalat-traffic-icon) { display: grid; place-items: center; width: 44px; height: 44px; flex-shrink: 0; border-radius: 15px; color: var(--trip-warning); background: color-mix(in oklch, var(--trip-warning) 12%, transparent); }
+.trip :global(.dalat-traffic-heading .dalat-eyebrow) { color: var(--trip-warning); font-size: 8px; letter-spacing: 1.6px; }
+.trip :global(.dalat-traffic-heading h2) { margin-top: 4px; font-size: 18px; line-height: 1.6; font-weight: 600; letter-spacing: -.5px; }
+.trip :global(.dalat-traffic-source) { margin-top: 13px; font-size: 10px; color: var(--muted-foreground); }
+.trip :global(.dalat-road-list) { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 18px 28px; padding-top: 20px; margin-top: 18px; border-top: 1px solid var(--trip-warning-border); }
+.trip :global(.dalat-road-list > li) { display: flex; gap: 11px; align-items: flex-start; min-width: 0; }
+.trip :global(.dalat-road-number) { color: var(--trip-warning); font-size: 10px; font-weight: 600; margin-top: 2px; }
+.trip :global(.dalat-road-list h3) { display: flex; align-items: flex-start; gap: 6px; font-size: 12px; font-weight: 600; line-height: 1.8; }
+.trip :global(.dalat-road-list h3 svg) { flex-shrink: 0; margin-top: 4px; color: var(--trip-warning); }
+.trip :global(.dalat-road-list li p) { font-size: 11px; line-height: 1.9; color: var(--muted-foreground); margin-top: 5px; }
 .trip :global(.dalat-section-heading) { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 30px; }
 .trip :global(.dalat-eyebrow) { color: var(--primary); font-size: 9px; font-weight: 600; letter-spacing: 2px; line-height: 1.8; }
 .trip :global(.dalat-section-heading h2), .trip :global(.dalat-party-intro h2) { font-size: clamp(28px, 3vw, 38px); line-height: 1.5; letter-spacing: -1.6px; font-weight: 500; margin-top: 8px; }
@@ -126,6 +144,19 @@
 .trip :global(.dalat-place-arrow) { display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--primary); flex-shrink: 0; }
 .trip :global(.dalat-place-arrow > span) { font-size: 8px; }
 .trip :global(.dalat-place-compact) { padding: 11px; gap: 8px; background: color-mix(in oklch, var(--muted) 55%, var(--card)); border-color: transparent; border-radius: 14px; }
+.trip :global(.dalat-place-card) { min-width: 0; border: 1px solid var(--border); border-radius: 18px; background: var(--card); overflow: hidden; }
+.trip :global(.dalat-place-card .dalat-place) { border: 0; border-radius: 0; }
+.trip :global(.dalat-place-card .dalat-place:hover) { transform: none; }
+.trip :global(.dalat-place-card-compact) { border-color: transparent; border-radius: 14px; background: color-mix(in oklch, var(--muted) 55%, var(--card)); }
+.trip :global(.dalat-place-card-compact .dalat-place) { background: transparent; }
+.trip :global(.dalat-place-card-compact .dalat-place:hover) { background: var(--accent); }
+.trip :global(.dalat-place-tips) { list-style: none; display: grid; gap: 7px; margin: 0 13px 13px; padding: 11px 0 0; border-top: 1px solid var(--border); }
+.trip :global(.dalat-place-tip) { display: flex; align-items: flex-start; gap: 7px; color: var(--muted-foreground); font-size: 10px; line-height: 1.85; overflow-wrap: anywhere; }
+.trip :global(.dalat-place-tip > svg) { flex-shrink: 0; margin-top: 3px; color: var(--primary); opacity: .8; }
+.trip :global(.dalat-place-tip strong) { font-weight: 500; }
+.trip :global(.dalat-place-tip-reservation) { color: var(--primary); }
+.trip :global(.dalat-place-booking) { display: flex; width: fit-content; align-items: center; gap: 5px; margin: 0 13px 13px; padding: 4px 9px; border: 1px solid var(--border); border-radius: 100px; font-size: 9px; color: var(--primary); }
+.trip :global(.dalat-place-booking:hover) { background: var(--accent); }
 .trip :global(.dalat-game-details) { border-top: 1px solid var(--border); margin-top: 13px; font-size: 11px; }
 .trip :global(.dalat-game-details summary) { cursor: pointer; display: flex; justify-content: space-between; gap: 10px; padding-top: 12px; color: var(--primary); font-weight: 500; list-style: none; }
 .trip :global(.dalat-game-details summary::-webkit-details-marker) { display: none; }
@@ -149,6 +180,9 @@
 .trip :global(.dalat-note strong) { display: block; font-size: 12px; font-weight: 500; color: var(--foreground); margin-bottom: 6px; }
 .trip :global(.dalat-mini-checklist) { border: 1px solid var(--border); border-radius: 24px; background: var(--card); padding: 22px; }
 .trip :global(.dalat-mini-checklist > p) { margin-bottom: 12px; }
+.trip :global(.dalat-packing-group + .dalat-packing-group) { margin-top: 18px; padding-top: 15px; border-top: 1px solid var(--border); }
+.trip :global(.dalat-packing-group h4) { color: var(--primary); font-size: 10px; font-weight: 500; margin-bottom: 7px; }
+.trip :global(.dalat-packing-items) { display: grid; gap: 3px; }
 .trip :global(.dalat-mini-checklist label) { display: flex; align-items: center; gap: 10px; min-height: 42px; position: relative; font-size: 11px; color: var(--muted-foreground); cursor: pointer; }
 .trip :global(.dalat-mini-checklist input) { position: absolute; opacity: 0; width: 20px; height: 20px; }
 .trip :global(.dalat-checkbox) { display: grid; place-items: center; flex-shrink: 0; width: 18px; height: 18px; border: 1px solid var(--border); border-radius: 6px; color: transparent; }
@@ -159,15 +193,21 @@
 .trip :global(.dalat-party-intro h2) { font-size: 32px; }
 .trip :global(.dalat-party-intro > p:not(.dalat-eyebrow)) { margin-top: 20px; color: var(--muted-foreground); font-size: 12px; line-height: 2; }
 .trip :global(.dalat-party-intro > a) { display: inline-flex; align-items: center; gap: 12px; font-size: 11px; font-weight: 600; margin-top: 25px; color: var(--primary); }
+.trip :global(.dalat-party-intro > .dalat-games-link) { display: flex; gap: 13px; padding: 17px; border: 1px solid var(--border); border-radius: 20px; background: color-mix(in oklch, var(--card) 70%, transparent); text-align: left; }
+.trip :global(.dalat-games-link > span) { flex: 1; }
+.trip :global(.dalat-games-link strong) { display: block; font-size: 12px; font-weight: 500; }
+.trip :global(.dalat-games-link small) { display: block; margin-top: 3px; font-size: 10px; color: var(--muted-foreground); font-weight: 400; }
+.trip :global(.dalat-games-link:hover) { background: var(--accent); }
+.trip :global(.dalat-game-rules-link) { display: inline-flex; align-items: center; gap: 7px; margin-top: 16px; color: var(--primary); font-size: 11px; font-weight: 500; }
 .trip :global(.dalat-takeaway > h3) { font-size: 13px; font-weight: 600; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .trip :global(.dalat-takeaway > h3 > span) { color: var(--muted-foreground); font-size: 9px; font-weight: 400; }
 .trip :global(.dalat-takeaway > div + div) { margin-top: 18px; }
-.trip :global(.dalat-takeaway .dalat-place) { background: color-mix(in oklch, var(--card) 85%, transparent); border: 1px solid var(--border); }
+.trip :global(.dalat-takeaway .dalat-place-card) { background: color-mix(in oklch, var(--card) 85%, transparent); border: 1px solid var(--border); }
 .trip :global(.dalat-takeaway > div > p) { color: var(--muted-foreground); font-size: 10px; margin-top: 8px; padding-inline: 5px; }
 .trip :global(.dalat-map-section) { padding-top: 85px; }
 .trip :global(.dalat-map-caption) { display: inline-flex; align-items: center; gap: 8px; color: var(--primary); font-size: 10px; white-space: nowrap; }
 .trip :global(.dalat-places-note) { font-size: 11px; color: var(--muted-foreground); margin: -12px 0 25px; }
-.trip :global(.dalat-all-places) { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.trip :global(.dalat-all-places) { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; gap: 12px; }
 .trip :global(.dalat-mobile-break) { display: none; }
 .trip :global(.dalat-footer) { text-align: center; padding-top: 55px; margin-top: 70px; border-top: 1px solid var(--border); }
 .trip :global(.dalat-footer > div:first-child) { display: flex; align-items: center; flex-direction: column; gap: 18px; color: var(--primary); }
@@ -217,6 +257,9 @@
   .trip :global(.dalat-strip-icon) { width: 30px; height: 34px; border-radius: 11px; }
   .trip :global(.dalat-strip-icon svg) { width: 17px; }
   .trip :global(.dalat-itinerary) { padding-top: 50px; }
+  .trip :global(.dalat-traffic-note) { margin-top: 25px; padding: 20px 17px; border-radius: 23px; }
+  .trip :global(.dalat-traffic-heading h2) { font-size: 16px; }
+  .trip :global(.dalat-road-list) { grid-template-columns: 1fr; gap: 18px; }
   .trip :global(.dalat-section-heading) { align-items: start; flex-direction: column; gap: 13px; margin-bottom: 24px; padding-inline: 4px; }
   .trip :global(.dalat-section-heading h2) { font-size: 29px; letter-spacing: -1.3px; }
   .trip :global(.dalat-section-heading > p) { font-size: 11px; }
@@ -247,12 +290,14 @@
   .trip :global(.dalat-place-copy strong) { font-size: 12px; }
   .trip :global(.dalat-place-compact .dalat-place-copy strong) { font-size: 11px; }
   .trip :global(.dalat-place-copy > span) { font-size: 10px; }
+  .trip :global(.dalat-place-tips) { margin: 0 10px 11px; padding-top: 9px; gap: 6px; }
+  .trip :global(.dalat-place-tip) { font-size: 10px; gap: 6px; }
   .trip :global(.dalat-sidebar) { position: static; width: 100%; gap: 22px; }
   .trip :global(.dalat-home-note) { padding: 26px; }
   .trip :global(.dalat-home-note h3 br) { display: none; }
   .trip :global(.dalat-home-note > svg) { margin-bottom: 14px; }
-  .trip :global(.dalat-mini-checklist) { display: grid; grid-template-columns: 1fr 1fr; gap: 0 13px; padding: 22px 18px; }
-  .trip :global(.dalat-mini-checklist > p) { grid-column: 1 / -1; }
+  .trip :global(.dalat-mini-checklist) { padding: 22px 18px; }
+  .trip :global(.dalat-packing-items) { grid-template-columns: 1fr 1fr; gap: 5px 13px; }
   .trip :global(.dalat-mini-checklist label) { font-size: 11px; line-height: 1.7; }
   .trip :global(.dalat-party-section) { margin-top: 45px; padding: 28px 20px; border-radius: 27px; grid-template-columns: 1fr; gap: 30px; }
   .trip :global(.dalat-party-intro h2) { font-size: 28px; }

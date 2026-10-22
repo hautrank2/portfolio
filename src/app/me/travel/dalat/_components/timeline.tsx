@@ -1,4 +1,5 @@
-import { Camera, ChevronDown, CloudSun, Coffee, Footprints, Gift, House, Utensils, Wine } from "lucide-react";
+import { ArrowUpRight, Camera, ChevronDown, CloudSun, Coffee, Dices, Footprints, Gift, House, Utensils, Wine } from "lucide-react";
+import Link from "next/link";
 
 import { PlaceLink } from "./place-link";
 import { games, type TripDay } from "./trip-data";
@@ -33,6 +34,7 @@ export const Timeline = ({ day }: { day: TripDay }) => (
               <div className="dalat-event-places">
                 {event.places.map((place) => <PlaceLink key={place.id} place={place} compact />)}
               </div>
+              {event.kind === "party" && <Link href="/me/travel/dalat/games" className="dalat-game-rules-link"><Dices size={15} aria-hidden="true" /> Xem luật 4 trò chơi tại home <ArrowUpRight size={14} aria-hidden="true" /></Link>}
               {event.places.some((place) => place.id === "pine-kart") && (
                 <details className="dalat-game-details">
                   <summary>Trò nào hợp tụi mình?<ChevronDown size={15} aria-hidden="true" /></summary>

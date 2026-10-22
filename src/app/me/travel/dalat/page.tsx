@@ -1,6 +1,5 @@
-import { ArrowDown, ArrowLeft, ArrowUpRight, Check, Cloud, Compass, Heart, House, MapPin, Navigation, Sparkles, Trees, Wine } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowUpRight, Cloud, Compass, Dices, Heart, House, MapPin, Navigation, Sparkles, Trees, Wine } from "lucide-react";
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -8,21 +7,13 @@ import { ThemeToggle } from "~/components/layouts/theme-toggle";
 import { Button } from "~/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 
+import { PackingList } from "./_components/packing-list";
 import { PlaceLink } from "./_components/place-link";
 import { Timeline } from "./_components/timeline";
+import { TrafficNote } from "./_components/traffic-note";
 import { allPlaces, days, home, mapHref, partyPlaces } from "./_components/trip-data";
+import { tripFont } from "./trip-font";
 import styles from "./trip.module.css";
-
-const tripFont = localFont({
-  src: [
-    { path: "../../../../assets/fonts/BeVietnamPro-Regular.ttf", weight: "400", style: "normal" },
-    { path: "../../../../assets/fonts/BeVietnamPro-Medium.ttf", weight: "500", style: "normal" },
-    { path: "../../../../assets/fonts/BeVietnamPro-SemiBold.ttf", weight: "600", style: "normal" },
-    { path: "../../../../assets/fonts/BeVietnamPro-Bold.ttf", weight: "700", style: "normal" },
-  ],
-  variable: "--font-trip",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "Đà Lạt | Chuyến đi của tụi mình",
@@ -34,7 +25,7 @@ const DalatPage = () => (
   <div className={`${styles.trip} ${tripFont.variable} dalat-page`} lang="vi">
     <header className="dalat-header">
       <Link href="/" className="dalat-brand" aria-label="Về trang chủ"><Trees size={25} strokeWidth={1.5} /><span>little trips<span>by Hậu & friends</span></span></Link>
-      <nav aria-label="Điều hướng chuyến đi"><a href="#lich-trinh">Lịch trình</a><a href="#nha-va-tiec">Nhà & tiệc</a><a href="#dia-diem">Địa điểm</a></nav>
+      <nav aria-label="Điều hướng chuyến đi"><a href="#lich-trinh">Lịch trình</a><a href="#nha-va-tiec">Nhà & tiệc</a><a href="#dia-diem">Địa điểm</a><Link href="/me/travel/dalat/games">Trò chơi</Link></nav>
       <ThemeToggle className="dalat-theme-toggle" />
     </header>
 
@@ -67,6 +58,8 @@ const DalatPage = () => (
         <a href={mapHref(home)} target="_blank" rel="noopener noreferrer"><span className="dalat-strip-icon"><House size={20} /></span><span><strong>Home ở khu Dinh 1</strong><small>12/2 Trần Quang Diệu</small></span><ArrowUpRight size={17} /></a>
       </div>
 
+      <TrafficNote />
+
       <section id="lich-trinh" className="dalat-itinerary">
         <div className="dalat-section-heading"><div><p className="dalat-eyebrow">THE ITINERARY</p><h2>Ba ngày ở <em>phố núi.</em></h2></div><p>Lịch có thể thong thả một chút. <br />Bấm tên địa điểm để mở Google Maps.</p></div>
         <div className="dalat-planner-layout">
@@ -79,13 +72,13 @@ const DalatPage = () => (
           <aside className="dalat-sidebar">
             <div className="dalat-home-note"><House size={24} strokeWidth={1.4} /><p className="dalat-eyebrow">CĂN CỨ CỦA TỤI MÌNH</p><h3>Một căn nhà,<br /><em>nhiều tiếng cười.</em></h3><p>{home.address}</p><a href={mapHref(home)} target="_blank" rel="noopener noreferrer">Chỉ đường về home <ArrowUpRight size={16} /></a><div className="dalat-home-times"><span>CHECK-IN<strong>Ngày 1 · 13:00</strong></span><span>CHECKOUT<strong>Ngày 3 · 10:30</strong></span></div></div>
             <div className="dalat-note"><Sparkles size={18} /><p><strong>Một chút linh hoạt</strong>Quán acoustic và trò chơi chiều ngày 2 để cả nhóm chọn. Các mục “gợi ý” chưa phải lịch đã chốt.</p></div>
-            <div className="dalat-mini-checklist"><p className="dalat-eyebrow">NHỚ MANG THEO</p>{["Áo khoác & áo mưa gọn", "Giày dễ đi, sạc dự phòng", "Giấy tờ, đồ dùng cá nhân", "Uno & một chiếc tâm hồn vui"].map((item) => <label key={item}><input type="checkbox" /><span className="dalat-checkbox"><Check size={12} /></span>{item}</label>)}</div>
+            <PackingList />
           </aside>
         </div>
       </section>
 
       <section id="nha-va-tiec" className="dalat-party-section">
-        <div className="dalat-party-intro"><span className="dalat-party-icon"><Wine size={28} strokeWidth={1.4} /></span><p className="dalat-eyebrow">A NIGHT TO REMEMBER</p><h2>Một tối ở nhà,<br /><em>vui cùng nhau.</em></h2><p>Ngày 2 · từ 18:00 tại homestay.<br />Đồ ăn ngon, nhạc mình thích và đủ mặt tụi mình.</p><a href={mapHref(home)} target="_blank" rel="noopener noreferrer">Về home bày tiệc <ArrowUpRight size={17} /></a></div>
+        <div className="dalat-party-intro"><span className="dalat-party-icon"><Wine size={28} strokeWidth={1.4} /></span><p className="dalat-eyebrow">A NIGHT TO REMEMBER</p><h2>Một tối ở nhà,<br /><em>vui cùng nhau.</em></h2><p>Ngày 2 · từ 18:00 tại homestay.<br />Đồ ăn ngon, nhạc mình thích và đủ mặt tụi mình.</p><a href={mapHref(home)} target="_blank" rel="noopener noreferrer">Về home bày tiệc <ArrowUpRight size={17} /></a><Link href="/me/travel/dalat/games" className="dalat-games-link"><Dices size={23} aria-hidden="true" /><span><strong>Tối nay, chơi gì đây?</strong><small>Luật 4 trò cho nhóm bạn</small></span><ArrowUpRight size={18} aria-hidden="true" /></Link></div>
         <div className="dalat-party-plan"><div className="dalat-takeaway"><h3>Đồ nhậu mang về <span>Gợi ý để chọn</span></h3>{partyPlaces.map((place) => <div key={place.id}><PlaceLink place={place} compact /><p>{place.note}</p></div>)}</div></div>
       </section>
 
