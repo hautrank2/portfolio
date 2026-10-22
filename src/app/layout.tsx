@@ -3,6 +3,7 @@ import { Nunito } from "next/font/google";
 import { ClickBurst } from "~/components/layouts/click-burst";
 import Footer from "~/components/layouts/footer";
 import Header from "~/components/layouts/header";
+import { SiteFrame } from "~/components/layouts/site-frame";
 import { ThemeProvider } from "~/components/layouts/theme-provider";
 import { profileData, titlePrefixData } from "~/data/site";
 import "./globals.css";
@@ -41,11 +42,13 @@ export default function RootLayout({
             aria-hidden
             className="pointer-events-none fixed inset-0 -z-10 print:hidden bg-[url(/svg/bg-gr.svg)] bg-[length:150vw_auto] bg-[-20vw_-60vh] bg-no-repeat opacity-30 dark:opacity-60"
           />
-          <Header />
-          <main className="pt-16 print:pt-0">{children}</main>
-          <Footer />
-          {/* Sparks on every click, site-wide. */}
-          <ClickBurst />
+          <SiteFrame
+            header={<Header />}
+            footer={<Footer />}
+            effects={<ClickBurst />}
+          >
+            {children}
+          </SiteFrame>
         </ThemeProvider>
       </body>
     </html>

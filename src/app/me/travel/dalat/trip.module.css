@@ -1,0 +1,284 @@
+.trip {
+  --background: oklch(0.975 0.012 295);
+  --foreground: oklch(0.3 0.06 290);
+  --card: oklch(0.998 0.003 295);
+  --card-foreground: var(--foreground);
+  --primary: oklch(0.49 0.17 295);
+  --primary-foreground: oklch(0.99 0.005 295);
+  --muted: oklch(0.94 0.025 295);
+  --muted-foreground: oklch(0.49 0.035 290);
+  --secondary: oklch(0.925 0.045 295);
+  --secondary-foreground: var(--foreground);
+  --accent: oklch(0.95 0.035 310);
+  --accent-foreground: var(--foreground);
+  --border: oklch(0.88 0.035 295);
+  --ring: var(--primary);
+  --input: var(--border);
+  --trip-rose: oklch(0.56 0.16 355);
+  --trip-haze: oklch(0.89 0.065 295);
+  --trip-party: oklch(0.94 0.035 330);
+  --trip-photo-ink: oklch(0.22 0.045 290);
+  --trip-photo-text: oklch(0.99 0.005 295);
+  --trip-shadow: color-mix(in oklch, var(--primary) 9%, transparent);
+  min-height: 100vh;
+  overflow-x: clip;
+  background: radial-gradient(ellipse at 95% 5%, var(--trip-haze), transparent 24rem), radial-gradient(ellipse at 0 22%, var(--trip-party), transparent 30rem), var(--background);
+  color: var(--foreground);
+  font-family: var(--font-trip), sans-serif;
+  font-size: 14px;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+}
+:global(.dark) .trip {
+  --background: oklch(0.19 0.035 285);
+  --foreground: oklch(0.94 0.018 295);
+  --card: oklch(0.235 0.04 285);
+  --primary: oklch(0.8 0.115 295);
+  --primary-foreground: oklch(0.2 0.055 290);
+  --muted: oklch(0.27 0.04 285);
+  --muted-foreground: oklch(0.74 0.03 295);
+  --secondary: oklch(0.3 0.065 290);
+  --accent: oklch(0.31 0.065 300);
+  --border: oklch(0.36 0.055 290);
+  --trip-rose: oklch(0.8 0.115 350);
+  --trip-haze: oklch(0.3 0.09 295);
+  --trip-party: oklch(0.275 0.055 320);
+  --trip-shadow: color-mix(in oklch, var(--trip-photo-ink) 30%, transparent);
+}
+.trip :global(h1), .trip :global(h2), .trip :global(h3), .trip :global(h4), .trip :global(button), .trip :global(input) { font-family: inherit; }
+.trip :global(em) { font-style: normal; color: var(--primary); }
+.trip :global(a) { text-decoration: none; }
+.trip :global(a:focus-visible), .trip :global(button:focus-visible), .trip :global(summary:focus-visible) { outline: 2px solid var(--ring); outline-offset: 5px; }
+.trip :global(section[id]) { scroll-margin-top: 30px; }
+.trip :global(.dalat-header) { width: min(1180px, calc(100% - 64px)); margin: auto; display: flex; align-items: center; justify-content: space-between; height: 100px; gap: 24px; }
+.trip :global(.dalat-brand) { display: flex; gap: 10px; align-items: center; color: var(--primary); }
+.trip :global(.dalat-brand > svg) { width: 42px; height: 42px; padding: 9px; background: var(--secondary); border-radius: 15px; }
+.trip :global(.dalat-brand > span) { font-size: 18px; font-weight: 600; letter-spacing: -.7px; line-height: 1.25; }
+.trip :global(.dalat-brand > span > span) { display: block; font-size: 9px; font-weight: 400; letter-spacing: .9px; color: var(--muted-foreground); margin-top: 5px; }
+.trip :global(.dalat-header nav) { display: flex; gap: 30px; padding: 11px 26px; border: 1px solid var(--border); border-radius: 100px; background: color-mix(in oklch, var(--card) 65%, transparent); font-size: 12px; }
+.trip :global(.dalat-header nav a:hover) { color: var(--primary); }
+.trip :global(.dalat-theme-toggle) { border: 1px solid var(--border); border-radius: 50%; background: var(--card); color: var(--primary); height: 42px; width: 42px; }
+.trip :global(.dalat-hero) { position: relative; width: min(1180px, calc(100% - 64px)); margin: 28px auto 64px; display: grid; grid-template-columns: 1.1fr 1fr; align-items: center; gap: 35px; }
+.trip :global(.dalat-hero-content) { position: relative; z-index: 1; padding-block: 35px; }
+.trip :global(.dalat-hero-kicker) { display: inline-flex; align-items: center; gap: 9px; border: 1px solid var(--border); border-radius: 100px; background: color-mix(in oklch, var(--card) 65%, transparent); padding: 8px 13px; color: var(--primary); font-size: 9px; letter-spacing: 1.2px; font-weight: 500; }
+.trip :global(.dalat-hero h1) { position: relative; width: fit-content; margin: 25px 0 24px; font-size: clamp(60px, 6.8vw, 90px); font-weight: 500; letter-spacing: -5px; line-height: 1.22; }
+.trip :global(.dalat-hero h1 em) { background: linear-gradient(110deg, var(--primary) 15%, var(--trip-rose)); background-clip: text; color: transparent; }
+.trip :global(.dalat-title-spark) { position: absolute; top: 5px; right: -50px; color: var(--trip-rose); font-size: 42px; font-weight: 400; }
+.trip :global(.dalat-hero-description) { font-size: 14px; color: var(--muted-foreground); line-height: 2; }
+.trip :global(.dalat-hero-actions) { display: flex; align-items: center; flex-wrap: wrap; gap: 20px; margin-top: 30px; }
+.trip :global(.dalat-hero-button) { border-radius: 100px; height: 50px; padding-inline: 23px; background: var(--primary); color: var(--primary-foreground); font-size: 12px; font-weight: 600; box-shadow: 0 9px 28px var(--trip-shadow); }
+.trip :global(.dalat-hero-button:hover) { background: color-mix(in oklch, var(--primary) 85%, var(--trip-rose)); }
+.trip :global(.dalat-hero-actions > span) { font-size: 9px; letter-spacing: 1.6px; color: var(--muted-foreground); }
+.trip :global(.dalat-hero-visual) { position: relative; padding: 15px 15px 15px 0; min-width: 0; }
+.trip :global(.dalat-photo-frame) { position: relative; height: 500px; border-radius: 240px 240px 40px 40px; overflow: hidden; border: 6px solid var(--card); box-shadow: 0 25px 70px var(--trip-shadow); }
+.trip :global(.dalat-hero-image) { object-fit: cover; object-position: 60% center; }
+.trip :global(.dalat-hero-shade) { position: absolute; inset: 0; background: linear-gradient(0deg, color-mix(in oklch, var(--trip-photo-ink) 80%, transparent), transparent 48%), linear-gradient(140deg, color-mix(in oklch, var(--trip-rose) 20%, transparent), transparent 65%); }
+.trip :global(.dalat-photo-caption) { position: absolute; bottom: 25px; left: 27px; right: 27px; display: flex; align-items: center; gap: 7px; font-size: 9px; letter-spacing: 1px; color: var(--trip-photo-text); }
+.trip :global(.dalat-photo-caption > span) { margin-left: auto; font-size: 8px; opacity: .75; }
+.trip :global(.dalat-floating-note) { position: absolute; bottom: 91px; left: -40px; z-index: 2; display: flex; gap: 13px; align-items: center; padding: 16px 19px; border: 1px solid var(--border); border-radius: 20px; background: color-mix(in oklch, var(--card) 87%, transparent); backdrop-filter: blur(18px); box-shadow: 0 12px 32px var(--trip-shadow); transform: rotate(-5deg); color: var(--primary); }
+.trip :global(.dalat-floating-note > span) { font-size: 11px; line-height: 1.8; color: var(--muted-foreground); }
+.trip :global(.dalat-floating-note strong) { font-weight: 500; color: var(--foreground); }
+.trip :global(.dalat-photo-orbit) { position: absolute; inset: 0; border: 1px solid var(--border); border-radius: 250px 250px 50px 50px; transform: rotate(5deg); z-index: 0; pointer-events: none; }
+.trip :global(.dalat-photo-star) { position: absolute; top: 4px; right: 4px; color: var(--primary); font-size: 64px; line-height: 1; transform: rotate(15deg); }
+.trip :global(.dalat-content) { width: min(1180px, calc(100% - 64px)); margin: auto; }
+.trip :global(.dalat-trip-strip) { display: grid; grid-template-columns: repeat(3, 1fr); gap: 13px; }
+.trip :global(.dalat-trip-strip > *) { display: flex; align-items: center; gap: 13px; padding: 20px; border-radius: 22px; border: 1px solid var(--border); background: color-mix(in oklch, var(--card) 70%, transparent); }
+.trip :global(.dalat-strip-icon) { display: grid; place-items: center; width: 40px; height: 40px; flex-shrink: 0; border-radius: 14px; background: var(--secondary); color: var(--primary); }
+.trip :global(.dalat-trip-strip strong) { font-size: 12px; display: block; font-weight: 600; }
+.trip :global(.dalat-trip-strip small) { display: block; font-size: 10px; color: var(--muted-foreground); margin-top: 4px; }
+.trip :global(.dalat-trip-strip > a > svg) { margin-left: auto; flex-shrink: 0; color: var(--primary); }
+.trip :global(.dalat-itinerary) { padding-top: 85px; }
+.trip :global(.dalat-section-heading) { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 30px; }
+.trip :global(.dalat-eyebrow) { color: var(--primary); font-size: 9px; font-weight: 600; letter-spacing: 2px; line-height: 1.8; }
+.trip :global(.dalat-section-heading h2), .trip :global(.dalat-party-intro h2) { font-size: clamp(28px, 3vw, 38px); line-height: 1.5; letter-spacing: -1.6px; font-weight: 500; margin-top: 8px; }
+.trip :global(.dalat-section-heading > p) { font-size: 11px; color: var(--muted-foreground); }
+.trip :global(.dalat-planner-layout) { display: grid; grid-template-columns: minmax(0, 1fr) 295px; gap: 32px; align-items: start; }
+.trip :global(.dalat-tabs) { min-width: 0; }
+.trip :global(.dalat-day-tabs) { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); height: auto; width: 100%; border: 1px solid var(--border); background: color-mix(in oklch, var(--background) 90%, transparent); backdrop-filter: blur(18px); border-radius: 22px; padding: 6px; gap: 5px; position: sticky; top: 10px; z-index: 10; box-shadow: 0 8px 30px var(--trip-shadow); }
+.trip :global(.dalat-day-tab) { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; padding: 13px 16px; border-radius: 16px; min-height: 72px; white-space: normal; color: var(--muted-foreground); }
+.trip :global(.dalat-day-tab > span) { font-size: 9px; letter-spacing: 1.4px; }
+.trip :global(.dalat-day-tab > strong) { font-size: 11px; font-weight: 500; }
+.trip :global(.dalat-day-tab[data-state="active"]) { background: var(--primary); color: var(--primary-foreground); box-shadow: 0 4px 14px var(--trip-shadow); }
+.trip :global(.dalat-tab-content) { margin-top: 0; }
+.trip :global(.dalat-day-heading) { display: flex; gap: 18px; align-items: center; padding: 30px 4px; }
+.trip :global(.dalat-day-heading > div) { flex: 1; min-width: 0; }
+.trip :global(.dalat-day-heading h3) { font-size: 24px; font-weight: 500; line-height: 1.65; letter-spacing: -.8px; max-width: 510px; margin: 7px 0 10px; }
+.trip :global(.dalat-day-heading p:last-child) { font-size: 12px; color: var(--muted-foreground); }
+.trip :global(.dalat-day-number) { font-size: 76px; font-weight: 500; line-height: 1.2; letter-spacing: -5px; color: var(--border); align-self: flex-start; }
+.trip :global(.dalat-timeline) { list-style: none; padding: 0; }
+.trip :global(.dalat-event) { position: relative; padding: 0 0 17px 46px; }
+.trip :global(.dalat-event::before) { content: ""; position: absolute; width: 1px; left: 16px; top: 36px; bottom: -1px; background: linear-gradient(var(--border), var(--trip-haze)); }
+.trip :global(.dalat-event:last-child::before) { display: none; }
+.trip :global(.dalat-event-marker) { position: absolute; left: 0; top: 19px; display: grid; place-items: center; width: 33px; height: 33px; background: var(--secondary); color: var(--primary); border-radius: 12px; border: 1px solid var(--border); z-index: 1; }
+.trip :global(.dalat-event-body) { border: 1px solid var(--border); border-radius: 23px; padding: 21px; background: color-mix(in oklch, var(--card) 75%, transparent); }
+.trip :global(.dalat-event-meta) { display: flex; flex-wrap: wrap; gap: 7px 12px; align-items: center; min-height: 25px; }
+.trip :global(.dalat-event-meta > span:first-child) { font-size: 11px; font-weight: 600; color: var(--primary); font-variant-numeric: tabular-nums; letter-spacing: .2px; }
+.trip :global(.dalat-event-tag) { display: inline-block; padding: 3px 9px; background: var(--muted); color: var(--muted-foreground); border-radius: 100px; font-size: 9px; font-weight: 400; line-height: 1.6; }
+.trip :global(.dalat-event h4) { font-size: 17px; font-weight: 600; margin: 8px 0; line-height: 1.65; letter-spacing: -.4px; }
+.trip :global(.dalat-event-body > p) { color: var(--muted-foreground); font-size: 12px; line-height: 1.85; }
+.trip :global(.dalat-event-places) { display: grid; gap: 8px; margin-top: 16px; }
+.trip :global(.dalat-place) { display: flex; align-items: center; gap: 11px; padding: 17px 14px; background: var(--card); border: 1px solid var(--border); border-radius: 18px; transition: border-color .2s, background .2s, transform .2s; min-width: 0; }
+.trip :global(.dalat-place:hover) { background: var(--accent); border-color: var(--primary); transform: translateY(-2px); }
+.trip :global(.dalat-place-pin) { display: grid; place-items: center; flex-shrink: 0; width: 31px; height: 34px; border-radius: 11px; color: var(--primary); background: var(--muted); }
+.trip :global(.dalat-place-copy) { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1; }
+.trip :global(.dalat-place-copy strong) { font-size: 11px; line-height: 1.7; font-weight: 500; overflow-wrap: anywhere; }
+.trip :global(.dalat-place-copy > span) { font-size: 10px; color: var(--muted-foreground); line-height: 1.7; }
+.trip :global(.dalat-place-arrow) { display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--primary); flex-shrink: 0; }
+.trip :global(.dalat-place-arrow > span) { font-size: 8px; }
+.trip :global(.dalat-place-compact) { padding: 11px; gap: 8px; background: color-mix(in oklch, var(--muted) 55%, var(--card)); border-color: transparent; border-radius: 14px; }
+.trip :global(.dalat-game-details) { border-top: 1px solid var(--border); margin-top: 13px; font-size: 11px; }
+.trip :global(.dalat-game-details summary) { cursor: pointer; display: flex; justify-content: space-between; gap: 10px; padding-top: 12px; color: var(--primary); font-weight: 500; list-style: none; }
+.trip :global(.dalat-game-details summary::-webkit-details-marker) { display: none; }
+.trip :global(.dalat-game-details[open] summary svg) { transform: rotate(180deg); }
+.trip :global(.dalat-game-details p) { color: var(--muted-foreground); padding: 10px 0 5px; }
+.trip :global(.dalat-game-details strong) { display: block; font-weight: 500; color: var(--foreground); margin-bottom: 4px; }
+.trip :global(.dalat-event-party .dalat-event-body) { background: linear-gradient(140deg, var(--secondary), var(--trip-party)); }
+.trip :global(.dalat-day-end) { display: flex; align-items: center; justify-content: center; gap: 13px; color: var(--muted-foreground); font-size: 11px; padding: 20px 0; text-align: center; }
+.trip :global(.dalat-day-end > span) { height: 1px; width: 25px; background: var(--border); }
+.trip :global(.dalat-sidebar) { position: sticky; top: 30px; display: grid; gap: 24px; }
+.trip :global(.dalat-home-note) { padding: 29px 25px 24px; border: 1px solid var(--border); background: linear-gradient(145deg, var(--secondary), color-mix(in oklch, var(--card) 70%, var(--trip-party))); border-radius: 26px; }
+.trip :global(.dalat-home-note > svg) { color: var(--primary); margin-bottom: 22px; }
+.trip :global(.dalat-home-note h3) { font-size: 24px; font-weight: 500; line-height: 1.65; margin: 12px 0 17px; letter-spacing: -.8px; }
+.trip :global(.dalat-home-note > p:not(.dalat-eyebrow)) { font-size: 12px; color: var(--muted-foreground); }
+.trip :global(.dalat-home-note > a) { display: flex; align-items: center; gap: 12px; margin-top: 20px; font-size: 11px; font-weight: 600; color: var(--primary); }
+.trip :global(.dalat-home-times) { display: grid; grid-template-columns: 1fr 1fr; margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--border); gap: 10px; }
+.trip :global(.dalat-home-times span) { font-size: 8px; letter-spacing: 1px; color: var(--muted-foreground); }
+.trip :global(.dalat-home-times strong) { display: block; font-weight: 500; margin-top: 5px; font-size: 11px; letter-spacing: 0; color: var(--foreground); }
+.trip :global(.dalat-note) { display: flex; gap: 11px; padding: 0 10px; color: var(--muted-foreground); font-size: 11px; }
+.trip :global(.dalat-note > svg) { flex-shrink: 0; margin-top: 3px; color: var(--trip-rose); }
+.trip :global(.dalat-note strong) { display: block; font-size: 12px; font-weight: 500; color: var(--foreground); margin-bottom: 6px; }
+.trip :global(.dalat-mini-checklist) { border: 1px solid var(--border); border-radius: 24px; background: var(--card); padding: 22px; }
+.trip :global(.dalat-mini-checklist > p) { margin-bottom: 12px; }
+.trip :global(.dalat-mini-checklist label) { display: flex; align-items: center; gap: 10px; min-height: 42px; position: relative; font-size: 11px; color: var(--muted-foreground); cursor: pointer; }
+.trip :global(.dalat-mini-checklist input) { position: absolute; opacity: 0; width: 20px; height: 20px; }
+.trip :global(.dalat-checkbox) { display: grid; place-items: center; flex-shrink: 0; width: 18px; height: 18px; border: 1px solid var(--border); border-radius: 6px; color: transparent; }
+.trip :global(.dalat-mini-checklist input:checked + span) { background: var(--primary); color: var(--primary-foreground); border-color: var(--primary); }
+.trip :global(.dalat-mini-checklist input:focus-visible + span) { outline: 2px solid var(--ring); outline-offset: 3px; }
+.trip :global(.dalat-party-section) { position: relative; margin-top: 65px; padding: 44px; background: radial-gradient(ellipse at 0 0, var(--secondary), transparent 65%), var(--trip-party); border: 1px solid var(--border); border-radius: 35px; display: grid; grid-template-columns: 1fr 1.1fr; gap: 45px; }
+.trip :global(.dalat-party-icon) { display: grid; place-items: center; width: 56px; height: 56px; background: color-mix(in oklch, var(--card) 60%, transparent); border: 1px solid var(--border); color: var(--trip-rose); border-radius: 19px; margin-bottom: 24px; transform: rotate(-8deg); }
+.trip :global(.dalat-party-intro h2) { font-size: 32px; }
+.trip :global(.dalat-party-intro > p:not(.dalat-eyebrow)) { margin-top: 20px; color: var(--muted-foreground); font-size: 12px; line-height: 2; }
+.trip :global(.dalat-party-intro > a) { display: inline-flex; align-items: center; gap: 12px; font-size: 11px; font-weight: 600; margin-top: 25px; color: var(--primary); }
+.trip :global(.dalat-takeaway > h3) { font-size: 13px; font-weight: 600; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.trip :global(.dalat-takeaway > h3 > span) { color: var(--muted-foreground); font-size: 9px; font-weight: 400; }
+.trip :global(.dalat-takeaway > div + div) { margin-top: 18px; }
+.trip :global(.dalat-takeaway .dalat-place) { background: color-mix(in oklch, var(--card) 85%, transparent); border: 1px solid var(--border); }
+.trip :global(.dalat-takeaway > div > p) { color: var(--muted-foreground); font-size: 10px; margin-top: 8px; padding-inline: 5px; }
+.trip :global(.dalat-map-section) { padding-top: 85px; }
+.trip :global(.dalat-map-caption) { display: inline-flex; align-items: center; gap: 8px; color: var(--primary); font-size: 10px; white-space: nowrap; }
+.trip :global(.dalat-places-note) { font-size: 11px; color: var(--muted-foreground); margin: -12px 0 25px; }
+.trip :global(.dalat-all-places) { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.trip :global(.dalat-mobile-break) { display: none; }
+.trip :global(.dalat-footer) { text-align: center; padding-top: 55px; margin-top: 70px; border-top: 1px solid var(--border); }
+.trip :global(.dalat-footer > div:first-child) { display: flex; align-items: center; flex-direction: column; gap: 18px; color: var(--primary); }
+.trip :global(.dalat-footer > div:first-child > span) { display: flex; align-items: center; gap: 6px; font-size: 14px; flex-wrap: wrap; justify-content: center; }
+.trip :global(.dalat-footer > p) { font-size: 10px; color: var(--muted-foreground); margin-top: 14px; }
+.trip :global(.dalat-footer-bottom) { display: flex; justify-content: space-between; gap: 15px; margin-top: 45px; padding-block: 20px; border-top: 1px solid var(--border); font-size: 9px; color: var(--muted-foreground); }
+.trip :global(.dalat-footer-bottom a) { display: flex; align-items: center; gap: 5px; }
+.trip :global(.dalat-mobile-nav) { display: none; }
+@media (max-width: 1050px) {
+  .trip :global(.dalat-hero h1) { font-size: 66px; letter-spacing: -3.5px; }
+  .trip :global(.dalat-photo-frame) { height: 450px; }
+  .trip :global(.dalat-planner-layout) { grid-template-columns: minmax(0, 1fr) 260px; gap: 24px; }
+  .trip :global(.dalat-all-places) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .trip :global(.dalat-trip-strip > *) { padding: 16px 12px; gap: 10px; }
+  .trip :global(.dalat-trip-strip small) { font-size: 9px; }
+  .trip :global(.dalat-party-section) { padding: 32px; gap: 28px; }
+}
+@media (max-width: 760px) {
+  .trip { padding-bottom: calc(95px + env(safe-area-inset-bottom)); background: radial-gradient(ellipse at 100% 1%, var(--trip-haze), transparent 33rem), var(--background); }
+  .trip :global(.dalat-header) { width: calc(100% - 40px); height: 80px; }
+  .trip :global(.dalat-brand > span) { font-size: 17px; }
+  .trip :global(.dalat-header nav) { display: none; }
+  .trip :global(.dalat-hero) { width: calc(100% - 40px); margin: 13px auto 35px; grid-template-columns: 1fr; gap: 25px; }
+  .trip :global(.dalat-hero-content) { padding: 0; }
+  .trip :global(.dalat-hero-kicker) { font-size: 8px; letter-spacing: .9px; padding: 7px 11px; }
+  .trip :global(.dalat-hero h1) { font-size: clamp(55px, 12vw, 78px); letter-spacing: -3.2px; margin: 20px 0 18px; line-height: 1.25; }
+  .trip :global(.dalat-title-spark) { font-size: 34px; top: 9px; right: -40px; }
+  .trip :global(.dalat-hero-description) { font-size: 12px; line-height: 2; }
+  .trip :global(.dalat-hero-actions) { gap: 17px; margin-top: 23px; }
+  .trip :global(.dalat-hero-button) { height: 45px; padding-inline: 18px; font-size: 11px; }
+  .trip :global(.dalat-hero-actions > span) { font-size: 8px; letter-spacing: 1px; }
+  .trip :global(.dalat-hero-visual) { padding: 8px 10px; margin-inline: 8px; }
+  .trip :global(.dalat-photo-frame) { height: 300px; border-radius: 170px 170px 30px 30px; border-width: 4px; }
+  .trip :global(.dalat-hero-image) { object-position: 58% 48%; }
+  .trip :global(.dalat-photo-orbit) { border-radius: 180px 180px 40px 40px; transform: rotate(4deg); }
+  .trip :global(.dalat-floating-note) { bottom: 54px; left: -11px; padding: 11px 14px; border-radius: 16px; gap: 10px; }
+  .trip :global(.dalat-floating-note > span) { font-size: 10px; }
+  .trip :global(.dalat-photo-star) { font-size: 49px; top: 8px; right: 8px; }
+  .trip :global(.dalat-photo-caption) { bottom: 19px; left: 18px; right: 18px; font-size: 8px; letter-spacing: .5px; }
+  .trip :global(.dalat-photo-caption > span) { font-size: 7px; }
+  .trip :global(.dalat-content) { width: calc(100% - 36px); }
+  .trip :global(.dalat-trip-strip) { grid-template-columns: 1fr 1fr; gap: 9px; }
+  .trip :global(.dalat-trip-strip > *) { padding: 14px 12px; gap: 9px; border-radius: 18px; }
+  .trip :global(.dalat-trip-strip > a) { grid-column: 1 / -1; }
+  .trip :global(.dalat-trip-strip strong) { font-size: 10px; }
+  .trip :global(.dalat-trip-strip small) { font-size: 9px; line-height: 1.8; }
+  .trip :global(.dalat-strip-icon) { width: 30px; height: 34px; border-radius: 11px; }
+  .trip :global(.dalat-strip-icon svg) { width: 17px; }
+  .trip :global(.dalat-itinerary) { padding-top: 50px; }
+  .trip :global(.dalat-section-heading) { align-items: start; flex-direction: column; gap: 13px; margin-bottom: 24px; padding-inline: 4px; }
+  .trip :global(.dalat-section-heading h2) { font-size: 29px; letter-spacing: -1.3px; }
+  .trip :global(.dalat-section-heading > p) { font-size: 11px; }
+  .trip :global(.dalat-section-heading > p br) { display: none; }
+  .trip :global(.dalat-planner-layout) { display: flex; flex-direction: column; gap: 30px; }
+  .trip :global(.dalat-tabs) { width: 100%; }
+  .trip :global(.dalat-day-tabs) { top: 6px; padding: 5px; gap: 3px; border-radius: 20px; }
+  .trip :global(.dalat-day-tab) { min-height: 68px; padding: 11px 9px; border-radius: 15px; }
+  .trip :global(.dalat-day-tab > span) { font-size: 9px; letter-spacing: 1px; }
+  .trip :global(.dalat-day-tab > strong) { font-size: 10px; text-align: left; line-height: 1.7; }
+  .trip :global(.dalat-day-heading) { padding: 26px 4px; gap: 10px; }
+  .trip :global(.dalat-day-heading h3) { font-size: 22px; line-height: 1.65; }
+  .trip :global(.dalat-day-heading p:last-child) { font-size: 12px; }
+  .trip :global(.dalat-day-number) { font-size: 53px; letter-spacing: -3px; }
+  .trip :global(.dalat-event) { padding-left: 34px; padding-bottom: 14px; }
+  .trip :global(.dalat-event-marker) { width: 27px; height: 30px; top: 17px; border-radius: 10px; }
+  .trip :global(.dalat-event-marker svg) { width: 14px; }
+  .trip :global(.dalat-event::before) { left: 13px; top: 40px; }
+  .trip :global(.dalat-event-body) { border-radius: 20px; padding: 17px 14px; }
+  .trip :global(.dalat-event h4) { font-size: 15px; line-height: 1.8; }
+  .trip :global(.dalat-event-body > p) { font-size: 12px; line-height: 1.95; }
+  .trip :global(.dalat-event-meta) { gap: 6px 8px; }
+  .trip :global(.dalat-event-meta > span:first-child) { font-size: 10px; }
+  .trip :global(.dalat-event-tag) { font-size: 9px; }
+  .trip :global(.dalat-place) { padding: 14px 12px; gap: 9px; }
+  .trip :global(.dalat-place-compact) { padding: 10px 8px; gap: 6px; }
+  .trip :global(.dalat-place-pin) { width: 27px; height: 31px; }
+  .trip :global(.dalat-place-copy strong) { font-size: 12px; }
+  .trip :global(.dalat-place-compact .dalat-place-copy strong) { font-size: 11px; }
+  .trip :global(.dalat-place-copy > span) { font-size: 10px; }
+  .trip :global(.dalat-sidebar) { position: static; width: 100%; gap: 22px; }
+  .trip :global(.dalat-home-note) { padding: 26px; }
+  .trip :global(.dalat-home-note h3 br) { display: none; }
+  .trip :global(.dalat-home-note > svg) { margin-bottom: 14px; }
+  .trip :global(.dalat-mini-checklist) { display: grid; grid-template-columns: 1fr 1fr; gap: 0 13px; padding: 22px 18px; }
+  .trip :global(.dalat-mini-checklist > p) { grid-column: 1 / -1; }
+  .trip :global(.dalat-mini-checklist label) { font-size: 11px; line-height: 1.7; }
+  .trip :global(.dalat-party-section) { margin-top: 45px; padding: 28px 20px; border-radius: 27px; grid-template-columns: 1fr; gap: 30px; }
+  .trip :global(.dalat-party-intro h2) { font-size: 28px; }
+  .trip :global(.dalat-party-icon) { width: 47px; height: 47px; margin-bottom: 20px; }
+  .trip :global(.dalat-party-intro > p:not(.dalat-eyebrow)) { margin-top: 15px; }
+  .trip :global(.dalat-party-intro > a) { margin-top: 18px; }
+  .trip :global(.dalat-map-section) { padding-top: 55px; }
+  .trip :global(.dalat-all-places) { grid-template-columns: 1fr; gap: 10px; }
+  .trip :global(.dalat-places-note) { margin-top: -5px; padding-inline: 4px; }
+  .trip :global(.dalat-mobile-break) { display: block; }
+  .trip :global(.dalat-footer) { padding-top: 35px; margin-top: 45px; }
+  .trip :global(.dalat-footer > div:first-child > span) { font-size: 12px; line-height: 2; }
+  .trip :global(.dalat-footer-bottom) { font-size: 8px; margin-top: 30px; }
+  .trip :global(.dalat-mobile-nav) { display: grid; grid-template-columns: repeat(4, 1fr); position: fixed; bottom: calc(12px + env(safe-area-inset-bottom)); left: 16px; right: 16px; z-index: 30; background: color-mix(in oklch, var(--card) 88%, transparent); backdrop-filter: blur(20px); border: 1px solid var(--border); border-radius: 25px; box-shadow: 0 8px 35px var(--trip-shadow); padding: 8px; }
+  .trip :global(.dalat-mobile-nav > a) { display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 4px; min-height: 45px; color: var(--primary); font-size: 9px; font-weight: 500; border-radius: 17px; }
+  .trip :global(.dalat-mobile-nav > a:first-child) { background: var(--secondary); }
+  .trip :global(.dalat-mobile-nav > a:hover) { background: var(--muted); }
+}
+@media (max-width: 380px) {
+  .trip :global(.dalat-hero h1) { font-size: 52px; }
+  .trip :global(.dalat-hero-actions) { gap: 12px; }
+  .trip :global(.dalat-hero-actions > span) { font-size: 7px; }
+  .trip :global(.dalat-photo-caption > span) { display: none; }
+  .trip :global(.dalat-trip-strip > *) { padding: 12px 9px; gap: 7px; }
+  .trip :global(.dalat-trip-strip small) { font-size: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .trip :global(*), .trip :global(*::before), .trip :global(*::after) { scroll-behavior: auto; transition: none; }
+}
