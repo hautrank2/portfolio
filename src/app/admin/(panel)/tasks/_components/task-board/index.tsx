@@ -1,6 +1,6 @@
 "use client";
 
-import { Clock, Plus } from "lucide-react";
+import { Braces, Clock, Plus } from "lucide-react";
 import { DataTableShell } from "~/app/admin/_components/data-table-shell";
 import { LabelChip } from "~/app/admin/_components/label-chip";
 import { RowActions } from "~/app/admin/_components/row-actions";
@@ -40,6 +40,7 @@ import { cn } from "~/lib/utils";
 import type { TaskPriorityType, TaskStatusType } from "~/types";
 import { LogFormDialog } from "~/app/admin/(panel)/logtime/_components/log-form";
 import { TaskFormDialog } from "../task-form";
+import { TaskImportDialog } from "../task-import";
 import { ALL_PROJECTS, useTaskBoard } from "./hook";
 import type { TaskBoardProps } from "./type";
 
@@ -72,6 +73,8 @@ export const TaskBoard = (props: TaskBoardProps) => {
     listError,
     selection,
     selectedJson,
+    importOpen,
+    setImportOpen,
     logDialog,
     handleLogtime,
     statusOptions,
@@ -138,10 +141,16 @@ export const TaskBoard = (props: TaskBoardProps) => {
           )}
         </div>
 
-        <Button onClick={() => openForm(null)}>
-          <Plus />
-          Add task
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={() => setImportOpen(true)}>
+            <Braces />
+            Import JSON
+          </Button>
+          <Button onClick={() => openForm(null)}>
+            <Plus />
+            Add task
+          </Button>
+        </div>
       </div>
 
       {listError && (
@@ -291,6 +300,12 @@ export const TaskBoard = (props: TaskBoardProps) => {
         projects={props.projects}
         tags={props.tags}
         categories={props.categories}
+      />
+
+      <TaskImportDialog
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        defaultProjectId={filter.projectId}
       />
 
       <LogFormDialog

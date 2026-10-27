@@ -125,12 +125,16 @@ const toFilter = ({ status, projectId }: TaskFilterModel): Filter<TaskDoc> => {
   };
 };
 
+/** Without a status filter, finished tasks stay out — the DONE tab shows them. */
 export const listTasksPage = async (
   query: PageQueryModel & TaskFilterModel
 ): Promise<PageModel<TaskModel>> => {
   const collection = await getCollection();
+  const filter: Filter<TaskDoc> = query.status
+    ? toFilter(query)
+    : { ...toFilter(query), status: { $ne: "DONE" } };
   const [{ docs, total }, labels] = await Promise.all([
-    findPage(collection, toFilter(query), { createdAt: -1 }, query),
+    findPage(collection, filter, { createdAt: -1 }, query),
     loadLabels(),
   ]);
   return {
@@ -165,17 +169,28 @@ export const countTasksByStatus = async (
   return counts;
 };
 
+const toNewDoc = (input: TaskInputModel, now: Date): TaskDoc => ({
+  ...toFields(input),
+  completedAt: input.status === "DONE" ? now : undefined,
+  createdAt: now,
+  updatedAt: now,
+});
+
 export const createTask = async (input: TaskInputModel): Promise<TaskModel> => {
   const collection = await getCollection();
-  const now = new Date();
-  const doc: TaskDoc = {
-    ...toFields(input),
-    completedAt: input.status === "DONE" ? now : undefined,
-    createdAt: now,
-    updatedAt: now,
-  };
+  const doc = toNewDoc(input, new Date());
   const { insertedId } = await collection.insertOne(doc);
   return toModel({ ...doc, _id: insertedId }, await loadLabels());
+};
+
+/** Several tasks in one write — the JSON import on the tasks page. */
+export const createTasks = async (inputs: TaskInputModel[]): Promise<TaskModel[]> => {
+  const collection = await getCollection();
+  const now = new Date();
+  const docs = inputs.map((input) => toNewDoc(input, now));
+  const { insertedIds } = await collection.insertMany(docs);
+  const labels = await loadLabels();
+  return docs.map((doc, index) => toModel({ ...doc, _id: insertedIds[index] }, labels));
 };
 
 export const updateTask = async (

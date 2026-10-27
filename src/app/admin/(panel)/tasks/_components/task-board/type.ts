@@ -23,7 +23,7 @@ export type TaskBoardProps = {
 export type UseTaskBoardProps = TaskBoardProps & {};
 
 export type TaskStatusOption = {
-  /** `null` is "All". */
+  /** `null` is "Not done" — every status but DONE. */
   value: TaskStatusType | null;
   label: string;
   /** `#rrggbb` of the status; "All" has none. */

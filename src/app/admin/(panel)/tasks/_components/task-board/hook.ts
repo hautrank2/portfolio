@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   taskStatusColorData,
   taskStatusData,
@@ -60,6 +61,7 @@ export const useTaskBoard = ({
   projects,
 }: UseTaskBoardProps) => {
   const { setParams } = useQueryParams();
+  const [importOpen, setImportOpen] = useState(false);
   const selection = useRowSelection(tasks.items);
   const { handleReplace, ...dialog } = useResourceDialog<
     TaskModel,
@@ -117,10 +119,13 @@ export const useTaskBoard = ({
   };
 
   const statusOptions: TaskStatusOption[] = [
+    // No status filter lists everything except DONE, so the count says the same.
     {
       value: null,
-      label: "All",
-      count: taskStatusData.reduce((sum, status) => sum + statusCounts[status], 0),
+      label: "Not done",
+      count: taskStatusData
+        .filter((status) => status !== "DONE")
+        .reduce((sum, status) => sum + statusCounts[status], 0),
     },
     ...taskStatusData.map((status) => ({
       value: status,
@@ -149,6 +154,8 @@ export const useTaskBoard = ({
     ...dialog,
     selection,
     selectedJson,
+    importOpen,
+    setImportOpen,
     logDialog,
     handleLogtime,
     statusOptions,
