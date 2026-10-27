@@ -72,6 +72,7 @@ const fetchRepoLines = async (fullName: string, handle: string) => {
 export const getGithubOverview = async (): Promise<GithubOverviewModel> => {
   const handle = profileData.handle;
 
+  console.log("handle", handle);
   const [reposResult, prResult, commentResult] = await Promise.all([
     github.get<GithubRepoResponse[]>(`/users/${handle}/repos`, {
       params: { per_page: 100, type: "owner", sort: "pushed" },

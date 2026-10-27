@@ -60,6 +60,19 @@ const GamesPage = () => (
         </div>
       </section>
 
+      <Link href="/me/travel/dalat/games/9-la-bai" className={styles.newGame}><span><Dices size={25} /><span><strong>9 lá bài · Ai sẽ nhận phạt?</strong><small>Chọn thẻ, đố showbiz, đố mẹo, câu hỏi bựa và kiến thức dễ cùng hội bạn.</small></span></span><span>Chơi ngay <ArrowUpRight size={18} /></span></Link>
+
+
+      <Link href="/me/travel/dalat/games/5-cau-5-ly" className={styles.newGame}><span><Sparkles size={25} /><span><strong>5 câu · Mấy ly đây?</strong><small>Chọn chủ đề, trả lời 5 câu. Sai bao nhiêu câu, uống bấy nhiêu ly.</small></span></span><span>Chơi ngay <ArrowUpRight size={18} /></span></Link>
+
+      <Link href="/me/travel/dalat/games/boc-bai" className={styles.newGame}><span><Dices size={25} /><span><strong>Bốc bài · Thật hay làm?</strong><small>88 lá nói thật, thử thách và drinking. Bốc ngẫu nhiên, lần lượt cả hội.</small></span></span><span>Chơi ngay <ArrowUpRight size={18} /></span></Link>
+
+      <Link href="/me/travel/dalat/games/bi-mat-kho-noi" className={styles.newGame}><span><MessageCircle size={25} /><span><strong>Bí mật khó nói · Nói hay uống?</strong><small>60 câu về bản thân và những chuyện chưa kể. Trả lời thật lòng hoặc uống để qua lượt.</small></span></span><span>Chơi ngay <ArrowUpRight size={18} /></span></Link>
+
+      <Link href="/me/travel/dalat/games/xoay-vong" className={styles.newGame}><span><Users size={25} /><span><strong>Xoay vòng · Bí là uống!</strong><small>Mỗi người nói một đáp án theo chủ đề. Bí, sai hoặc trùng thì nhận 1 ngụm.</small></span></span><span>Chơi ngay <ArrowUpRight size={18} /></span></Link>
+
+      <Link href="/me/travel/dalat/games/hai-dua-minh" className={styles.newGame}><span><MessageCircle size={25} /><span><strong>Hai đứa mình · Dành cho cặp đôi</strong><small>48 lá đoán ý, chia sẻ và thử thách tình cảm. Chỉ hai người yêu nhau.</small></span></span><span>Chơi ngay <ArrowUpRight size={18} /></span></Link>
+
       <nav className={styles.gameMenu} aria-label="Chọn luật trò chơi">
         {gameMenu.map(({ id, name, subtitle, Icon }, index) => <a href={`#${id}`} key={id}><span className={styles.menuIcon}><Icon size={21} strokeWidth={1.4} /></span><span><small>0{index + 1} / {subtitle}</small><strong>{name}</strong></span><ArrowDown size={15} /></a>)}
       </nav>

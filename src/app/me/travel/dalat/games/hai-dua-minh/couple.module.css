@@ -1,0 +1,34 @@
+.page button:disabled { opacity: .45; cursor: not-allowed; }
+.twoNames { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.length { display: flex; flex-wrap: wrap; gap: 12px; border: 0; padding: 0; margin: 24px 0; }
+.length legend { font-size: 20px; font-weight: 600; margin-bottom: 12px; }
+.length label { display: flex; align-items: center; gap: 8px; font-size: 20px; padding: 12px 20px; border: 2px solid var(--border); border-radius: 14px; cursor: pointer; background: var(--card); }
+.length .chosen { border-color: var(--trip-rose); background: var(--trip-party); }
+.length input { width: 18px; height: 18px; accent-color: var(--trip-rose); }
+.categories { display: flex; flex-wrap: wrap; gap: 12px; margin: 20px 0; }
+.categories span { font-size: 18px; padding: 9px 14px; border-radius: 30px; background: var(--trip-party); border: 1px solid var(--border); }
+.note { color: var(--muted-foreground); font-size: 18px !important; margin: 22px 0; }
+.loveDeck { background: radial-gradient(ellipse at 25% 0,#cf729b,transparent 65%),repeating-linear-gradient(45deg,transparent,transparent 18px,rgb(255 255 255 / .025) 18px,rgb(255 255 255 / .025) 20px),#752f63; border-color: #f7d4df; }
+.loveFace { --card-color: var(--trip-rose); }
+.actions { display: flex; flex-wrap: wrap; gap: 14px; }
+.pairScore { display: flex; align-items: center; gap: 12px; color: var(--trip-rose); margin: 22px 0; }
+.pairScore strong { font-size: 42px; }
+.pairScore span { font-size: 18px; }
+.outcome > p { font-size: 27px; color: var(--trip-rose); margin-bottom: 24px; }
+.total { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; color: var(--trip-rose); margin: 25px 0; }
+.total > svg { width: 55px; height: 55px; }
+.total strong { font-size: 90px; line-height: 1.2; }
+.total span { font-size: 27px; }
+.stats { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 15px; margin: 25px 0; }
+.stats > div { padding: 22px; border: 1px solid var(--border); background: var(--card); border-radius: 20px; }
+.stats strong { display: block; font-size: 38px; color: var(--primary); }
+.stats span { font-size: 18px; }
+@media(max-width:700px) {
+ .twoNames, .stats { grid-template-columns: 1fr; }
+ .categories { gap: 8px; }
+ .categories span { font-size: 15px; }
+ .note { font-size: 16px !important; }
+ .actions { flex-direction: column; }
+ .outcome > p { font-size: 22px; }
+ .total strong { font-size: 70px; }
+}

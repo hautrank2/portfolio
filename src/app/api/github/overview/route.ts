@@ -7,10 +7,14 @@ export async function GET() {
   if (denied) return denied;
 
   try {
-    return Response.json(await getGithubOverview());
+    const githubRes = await getGithubOverview();
+    console.log("githubRese", githubRes);
+    return Response.json(githubRes);
   } catch (error) {
     // GitHub down, rate-limited, or unreachable — not a client mistake.
-    const message = axios.isAxiosError(error) ? error.message : "Failed to reach GitHub.";
+    const message = axios.isAxiosError(error)
+      ? error.message
+      : "Failed to reach GitHub.";
     return jsonError(message, 502);
   }
 }

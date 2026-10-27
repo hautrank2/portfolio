@@ -1,0 +1,118 @@
+export type CardKind = "truth" | "dare" | "drink" | "choice";
+export type PartyCard = { id: string; kind: CardKind; text: string; bold?: boolean; truth?: string; dare?: string };
+export const kinds: Record<CardKind, { name: string; icon: string; subtitle: string }> = {
+  truth: { name: "Nói thật", icon: "🤫", subtitle: "Thật lòng một chút, thân nhau thêm chút" },
+  dare: { name: "Dám làm", icon: "🤡", subtitle: "Sân khấu này là của bạn" },
+  drink: { name: "Drinking", icon: "🥂", subtitle: "Một ngụm, một câu chuyện" },
+  choice: { name: "Thật hay làm?", icon: "😈", subtitle: "Tự chọn số phận của mình" },
+};
+const truths = [
+  "Lần gần nhất bạn giả vờ bận để khỏi đi chơi là khi nào?",
+  "Trong nhóm, ai có khả năng lạc đường cao nhất? Vì sao?",
+  "Kể một lần bạn nhắn nhầm người mà muốn độn thổ.",
+  "Ấn tượng đầu tiên của bạn về người ngồi bên trái là gì?",
+  "Món đồ vô dụng nhất bạn từng mua lúc hứng lên là gì?",
+  "Nếu phải ở cùng một người trong nhóm một tháng, bạn chọn ai?",
+  "Bạn từng tập nói chuyện hay tạo dáng trước gương chưa? Kể một lần.",
+  "Bài hát nào bạn thuộc nhưng ngại thú nhận là mình thích?",
+  "Một thói quen hơi kỳ cục của bạn khi ở một mình?",
+  "Lần gần nhất bạn cười sai thời điểm là khi nào?",
+  "Nếu chuyến Đà Lạt này là một bộ phim, bạn đặt tên gì?",
+  "Bạn từng viện lý do gì để đến trễ? Nói thật lần này nha.",
+  "Điều nhỏ nhất từng khiến bạn dỗi cả ngày là gì?",
+  "Trong nhóm, ai nên giữ tiền quỹ? Ai tuyệt đối không nên giữ lịch trình?",
+  "Bức ảnh nào của bản thân bạn muốn biến mất khỏi trí nhớ mọi người? Chỉ kể thôi nhé.",
+  "Bạn từng hiểu sai lời bài hát nào suốt một thời gian dài?",
+  "Nếu phải đổi tên một ngày, bạn chọn tên gì?",
+  "Kể một lần bạn tự tin trả lời rồi phát hiện sai hoàn toàn.",
+  "Trong nhóm, ai có khả năng ngủ quên lúc chuẩn bị xuất phát nhất?",
+  "Một điều bạn muốn cảm ơn cả nhóm nhưng chưa nói?",
+];
+const dares = [
+  "Hát một đoạn bài hát yêu thích bằng giọng robot.",
+  "Tạo 3 dáng chụp ảnh như đang quảng cáo quần chíp. Không cần chụp thật!",
+  "Giới thiệu chiếc dép của bạn như món hàng xa xỉ trong 20 giây.",
+  "Làm MC giới thiệu người bên phải như một siêu sao quốc tế.",
+  "Bắt chước một con vật để cả nhóm đoán.",
+  "Đọc câu “Tôi rất tỉnh táo và vô cùng thanh lịch” bằng giọng phản diện.",
+  "Nhảy bằng tay và biểu cảm trong 15 giây, có thể ngồi tại chỗ.",
+  "Nói một lời khen với mỗi người, lời nào cũng phải bắt đầu bằng chữ Đ.",
+  "Diễn cảnh phát hiện tài khoản chỉ còn 1.000 đồng mà hóa đơn vừa tới.",
+  "Hát một câu bất kỳ nhưng thay mọi từ bằng “meo”.",
+  "Thuyết phục cả nhóm rằng bạn là người ngoài hành tinh trong 20 giây.",
+  "Đọc dự báo thời tiết Đà Lạt bằng phong cách bình luận bóng đá.",
+  "Dùng biểu cảm diễn tả 3 trạng thái: đói, thấy đồ ăn, thấy hóa đơn.",
+  "Rao bán một chiếc gối tưởng tượng như livestream chốt đơn.",
+  "Nói tên từng người bằng giọng trợ lý ảo.",
+  "Tự trao cho mình một giải thưởng vô lý rồi phát biểu nhận giải.",
+  "Tạo một slogan cho nhóm bạn và hô thật khí thế.",
+  "Diễn cảnh ăn phải miếng chanh nhưng cố tỏ ra sang trọng.",
+  "Kể chuyện đi mua bánh mì bằng giọng kể phim kinh dị.",
+  "Tạo dáng bìa album và đặt tên cho album đó.",
+];
+const drinks = [
+  "Nhấp 1 ngụm rồi kể món bạn muốn ăn nhất vào sáng mai.",
+  "Nhấp 1 ngụm, gửi một lời chúc vui cho chuyến đi.",
+  "Nhấp 1 ngụm rồi đặt tên cho quán cà phê tưởng tượng của bạn.",
+  "Nhấp 1 ngụm và mô tả tâm trạng hiện tại bằng một từ.",
+  "Nhấp 1 ngụm, nói một điều đáng yêu về nhóm mình.",
+  "Nhấp 1 ngụm rồi chọn bài nhạc cho chặng đường về.",
+  "Nhấp 1 ngụm và kể một món ăn bạn có thể ăn cả tuần.",
+  "Nhấp 1 ngụm rồi nghĩ một tên mới cho homestay tối nay.",
+  "Nhấp 1 ngụm, nói địa điểm bạn muốn cả nhóm ghé lần tới.",
+  "Nhấp 1 ngụm và kể khoảnh khắc vui nhất trong ngày.",
+  "Nhấp 1 ngụm, gọi tên một người bạn muốn cảm ơn tối nay.",
+  "Nhấp 1 ngụm rồi đặt tên cho hội bạn bằng đúng 4 từ.",
+];
+const choices = [
+  ["Một bí mật vô hại về bản thân mà nhóm chưa biết?", "Diễn cảnh gặp idol giữa chợ Đà Lạt."],
+  ["Bạn từng lén ăn món gì mà định để dành cho cả nhóm?", "Quảng cáo một chai nước như nước hoa hàng hiệu."],
+  ["Kể một lần bạn ngủ quên rất sai thời điểm.", "Nói chúc ngủ ngon bằng 3 biểu cảm khác nhau."],
+  ["Thứ gì trong hành lý của bạn là khó hiểu nhất?", "Giới thiệu vali tưởng tượng bằng giọng hướng dẫn viên."],
+  ["Bạn có biệt danh hồi nhỏ nào không?", "Tự đặt một nghệ danh rồi chào khán giả."],
+  ["Có món ăn nổi tiếng nào bạn không thích không?", "Đóng vai giám khảo chấm một miếng bánh tưởng tượng."],
+  ["Bạn từng làm gì chỉ để trông có vẻ ngầu?", "Tạo dáng siêu anh hùng rồi nghĩ ra siêu năng lực vô dụng."],
+  ["Nếu được quay lại một khoảnh khắc của hôm nay, bạn chọn lúc nào?", "Kể lại hôm nay bằng một bản tin 20 giây."],
+];
+export const partyCards: PartyCard[] = [
+  ...truths.map((text, i) => ({ id: `truth-${i}`, kind: "truth" as const, text })),
+  ...dares.map((text, i) => ({ id: `dare-${i}`, kind: "dare" as const, text })),
+  ...drinks.map((text, i) => ({ id: `drink-${i}`, kind: "drink" as const, text })),
+  ...choices.map(([truth, dare], i) => ({ id: `choice-${i}`, kind: "choice" as const, text: "Nói thật hay nhận thử thách? Chốt rồi mới được xem nha!", truth, dare })),
+  {"id":"bold-truth-0","kind":"truth","bold":true,"text":"Trong nhóm, ai gần gu hẹn hò của bạn nhất? Không có ai cũng là một đáp án, nhưng phải nói gu của mình."},
+  {"id":"bold-truth-1","kind":"truth","bold":true,"text":"Kể lần bạn thả thính mà đối phương tưởng bạn đang nói chuyện bình thường."},
+  {"id":"bold-truth-2","kind":"truth","bold":true,"text":"Bạn từng quay lại nói chuyện với người cũ vì cô đơn chưa? Kể chuyện của bạn, không cần nêu tên."},
+  {"id":"bold-truth-3","kind":"truth","bold":true,"text":"Một red flag của chính bạn trong chuyện tình cảm mà bạn biết rất rõ?"},
+  {"id":"bold-truth-4","kind":"truth","bold":true,"text":"Bạn từng ghen với một người mà mình còn chưa chính thức hẹn hò chưa?"},
+  {"id":"bold-truth-5","kind":"truth","bold":true,"text":"Kể lần bạn bị từ chối hoặc bị lơ mà quê nhất. Không cần gọi tên người kia."},
+  {"id":"bold-truth-6","kind":"truth","bold":true,"text":"Nếu được xóa một pha tán tỉnh của bản thân khỏi lịch sử, bạn xóa pha nào?"},
+  {"id":"bold-truth-7","kind":"truth","bold":true,"text":"Điều bạn thường khoe cho ngầu nhưng thực ra chỉ biết sơ sơ là gì?"},
+  {"id":"bold-truth-8","kind":"truth","bold":true,"text":"Bạn từng thích hai người cùng lúc chưa? Bạn đã xử lý thế nào?"},
+  {"id":"bold-truth-9","kind":"truth","bold":true,"text":"Điều ngớ ngẩn nhất bạn từng làm chỉ để người mình thích chú ý?"},
+  {"id":"bold-truth-10","kind":"truth","bold":true,"text":"Trong nhóm, ai sẽ là người thả thính giỏi nhất? Tặng người đó một câu nhận xét thật lòng."},
+  {"id":"bold-truth-11","kind":"truth","bold":true,"text":"Một lần bạn giả vờ không quan tâm nhưng thực ra để ý cực nhiều?"},
+  {"id":"bold-dare-0","kind":"dare","bold":true,"text":"Chọn một bạn đồng ý đóng vai crush. Thả thính người đó 20 giây bằng giọng tổng tài; nếu không ai nhận vai, diễn với chiếc gối."},
+  {"id":"bold-dare-1","kind":"dare","bold":true,"text":"Đứng tại chỗ hoặc ngồi, diễn một màn catwalk quyến rũ bằng vai và biểu cảm. Kết bằng câu “Biết thế đừng chọn lá này”."},
+  {"id":"bold-dare-2","kind":"dare","bold":true,"text":"Roast nhẹ bản thân bằng 3 câu như bạn là khách mời bị bóc phốt. Mỗi câu phải bắt đầu bằng “Tôi tưởng tôi…”."},
+  {"id":"bold-dare-3","kind":"dare","bold":true,"text":"Chọn một bạn đồng ý nghe roast. Cà khịa một thói quen vui của họ rồi kết bằng một lời khen; nếu không ai nhận, roast chính mình."},
+  {"id":"bold-dare-4","kind":"dare","bold":true,"text":"Diễn cảnh gặp người yêu cũ trong thang máy cùng người mới — một mình bạn đóng cả 3 vai."},
+  {"id":"bold-dare-5","kind":"dare","bold":true,"text":"Thả thính cả nhóm bằng một câu có đủ 3 từ: quần chíp, Đà Lạt, định mệnh."},
+  {"id":"bold-dare-6","kind":"dare","bold":true,"text":"Đóng vai người vừa bị bắt quả tang ăn vụng chiếc bánh cuối cùng. Biện hộ thật lươn trong 30 giây."},
+  {"id":"bold-dare-7","kind":"dare","bold":true,"text":"Dùng một chiếc gối làm bạn diễn, đóng cảnh tỏ tình kiểu phim sến. Kết bằng một cú từ chối do chính bạn diễn."},
+  {"id":"bold-dare-8","kind":"dare","bold":true,"text":"Giả làm tổng tài cầu xin được mượn 20.000 đồng. Không được cười trong câu đầu tiên."},
+  {"id":"bold-dare-9","kind":"dare","bold":true,"text":"Tự đọc diễn văn đăng quang “Chúa tể quê độ”, kể 3 thành tích không ai muốn có."},
+  {"id":"bold-dare-10","kind":"dare","bold":true,"text":"Diễn quảng cáo nước hoa tên “Mùi người yêu cũ”: vừa sang chảnh vừa đau đớn trong 20 giây."},
+  {"id":"bold-dare-11","kind":"dare","bold":true,"text":"Diễn cảnh bạn gửi nhầm tin thả thính vào nhóm gia đình. Tự đóng vai cả người gửi lẫn người nhà."},
+  {"id":"bold-choice-0","kind":"choice","bold":true,"text":"Câu này hơi căng. Nói thật hay dám làm?","truth":"Bạn từng tưởng ai đó thích mình rồi nhận ra chỉ là mình tưởng tượng chưa?","dare":"Diễn một đoạn tán tỉnh chiếc ghế như lần đầu gặp định mệnh."},
+  {"id":"bold-choice-1","kind":"choice","bold":true,"text":"Câu này hơi căng. Nói thật hay dám làm?","truth":"Một lời nói dối để giữ thể diện mà giờ bạn có thể tự cười về nó?","dare":"Tự bóc phốt mình bằng phong cách họp báo xin lỗi cực kỳ nghiêm túc."},
+  {"id":"bold-choice-2","kind":"choice","bold":true,"text":"Câu này hơi căng. Nói thật hay dám làm?","truth":"Bạn từng luyện trước một câu thả thính rồi vẫn nói hỏng thế nào?","dare":"Tán tỉnh bằng giọng đọc thông báo sân bay trong 20 giây."},
+  {"id":"bold-choice-3","kind":"choice","bold":true,"text":"Câu này hơi căng. Nói thật hay dám làm?","truth":"Nói một điều hơi ngượng mà bạn muốn người yêu tương lai biết về mình.","dare":"Quay lưng lại rồi xoay mặt biểu cảm như nhân vật chính phát hiện mình chỉ là người giao đồ ăn."},
+];
+export function shuffleCards(enabled: readonly CardKind[]): PartyCard[] {
+  const deck = partyCards.filter(card => enabled.includes(card.kind));
+  for (let index = deck.length - 1; index > 0; index--) {
+    const other = Math.floor(Math.random() * (index + 1));
+    [deck[index], deck[other]] = [deck[other], deck[index]];
+  }
+  return deck;
+}

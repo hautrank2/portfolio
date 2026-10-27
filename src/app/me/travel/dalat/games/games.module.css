@@ -13,6 +13,13 @@
   --game-rose: oklch(0.81 0.11 350);
 }
 
+.newGame { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 22px; margin-bottom: 25px; background: var(--secondary); color: var(--primary); border: 1px solid var(--border); border-radius: 22px; }
+.newGame > span { display: flex; align-items: center; gap: 13px; }
+.newGame strong, .newGame small { display: block; }
+.newGame strong { font-size: 15px; }
+.newGame small { font-size: 11px; margin-top: 4px; color: var(--muted-foreground); }
+.newGame > span:last-child { font-size: 12px; flex-shrink: 0; }
+@media(max-width: 540px) { .newGame { align-items: flex-start; flex-direction: column; } }
 .header { border-bottom: 1px solid var(--border); }
 .back { display: inline-flex; align-items: center; gap: 9px; font-size: 12px; font-weight: 500; color: var(--primary); }
 .headerLabel { color: var(--muted-foreground); font-size: 10px; letter-spacing: 1.2px; }

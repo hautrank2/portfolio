@@ -1,0 +1,204 @@
+.header { border-bottom: 1px solid var(--border); }
+.header a { display: flex; align-items: center; gap: 8px; color: var(--primary); font-size: 12px; }
+.main { width: min(840px, calc(100% - 36px)); margin: auto; padding: 45px 0; }
+.hero { text-align: center; margin-bottom: 32px; }
+.eyebrow { display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--primary); font-size: 10px; letter-spacing: 1.7px; }
+.hero h1 { font-size: clamp(38px, 7vw, 64px); line-height: 1.35; letter-spacing: -2px; margin: 17px 0; font-weight: 500; }
+.hero > p:last-child, .setup > p { color: var(--muted-foreground); font-size: 13px; }
+.setup, .question { background: var(--card); border: 1px solid var(--border); border-radius: 26px; padding: 28px; margin: 24px 0; }
+.setup h2 { display: flex; align-items: center; gap: 10px; font-size: 20px; margin: 8px 0; }
+.names { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 22px 0; }
+.names label { font-size: 11px; color: var(--muted-foreground); }
+.names input { width: 100%; display: block; border: 1px solid var(--border); background: var(--background); border-radius: 12px; padding: 11px; color: var(--foreground); margin-top: 7px; }
+.primary { display: inline-flex; align-items: center; justify-content: center; gap: 9px; background: var(--primary); color: var(--primary-foreground); border: 0; border-radius: 13px; padding: 13px 20px; font-size: 13px; cursor: pointer; }
+.primary:disabled { opacity: .45; cursor: not-allowed; }
+.scoreboard { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.scoreboard > div { border: 1px solid var(--border); background: var(--card); border-radius: 18px; padding: 15px; min-width: 0; }
+.scoreboard .current { border-color: var(--primary); background: var(--secondary); }
+.scoreboard span { display: block; overflow-wrap: anywhere; font-size: 13px; }
+.scoreboard strong { display: block; font-size: 26px; color: var(--primary); }
+.scoreboard small { font-size: 10px; color: var(--muted-foreground); font-weight: 400; }
+.turn { text-align: center; margin: 28px 0 20px; }
+.turn > span { font-size: 10px; letter-spacing: 2px; color: var(--primary); }
+.turn h2 { font-size: 21px; margin-top: 5px; overflow-wrap: anywhere; }
+.board { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.card { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; min-height: 180px; border: 1px solid var(--border); border-radius: 23px; color: var(--primary); background: linear-gradient(140deg, var(--card), var(--secondary)); transition: transform .2s, border-color .2s; cursor: pointer; }
+.card:nth-child(3n + 2) { background: linear-gradient(140deg, var(--card), var(--trip-party)); color: var(--trip-rose); }
+.card:not(:disabled):hover { transform: translateY(-4px); border-color: var(--primary); }
+.card > span:last-child { font-size: 9px; letter-spacing: 1px; }
+.number { position: absolute; top: 12px; left: 15px; font-size: 11px; opacity: .6; }
+.card:disabled { cursor: default; }
+.card.used { opacity: .55; background: var(--muted); }
+.card.selected { outline: 2px solid var(--primary); outline-offset: 3px; }
+.question { scroll-margin-top: 25px; }
+.question .eyebrow { justify-content: flex-start; }
+.question h2 { font-size: 23px; line-height: 1.6; margin: 14px 0 22px; }
+.question fieldset { border: 0; padding: 0; margin: 0 0 22px; display: grid; gap: 10px; }
+.question legend { font-size: 11px; color: var(--muted-foreground); margin-bottom: 10px; }
+.option { display: flex; align-items: center; gap: 10px; padding: 14px; border: 1px solid var(--border); border-radius: 13px; font-size: 13px; cursor: pointer; }
+.option input { accent-color: var(--primary); flex-shrink: 0; }
+.option > svg { flex-shrink: 0; margin-left: auto; }
+.picked { background: var(--secondary); border-color: var(--primary); }
+.correct { border-color: var(--primary); box-shadow: inset 3px 0 var(--primary); }
+.feedback h3 { font-size: 20px; color: var(--primary); }
+.feedback > p { color: var(--muted-foreground); font-size: 13px; margin: 10px 0 20px; }
+.penalty { border: 1px dashed var(--trip-rose); border-radius: 16px; background: var(--trip-party); padding: 18px; margin: 18px 0; }
+.penalty strong { color: var(--trip-rose); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+.penalty p { margin: 7px 0; }
+.penalty small { color: var(--muted-foreground); font-size: 11px; }
+.note { text-align: center; font-size: 10px; color: var(--muted-foreground); margin-top: 28px; }
+@media(max-width: 540px) {
+  .main { padding-top: 28px; }
+  .setup, .question { padding: 20px; }
+  .names { grid-template-columns: 1fr; }
+  .board { gap: 9px; }
+  .card { min-height: 135px; border-radius: 17px; gap: 15px; }
+  .card > svg { width: 29px; }
+  .card > span:last-child { font-size: 7px; letter-spacing: .3px; }
+  .scoreboard > div { padding: 10px; }
+  .question h2 { font-size: 19px; }
+  .primary { width: 100%; }
+}
+@media(prefers-reduced-motion: reduce) { .card { transition: none; } }
+
+.overlay { position: fixed; inset: 0; z-index: 80; background: rgb(15 10 30 / .65); backdrop-filter: blur(7px); }
+.modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 81; width: min(580px, calc(100% - 32px)); min-height: 0; max-height: calc(100dvh - 40px); overflow: auto; padding: 32px; border: 1px solid var(--border); border-radius: 25px; background: var(--card); box-shadow: 0 25px 90px rgb(0 0 0 / .25); }
+.modal .eyebrow { justify-content: flex-start; padding-right: 25px; letter-spacing: .8px; }
+.questionTitle { font-size: 24px; line-height: 1.6; margin: 18px 0 12px; font-weight: 600; }
+.description { color: var(--muted-foreground); font-size: 12px; margin-bottom: 24px; }
+.answer { border: 1px solid var(--border); background: var(--secondary); border-radius: 17px; padding: 20px; margin-bottom: 22px; }
+.answer small { color: var(--muted-foreground); font-size: 10px; letter-spacing: 1.5px; }
+.answer strong { display: block; font-size: 23px; line-height: 1.5; color: var(--primary); margin-top: 8px; }
+.gradeButtons { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.wrong { display: inline-flex; justify-content: center; align-items: center; gap: 9px; padding: 13px 20px; background: var(--trip-party); color: var(--trip-rose); border: 1px solid var(--trip-rose); border-radius: 13px; cursor: pointer; }
+.close { position: absolute; top: 15px; right: 15px; display: grid; place-items: center; width: 32px; height: 32px; color: var(--muted-foreground); background: var(--muted); border: 1px solid var(--border); border-radius: 50%; cursor: pointer; }
+.modal .feedback > .primary { margin-top: 18px; }
+@media(max-width: 540px) { .modal { padding: 26px 20px; } .questionTitle { font-size: 20px; } }
+
+/* Toy-like emoji badges: recognizable symbols with readable Vietnamese names. */
+.topics { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: -8px 0 28px; }
+.topics span { border: 1px solid var(--border); border-radius: 30px; background: var(--card); padding: 7px 12px; font-size: 11px; }
+.board { gap: 18px; perspective: 1000px; }
+.card { --toy-tint: color-mix(in oklch, var(--primary) 12%, var(--card)); min-height: 220px; gap: 8px; padding: 24px 12px 18px; background: radial-gradient(circle at 30% 15%, var(--card), transparent 65%), var(--toy-tint); box-shadow: inset 0 2px 0 color-mix(in oklch, white 60%, transparent), 0 6px 0 var(--border), 0 14px 25px var(--trip-shadow); }
+.card:nth-child(3n + 2) { --toy-tint: var(--trip-party); background: radial-gradient(circle at 30% 15%, var(--card), transparent 65%), var(--toy-tint); }
+.card:nth-child(3n) { --toy-tint: color-mix(in oklch, #e6bc57 14%, var(--card)); }
+.card .symbol { display: grid; place-items: center; width: 92px; height: 92px; font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif; font-size: 64px; line-height: 1; filter: drop-shadow(0 7px 3px rgb(35 15 65 / .16)); transform: rotate(-8deg); transition: transform .2s ease; }
+.card:nth-child(even) .symbol { transform: rotate(8deg); }
+.card:not(:disabled):hover { transform: translateY(-6px) rotate(-1deg); }
+.card:not(:disabled):hover .symbol { transform: rotate(0) scale(1.12); }
+.card .cardName { color: var(--foreground); font-size: 17px; font-weight: 600; }
+.card > .cardTease:last-child { font-size: 10px; letter-spacing: 0; line-height: 1.5; color: var(--muted-foreground); }
+.card.used .symbol { filter: grayscale(.7); }
+.card.used { box-shadow: inset 0 1px 4px var(--trip-shadow); }
+@media(max-width: 540px) {
+  .board { gap: 11px; }
+  .card { min-height: 170px; padding: 24px 7px 14px; }
+  .card .symbol { width: 65px; height: 65px; font-size: 48px; }
+  .card .cardName { font-size: 13px; }
+  .card > .cardTease:last-child { font-size: 9px; }
+  .topics { gap: 6px; }
+  .topics span { font-size: 10px; padding: 6px 9px; }
+}
+@media(prefers-reduced-motion: reduce) { .card .symbol { transition: none; } .card:not(:disabled):hover, .card:not(:disabled):hover .symbol { transform: none; } }
+
+/* Laptop/projector layout: keep the board visible and prioritize distance reading. */
+@media (min-width: 900px) {
+  .header { height: 64px !important; width: calc(100% - 64px) !important; }
+  .header a { font-size: 18px; }
+  .main { width: min(1500px, calc(100% - 64px)); padding: 30px 0; }
+  .hero h1 { font-size: clamp(52px, 5vw, 76px); }
+  .eyebrow { font-size: 17px; letter-spacing: 1px; }
+  .hero > p:last-child, .setup > p { font-size: 21px; color: var(--foreground); }
+  .topics span { font-size: 19px; padding: 8px 20px; }
+  .setup { padding: 32px; }
+  .setup h2 { font-size: 30px; }
+  .names label { font-size: 20px; color: var(--foreground); }
+  .names input { font-size: 25px; padding: 15px; }
+  .primary, .wrong { min-height: 62px; padding: 15px 26px; font-size: 23px; font-weight: 600; }
+  .primary svg, .wrong svg { width: 25px; height: 25px; }
+  .playing { display: grid; grid-template-columns: minmax(250px, 300px) minmax(0, 1fr); align-items: start; gap: 20px 28px; padding-top: 22px; }
+  .playing > .hero, .playing > .topics { display: none; }
+  .gameInfo { position: sticky; top: 20px; }
+  .scoreboard { grid-template-columns: 1fr; gap: 12px; }
+  .scoreboard > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; padding: 15px 20px; border-width: 2px; }
+  .scoreboard span { font-size: 23px; font-weight: 600; }
+  .scoreboard strong { font-size: 38px; line-height: 1.3; white-space: nowrap; }
+  .scoreboard small { font-size: 17px; color: var(--foreground); }
+  .scoreboard > div > small { grid-column: 1 / -1; }
+  .scoreboard .current { box-shadow: inset 5px 0 var(--primary); }
+  .turn { text-align: left; margin: 26px 0 0; }
+  .turn > span { font-size: 19px; }
+  .turn h2 { font-size: 29px; line-height: 1.4; margin: 10px 0 18px; }
+  .turn .primary { width: 100%; font-size: 20px; }
+  .playing .board { gap: 16px; }
+  .card { min-height: 240px; }
+  .playing .card { min-height: clamp(165px, calc((100dvh - 160px) / 3), 300px); padding: 15px 12px; gap: 3px; }
+  .card .symbol { width: 100px; height: 100px; font-size: 78px; }
+  .playing .card .symbol { width: 90px; height: 80px; font-size: clamp(58px, 8vh, 86px); }
+  .card .cardName { font-size: 28px; line-height: 1.3; }
+  .card > .cardTease:last-child { font-size: 17px; color: var(--foreground); }
+  .number { font-size: 18px; opacity: 1; }
+  .card.used { opacity: .8; }
+  .playing > .setup { grid-column: 1 / -1; }
+  .note { font-size: 16px; color: var(--foreground); }
+  .playing > .note { grid-column: 1 / -1; margin-top: 4px; }
+  .modal { width: min(1120px, calc(100% - 80px)); max-height: calc(100dvh - 48px); padding: 36px 46px; border-radius: 28px; }
+  .modal .eyebrow { font-size: 21px; padding-right: 38px; }
+  .questionTitle { font-size: clamp(30px, 3vw, 44px); line-height: 1.4; margin: 20px 0 16px; }
+  .description { font-size: 20px; line-height: 1.5; margin-bottom: 24px; color: var(--foreground); }
+  .answer { padding: 22px 28px; margin-bottom: 22px; }
+  .answer small { font-size: 18px; color: var(--foreground); }
+  .answer strong { font-size: clamp(30px, 3vw, 44px); line-height: 1.35; }
+  .gradeButtons { gap: 20px; }
+  .gradeButtons button { min-height: 76px; font-size: 30px; }
+  .feedback h3 { font-size: 28px; line-height: 1.4; }
+  .penalty { padding: 20px 25px; }
+  .penalty strong { font-size: 18px; }
+  .penalty p { font-size: 28px; line-height: 1.4; }
+  .penalty small { font-size: 18px; color: var(--foreground); }
+  .close { width: 44px; height: 44px; }
+  .close svg { width: 26px; height: 26px; }
+}
+@media (min-width: 900px) and (max-height: 800px) {
+  .playing { grid-template-columns: 260px minmax(0, 1fr); gap: 16px 22px; padding-top: 16px; }
+  .scoreboard > div { padding: 10px 16px; }
+  .turn { margin-top: 18px; }
+  .card > .cardTease:last-child { font-size: 15px; }
+  .modal { padding: 26px 38px; }
+  .modal .eyebrow { font-size: 19px; }
+  .questionTitle { font-size: 32px; margin: 14px 0; }
+  .description { font-size: 18px; margin-bottom: 18px; }
+  .answer { padding: 16px 22px; margin-bottom: 18px; }
+  .answer strong { font-size: 32px; }
+}
+
+/* Explicit card states remain legible from the back of the room. */
+.card { padding-top: 42px; border-width: 2px; }
+.card .stateBadge { position: absolute; top: 10px; right: 10px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding: 4px 9px; border-radius: 100px; background: var(--card); color: var(--primary); font-size: 12px; line-height: 1.3; font-weight: 600; }
+.card.locked { background: var(--muted); border: 2px dashed var(--border); box-shadow: none; cursor: not-allowed; }
+.card.locked .symbol { filter: grayscale(1); opacity: .45; transform: none; }
+.card.locked .cardName, .card.locked .cardTease { color: var(--muted-foreground); }
+.card.locked .stateBadge { color: var(--muted-foreground); background: var(--background); }
+.card.used { opacity: 1; box-shadow: none; border-style: solid; cursor: not-allowed; }
+.card.used .symbol { opacity: .55; filter: grayscale(.8); transform: scale(.85); }
+.card.won { background: color-mix(in oklch, #16a34a 9%, var(--card)); border-color: #15803d; }
+.card.lost { background: color-mix(in oklch, #e11d48 8%, var(--card)); border-color: #be123c; }
+.card.won .stateBadge { background: #166534; color: white; }
+.card.lost .stateBadge { background: #9f1239; color: white; }
+.card.selected { z-index: 1; opacity: 1; border: 3px solid #fbbf24; outline: 3px solid var(--primary); outline-offset: 3px; background: radial-gradient(circle at 50% 15%, #9054e8, transparent 75%), #5423a0; box-shadow: 0 0 0 7px color-mix(in oklch, var(--primary) 18%, transparent), 0 14px 30px var(--trip-shadow); cursor: pointer; }
+.card.selected .cardName, .card.selected > .cardTease:last-child, .card.selected .number { color: white; }
+.card.selected .symbol { opacity: 1; filter: drop-shadow(0 0 14px rgb(255 225 150 / .75)); transform: rotate(-10deg) scale(1.08); }
+.card.selected .stateBadge { background: #fbbf24; color: #35124f; }
+.card.selected:not(:disabled):hover { transform: translateY(-3px); border-color: #fde68a; }
+@media (min-width: 900px) {
+  .playing .card { padding-top: 42px; }
+  .card .stateBadge { font-size: 16px; padding: 5px 11px; }
+  .card .stateBadge svg { width: 18px; height: 18px; }
+  .playing .card.selected .cardTease { font-weight: 600; }
+}
+@media (max-width: 540px) {
+  .card, .playing .card { padding-top: 35px; }
+  .card .stateBadge { top: 8px; right: 5px; font-size: 9px; padding: 4px 5px; gap: 3px; }
+  .card .stateBadge svg { width: 11px; height: 11px; }
+  .number { top: 12px; left: 6px; font-size: 9px; }
+}
