@@ -11,6 +11,7 @@ export const adminNavData: NavItemModel[] = [
   { title: "Logtime", href: "/admin/logtime" },
   { title: "Task", href: "/admin/tasks" },
   { title: "Project", href: "/admin/projects" },
+  { title: "GitHub", href: "/admin/github" },
 ];
 
 export const workProjectStatusData = [

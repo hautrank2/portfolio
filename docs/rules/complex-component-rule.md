@@ -1,7 +1,3 @@
----
-trigger: always_on
----
-
 # Component Split — `index.tsx` / `hook.ts` / `type.ts`
 
 > **Reusable** — convention chung, copy nguyên sang dự án khác.
@@ -76,4 +72,5 @@ export const Foo = (props: FooProps) => {
 };
 ```
 
-Form nằm trong dialog có thêm quy định riêng — xem `dialog-form-rule.md`.
+Form nằm trong dialog có thêm quy định riêng — xem Skill `dialog-form`
+(`.claude/skills/dialog-form/SKILL.md`).

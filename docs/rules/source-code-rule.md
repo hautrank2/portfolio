@@ -1,27 +1,23 @@
----
-trigger: always_on
----
-
 # Source Code Rules — Reusable Conventions
 
 How code under `src/` is written: TypeScript, style, naming, components, hooks,
 reuse, and styling.
 
 > **Reusable.** This file is project-independent — copy it to the next project
-> unchanged, together with `complex-component-rule.md` and
-> `dialog-form-rule.md`. Everything specific to the current repo (stack
+> unchanged, together with `complex-component-rule.md` and the
+> `dialog-form` skill. Everything specific to the current repo (stack
 > versions, UI library inventory, theme details, legacy exceptions) lives in
-> `global.md`, which is rewritten per project.
+> the root `CLAUDE.md`, which is rewritten per project.
 
-Related rule files:
+Related files:
 
-- `global.md` — the project itself: stack, content, structure, verification,
-  and the current repo's exceptions to the rules below.
+- `CLAUDE.md` (project root) — the project itself: stack, content, structure,
+  verification, and the current repo's exceptions to the rules below.
 - `complex-component-rule.md` — the `index.tsx` / `hook.ts` / `type.ts` split.
-- `dialog-form-rule.md` — forms inside a dialog.
+- `.claude/skills/dialog-form/SKILL.md` — forms inside a dialog.
 
 When two files disagree, the more specific one wins: a component rule beats
-this file, and `global.md` beats this file on anything about the current
+this file, and `CLAUDE.md` beats this file on anything about the current
 project (its stack, its legacy code, its documented exceptions).
 
 ---
@@ -57,7 +53,7 @@ project (its stack, its legacy code, its documented exceptions).
 
 Component files are kebab-case because that is what `npx shadcn add` writes;
 renaming them would break the next update. Files that predate a naming rule
-are listed under *Legacy Exceptions* in `global.md` — leave them alone.
+are listed under *Legacy Exceptions* in `CLAUDE.md` — leave them alone.
 
 ---
 
@@ -65,9 +61,9 @@ are listed under *Legacy Exceptions* in `global.md` — leave them alone.
 
 `complex-component-rule.md` is the authority on how a component is structured —
 when to split into `index.tsx` / `hook.ts` / `type.ts`, arrow functions, and
-how hook props derive from component props. `dialog-form-rule.md` covers forms
-inside a dialog. This section only adds what is specific to Next.js and to
-files that arrive from a registry.
+how hook props derive from component props. The `dialog-form` skill covers
+forms inside a dialog. This section only adds what is specific to Next.js and
+to files that arrive from a registry.
 
 - **Arrow functions** for components you write:
   `export const Foo = (props: FooProps) => …`
@@ -125,7 +121,7 @@ The project carries a local component library (shadcn/ui plus registry
 components). **Search it before writing any new UI primitive.** Hand-rolling
 something that already exists is the default failure mode. The current repo's
 inventory — which folders hold what, and per-component caveats — is in
-`global.md`.
+`CLAUDE.md`.
 
 1. **Look in the library first.** Write a new component only when nothing there
    fits, and say why in the task summary.
@@ -163,7 +159,7 @@ imports still fails a build that type-checks all of `src/`.
   silently replace them; scope by structure instead, e.g.
   `.prose :not(pre) > code`.
 - Where the current repo declares its theme, its tokens and its prose block is
-  documented in `global.md`.
+  documented in `CLAUDE.md`.
 
 ---
 

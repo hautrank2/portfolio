@@ -1,6 +1,6 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { requestJson } from "~/lib/api-client";
+import { requestJson } from "~/lib/http-client";
 import { refreshApiQueries } from "./useApiQuery";
 
 type UseResourceDialogProps<TModel, TValues, TInput> = {

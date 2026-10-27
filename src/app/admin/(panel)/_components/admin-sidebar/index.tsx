@@ -6,20 +6,23 @@ import {
   LayoutDashboard,
   ListTodo,
   LogOut,
-  type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
+import { FaGithub } from "react-icons/fa6";
 import { Button } from "~/components/ui/button";
 import { adminNavData } from "~/data/admin";
 import { cn } from "~/lib/utils";
 import { useAdminSidebar } from "./hook";
 import type { AdminSidebarProps } from "./type";
 
-const NAV_ICONS: Record<string, LucideIcon> = {
+// lucide-react dropped brand logos, so the GitHub entry borrows the same
+// react-icons glyph `app/about/page.tsx` already uses for the social link.
+const NAV_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
   "/admin/dashboard": LayoutDashboard,
   "/admin/projects": FolderKanban,
   "/admin/logtime": Clock,
   "/admin/tasks": ListTodo,
+  "/admin/github": FaGithub,
 };
 
 /** A rail beside the page on large screens, a bar above it on small ones. */

@@ -2,6 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { getErrorMessage, httpClient } from "~/lib/http-client";
 import {
   loginFormSchema,
   type LoginFormValues,
@@ -19,20 +20,11 @@ export const useLoginForm = ({ redirectTo }: UseLoginFormProps) => {
   const handleSubmit = async (values: LoginFormValues) => {
     setError(null);
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      });
-      if (!response.ok) {
-        const body: { error?: string } = await response.json().catch(() => ({}));
-        setError(body.error ?? "Sign-in failed.");
-        return;
-      }
+      await httpClient.post("/api/auth/login", values);
       router.replace(redirectTo);
       router.refresh();
-    } catch {
-      setError("Could not reach the server.");
+    } catch (error) {
+      setError(getErrorMessage(error, "Sign-in failed."));
     }
   };
 

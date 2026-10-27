@@ -30,6 +30,8 @@ export type LogFormProps = {
   /** Server-side failure from the last submit, shown above the footer. */
   error?: string | null;
   tasks: TaskModel[];
+  /** Task ids to show first in the picker — logged within the last few days. */
+  recentTaskIds?: Set<string>;
   categories: CategoryModel[];
 };
 

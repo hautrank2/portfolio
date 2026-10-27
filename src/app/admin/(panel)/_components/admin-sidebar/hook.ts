@@ -1,5 +1,5 @@
 import { usePathname, useRouter } from "next/navigation";
-import { requestJson } from "~/lib/api-client";
+import { requestJson } from "~/lib/http-client";
 import type { UseAdminSidebarProps } from "./type";
 
 export const useAdminSidebar = ({ username }: UseAdminSidebarProps) => {

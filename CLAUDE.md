@@ -1,7 +1,3 @@
----
-trigger: always_on
----
-
 # Global Rules — Portfolio & Learning Blog
 
 Personal portfolio for Hậu Trần. Four parts share one Next.js app:
@@ -12,6 +8,17 @@ Personal portfolio for Hậu Trần. Four parts share one Next.js app:
 - **Recipes** — a flat shelf of food and coffee notes.
 - **Admin** — a private, signed-in area (`/admin`) for the owner's work log.
   It is the only part backed by a database.
+
+This file is always loaded. Two files it pulls in below are reusable across
+projects — see `docs/rules/README.md` for how this whole set is organised
+and how to carry it to a new repo.
+
+@docs/rules/source-code-rule.md
+@docs/rules/complex-component-rule.md
+
+A third reusable rule — forms inside a dialog — is a **Skill**
+(`.claude/skills/dialog-form/SKILL.md`) instead of an import here, because it
+only applies to that one situation; see *Source Code Rules* below.
 
 ---
 
@@ -37,6 +44,7 @@ Personal portfolio for Hậu Trần. Four parts share one Next.js app:
 | Content | Markdown files in `content/` (blog, recipes), no CMS |
 | Markdown | `unified` — remark to rehype to **React elements** (`src/components/blog/markdown.tsx`) |
 | Database | **MongoDB** via the official `mongodb` driver — admin area only |
+| HTTP client | **axios** — browser calls via `~/lib/http-client`, server-to-external-API calls via `~/lib/http-server` |
 | Auth | `jose` (HS256 JWT in an httpOnly cookie) + `bcryptjs` |
 | Forms & validation | `react-hook-form` + `zod` |
 | Package manager | **pnpm** |
@@ -50,25 +58,26 @@ Two halves with different rules:
   the database and never fetch on the client. Keep it that way — a blog page
   that needs MongoDB to render is a regression.
 - **`/admin` and `/api` are dynamic.** Route handlers under `src/app/api/` read
-  and write MongoDB; admin components call them with `fetch` from their
-  `hook.ts`. See *Admin, Auth & Database* below.
+  and write MongoDB; admin components call them through `~/lib/http-client`
+  from their `hook.ts`. See *Admin, Auth & Database* below.
 
 ---
 
 ## Source Code Rules
 
-Coding conventions live in their own files. Read them before writing code:
+Coding conventions live in their own files, imported at the top of this file.
+Read them before writing code:
 
 | File | Covers | Portability |
 | --- | --- | --- |
-| `source-code-rule.md` | TypeScript, code style, file naming, components, hooks, reuse, styling | Reusable — copy between projects |
-| `complex-component-rule.md` | the `index.tsx` / `hook.ts` / `type.ts` component split | Reusable |
-| `dialog-form-rule.md` | forms inside a dialog | Reusable (assumes shadcn/ui) |
+| `docs/rules/source-code-rule.md` | TypeScript, code style, file naming, components, hooks, reuse, styling | Reusable — copy between projects |
+| `docs/rules/complex-component-rule.md` | the `index.tsx` / `hook.ts` / `type.ts` component split | Reusable |
+| `.claude/skills/dialog-form/SKILL.md` | forms inside a dialog | Reusable (assumes shadcn/ui) |
 
-Those three files are project-independent. **This file is the project-specific
+Those three are project-independent. **This file is the project-specific
 half**: what the project is, its stack, content, admin, structure, this repo's
 UI library and theme, legacy exceptions, and how to verify. For a new project,
-copy the three convention files unchanged and rewrite this one, keeping its
+copy the rules and the skill unchanged and rewrite this one, keeping its
 outline.
 
 ---
@@ -76,7 +85,7 @@ outline.
 ## UI Library in This Repo
 
 What is installed and where — the reuse rules themselves are in
-`source-code-rule.md`:
+`docs/rules/source-code-rule.md`:
 
 | Folder | Contains |
 | --- | --- |
@@ -207,7 +216,10 @@ database out of everything else.
   `workProjectStatusColorData` (`~/data/admin`), shown through `StatusSelect` /
   `StatusDot`. Do not pick a colour for a status anywhere else.
 - **`lib/` is only for code that talks to something outside the app:** MongoDB
-  (`db`, `task`, `logtime`, `project`, `label`) and HTTP (`api-client`).
+  (`db`, `task`, `logtime`, `project`, `label`), HTTP (`http-client` for the
+  browser, `http-server` for server-to-external-API calls), and one file per
+  external service built on `http-server` (`github`, for now — the GitHub
+  admin page's PR/comment/line counts; no Claude-based review yet).
   Everything else — content loaders, auth, schemas, date and paging helpers,
   route-handler helpers — lives in `utils/`. The one exception is
   `lib/utils.ts` (`cn`), which stays put because shadcn's CLI writes imports
@@ -234,7 +246,7 @@ database out of everything else.
   in minutes; the form takes hours. There is no start / end time, and `note` is
   optional and usually empty.
 - **Admin pages read through `useApiQuery`** (`~/hooks`) and write through
-  `requestJson` (`~/lib/api-client`). After a write, `refreshApiQueries()`
+  `requestJson` (`~/lib/http-client`). After a write, `refreshApiQueries()`
   refetches what is on screen; lists with add / edit / delete get all of that
   from `useResourceDialog`.
 - **Admin lists are tables paged by the API.** The page, page size and filters
@@ -252,11 +264,27 @@ database out of everything else.
   body as `unknown`. Reject with `400`, never let a bad shape reach the driver.
 - **Documents never leave the lib.** Map them to a `…Model` first: `_id`
   becomes a string `id`, `Date` becomes an ISO string.
-- **Server only.** `~/lib/db`, `~/utils/auth` and anything importing `mongodb`
-  must not be imported from a Client Component.
+- **Server only.** `~/lib/db`, `~/lib/http-server`, `~/utils/auth` and anything
+  importing `mongodb` must not be imported from a Client Component.
 - Admin routes are `noindex` through `src/app/admin/layout.tsx`.
 - `PUT /api/cv` writes `src/data/cv.json` and answers `404` outside
   development on purpose — the CV is published through git, not at runtime.
+
+### HTTP clients
+
+- **Browser → same-origin `/api/*`:** `~/lib/http-client`. Export `httpClient`
+  (a shared axios instance) plus `requestJson` (never throws — returns an
+  `ApiResult<T>`, used by `useApiQuery` / `useResourceDialog`) and
+  `getErrorMessage` (for forms that want axios's throw-on-failure behaviour and
+  just need a message to show, e.g. the login form).
+- **Server → external APIs** (GitHub, an LLM provider, …): `~/lib/http-server`.
+  `createHttpServer({ baseURL, headers })` makes one instance per service —
+  give each external integration its own file in `src/lib/<service>.ts`
+  wrapping its own instance, rather than growing one shared client's config.
+  Never import this from a Client Component; it is where secrets such as API
+  keys get attached as headers.
+- Do not add `fetch` calls anywhere in `src/` — go through one of the two
+  clients above so timeouts, headers and error shape stay consistent.
 
 ### Environment
 
@@ -266,6 +294,7 @@ database out of everything else.
 | `MONGODB_DB` | `lib/db.ts`, seed script | optional, defaults to `portfolio` |
 | `AUTH_SECRET` | `utils/auth.ts` | at least 32 characters |
 | `ADMIN_USERNAME`, `ADMIN_PASSWORD` | `scripts/seed-admin.mjs` only | never read by the app |
+| `GITHUB_TOKEN` | `lib/github.ts` | optional — raises the GitHub API rate limit; works unauthenticated without it |
 
 - `.env*` is gitignored. Never commit a secret, print one, or paste one into a
   note. Only the bcrypt hash of the admin password is stored.
@@ -293,8 +322,8 @@ src/
 ├── app/               # App Router: routes, layouts, globals.css
 │   ├── _components/   # sections used only by the home page
 │   ├── <route>/_components/  # components used only by that route
-│   ├── admin/         # login, plus the (panel) group: sidebar, logtime, tasks, projects
-│   ├── api/           # route handlers: auth, projects, tasks, logtimes, categories, tags, cv
+│   ├── admin/         # login, plus the (panel) group: sidebar, logtime, tasks, projects, github
+│   ├── api/           # route handlers: auth, projects, tasks, logtimes, categories, tags, cv, github
 │   └── code/[slug]/   # builds the exercise zip
 ├── assets/fonts/
 ├── components/        # only what more than one route uses
@@ -308,7 +337,7 @@ src/
 │   └── icons/
 ├── data/              # static site content (profile, projects, cv.json)
 ├── hooks/             # shared hooks + barrel (useXxx.ts)
-├── lib/               # talks to the outside: db, api-client, task, logtime, project, label (+ cn)
+├── lib/               # talks to the outside: db, http-client, http-server, task, logtime, project, label, github (+ cn)
 ├── styles/
 ├── types/             # shared types + barrel
 └── utils/             # everything else: content loaders, auth, schema, admin-time, local, …
@@ -348,6 +377,7 @@ say the change is unverified instead of guessing.
 - Making a public page depend on MongoDB or on a client-side fetch.
 - An `/api` handler or admin page without a `getSession()` check.
 - Opening a second MongoDB connection instead of using `getDb()`.
+- Calling `fetch` directly instead of `~/lib/http-client` / `~/lib/http-server`.
 - Committing `.env*`, or a `.zip` under `public/code/`.
 - Translating established technical terms in notes into Vietnamese coinages.
 

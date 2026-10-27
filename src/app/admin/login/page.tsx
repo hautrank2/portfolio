@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { requestJson } from "~/lib/api-client";
+import { requestJson } from "~/lib/http-client";
 import { LoginForm } from "./_components/login-form";
 
 const AFTER_LOGIN = "/admin/logtime";

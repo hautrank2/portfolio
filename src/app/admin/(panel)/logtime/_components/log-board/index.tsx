@@ -50,6 +50,7 @@ export const LogBoard = (props: LogBoardProps) => {
     listError,
     taskById,
     categoryById,
+    recentTaskIds,
     openForm,
     handleSubmit,
     handleDelete,
@@ -169,6 +170,7 @@ export const LogBoard = (props: LogBoardProps) => {
         onSubmit={handleSubmit}
         error={formError}
         tasks={props.tasks}
+        recentTaskIds={recentTaskIds}
         categories={props.categories}
       />
     </div>

@@ -2,7 +2,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { labelColorData } from "~/data/admin";
 import { refreshApiQueries } from "~/hooks";
-import { requestJson } from "~/lib/api-client";
+import { requestJson } from "~/lib/http-client";
 import type { LabelInputModel, LabelModel } from "~/types";
 import type { UseLabelPickerProps } from "./type";
 

@@ -1,5 +1,6 @@
 import { useRouter } from "next/navigation";
 import * as React from "react";
+import { httpClient } from "~/lib/http-client";
 import { normalizeCv, tidyCv } from "~/utils/cv";
 import {
   clearCvDraft,
@@ -106,12 +107,7 @@ export const useCvEditor = ({ initialCv }: UseCvEditorProps) => {
   const save = async () => {
     setIsSaving(true);
     try {
-      const response = await fetch("/api/cv", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(cv),
-      });
-      if (!response.ok) throw new Error(String(response.status));
+      await httpClient.put("/api/cv", cv);
       setSaved(tidyCv(cv));
       clearCvDraft();
       router.refresh();

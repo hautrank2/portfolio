@@ -1,6 +1,6 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { requestJson } from "~/lib/api-client";
+import { requestJson } from "~/lib/http-client";
 
 type QueryState<T> = {
   /** Which request the rest of the state belongs to. */

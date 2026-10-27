@@ -4,6 +4,7 @@ import { Controller } from "react-hook-form";
 import { DatePicker } from "~/app/admin/_components/date-picker";
 import { FormField } from "~/app/admin/_components/form-field";
 import { LabelPicker } from "~/app/admin/_components/label-picker";
+import { TaskPicker } from "~/app/admin/_components/task-picker";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -15,19 +16,9 @@ import {
   DialogTitle,
 } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
 import { Textarea } from "~/components/ui/textarea";
 import { useLogForm } from "./hook";
 import type { LogFormDialogProps, LogFormProps } from "./type";
-
-// Radix Select cannot hold an empty-string value, so "no task" needs a name.
-const NO_TASK = "none";
 
 export const LogFormDialog = ({
   open,
@@ -111,24 +102,13 @@ export const LogForm = (props: LogFormProps) => {
             control={form.control}
             name="taskId"
             render={({ field }) => (
-              <Select
-                value={field.value || NO_TASK}
-                onValueChange={(value) =>
-                  field.onChange(value === NO_TASK ? "" : value)
-                }
-              >
-                <SelectTrigger id="log-task" className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={NO_TASK}>No task</SelectItem>
-                  {props.tasks.map((task) => (
-                    <SelectItem key={task.id} value={task.id}>
-                      {task.title}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <TaskPicker
+                id="log-task"
+                tasks={props.tasks}
+                recentTaskIds={props.recentTaskIds}
+                value={field.value}
+                onChange={field.onChange}
+              />
             )}
           />
         </FormField>

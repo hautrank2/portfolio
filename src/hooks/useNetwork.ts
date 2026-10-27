@@ -5,6 +5,7 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
+import { httpClient } from "~/lib/http-client";
 
 /** Connection type estimated by the Network Information API */
 export type EffectiveType = "slow-2g" | "2g" | "3g" | "4g" | "unknown";
@@ -187,9 +188,10 @@ export function useNetwork(options: UseWifiOptions = {}): NetworkInfoModel {
     }
     try {
       const start = performance.now();
-      await fetch(`${pingUrl}?_=${Date.now()}`, {
-        cache: "no-store",
-        method: "GET",
+      // The cache-busting query string is what actually defeats the browser
+      // HTTP cache here — axios has no `fetch`-style `cache` option.
+      await httpClient.get(`${pingUrl}?_=${Date.now()}`, {
+        validateStatus: () => true,
       });
       setLatency(Math.round(performance.now() - start));
     } catch {

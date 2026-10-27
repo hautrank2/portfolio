@@ -4,7 +4,7 @@ import {
   taskStatusLabelData,
 } from "~/data/admin";
 import { useQueryParams, useResourceDialog, useRowSelection } from "~/hooks";
-import { splitList } from "~/lib/api-client";
+import { splitList } from "~/utils/list";
 import type {
   LogtimeInputModel,
   LogtimeModel,

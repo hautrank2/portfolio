@@ -1,14 +1,16 @@
 ---
-trigger: model_decision
-description: Áp dụng khi tạo hoặc sửa một form nằm trong dialog (shadcn Dialog + react-hook-form + zod).
+name: dialog-form
+description: Use when creating or editing a form that lives inside a dialog (shadcn Dialog + react-hook-form + zod) — covers the DialogShell/Form two-component split, the index.tsx/hook.ts/type.ts layout, and a MUI→shadcn mapping table for ported code. Reusable across projects that use shadcn/ui.
 ---
 
 # Form trong Dialog
 
-> **Reusable** (phụ thuộc stack shadcn/ui) — copy sang dự án khác nếu dự án đó
-> cũng dùng shadcn; dự án MUI thì xem bảng đối chiếu bên dưới theo chiều ngược lại.
+> **Reusable** (phụ thuộc stack shadcn/ui) — copy nguyên folder
+> `.claude/skills/dialog-form/` sang dự án khác nếu dự án đó cũng dùng
+> shadcn; dự án MUI thì xem bảng đối chiếu bên dưới theo chiều ngược lại.
 
-- Áp dụng chung với `complex-component-rule.md`: vẫn tách `index.tsx` / `hook.ts` / `type.ts`
+- Áp dụng chung với `docs/rules/complex-component-rule.md`: vẫn tách
+  `index.tsx` / `hook.ts` / `type.ts`
 - Phải có ít nhất 2 component đặt vào file `index.tsx`: vỏ Dialog và Form (xem dưới)
 
 > Stack ở repo này là **shadcn/ui + Tailwind**, không phải MUI. Dialog lấy từ
@@ -118,7 +120,8 @@ export type UseAFormProps = Pick<AFormProps, "defaultValues" | "onSubmit">;
 ```
 
 - Props bắt buộc: **`isEdit`** và **`defaultValues`**.
-- `AFormDialogProps` kế thừa `AFormProps`, đúng như `complex-component-rule.md`.
+- `AFormDialogProps` kế thừa `AFormProps`, đúng như
+  `docs/rules/complex-component-rule.md`.
 - **Định nghĩa zod đặt trong `type.ts`**, cùng chỗ với type suy ra từ nó
   (`z.infer`) để schema và type không bao giờ lệch nhau.
 
