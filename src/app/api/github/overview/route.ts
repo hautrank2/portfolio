@@ -8,7 +8,6 @@ export async function GET() {
 
   try {
     const githubRes = await getGithubOverview();
-    console.log("githubRese", githubRes);
     return Response.json(githubRes);
   } catch (error) {
     // GitHub down, rate-limited, or unreachable — not a client mistake.

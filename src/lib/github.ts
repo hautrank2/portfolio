@@ -56,9 +56,11 @@ const toRepoLines = (repo: GithubRepoResponse) => ({
 const fetchRepoLines = async (fullName: string, handle: string) => {
   const result = await github.get<GithubContributorStat[]>(
     `/repos/${fullName}/stats/contributors`,
-    { validateStatus: (status) => status === 200 || status === 202 },
+    { validateStatus: (status) => [200, 202, 204].includes(status) },
   );
   if (result.status === 202) return { linesAdded: null, linesDeleted: null };
+  // 204 No Content — the repo has no commits yet, so nothing to count.
+  if (result.status === 204) return { linesAdded: 0, linesDeleted: 0 };
 
   const mine = result.data.find((stat) => stat.author?.login === handle);
   const totals = (mine?.weeks ?? []).reduce(
@@ -73,7 +75,7 @@ export const getGithubOverview = async (): Promise<GithubOverviewModel> => {
   const handle = profileData.handle;
 
   console.log("handle", handle);
-  const [reposResult, prResult, commentResult] = await Promise.all([
+  const [reposResult, prResult, issueCommentResult, prCommentResult] = await Promise.all([
     github.get<GithubRepoResponse[]>(`/users/${handle}/repos`, {
       params: { per_page: 100, type: "owner", sort: "pushed" },
     }),
@@ -81,8 +83,13 @@ export const getGithubOverview = async (): Promise<GithubOverviewModel> => {
       params: { q: `author:${handle} type:pr`, per_page: 1 },
     }),
     // Issue/PR comments only — Search has no endpoint for review comments.
+    // Authenticated search rejects a query without is:issue / is:pull-request
+    // (422), so the two kinds are counted separately and summed.
     github.get<GithubSearchResponse>("/search/issues", {
-      params: { q: `commenter:${handle}`, per_page: 1 },
+      params: { q: `commenter:${handle} is:issue`, per_page: 1 },
+    }),
+    github.get<GithubSearchResponse>("/search/issues", {
+      params: { q: `commenter:${handle} is:pull-request`, per_page: 1 },
     }),
   ]);
 
@@ -98,7 +105,7 @@ export const getGithubOverview = async (): Promise<GithubOverviewModel> => {
     repoCount: repos.length,
     totalStars: repos.reduce((sum, repo) => sum + repo.stars, 0),
     pullRequestCount: prResult.data.total_count,
-    commentCount: commentResult.data.total_count,
+    commentCount: issueCommentResult.data.total_count + prCommentResult.data.total_count,
     repos,
   };
 };
