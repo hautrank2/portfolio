@@ -12,6 +12,7 @@ import {
 } from "~/components/ui/table";
 import { TechnologyBadge } from "~/app/admin/_components/technology-list";
 import type { GithubOverviewModel, GithubRepoModel } from "~/types";
+import { RepoReview } from "./repo-review";
 
 export type GithubBoardProps = {
   overview: GithubOverviewModel;
@@ -70,13 +71,15 @@ export const GithubBoard = ({ overview }: GithubBoardProps) => {
         </div>
       </dl>
 
-      <p className="rounded-lg border border-dashed border-border/60 px-4 py-3 text-sm text-muted-foreground">
-        AI code review (Claude) — coming soon.
-      </p>
+      <h2 className="text-sm font-medium text-muted-foreground">
+        Pushed in the last 30 days
+      </h2>
 
-      <div className="surface overflow-hidden rounded-xl border border-border/60">
+      {/* `Table` wraps itself in an `overflow-x-auto` div, which would trap a
+          sticky header — so this outer div scrolls both ways instead. */}
+      <div className="surface max-h-[70vh] overflow-auto rounded-xl border border-border/60 [&>[data-slot=table-container]]:overflow-visible">
         <Table>
-          <TableHeader>
+          <TableHeader className="sticky top-0 z-10 bg-card">
             <TableRow>
               <TableHead>Repository</TableHead>
               <TableHead>Language</TableHead>
@@ -84,9 +87,20 @@ export const GithubBoard = ({ overview }: GithubBoardProps) => {
               <TableHead className="text-right">Forks</TableHead>
               <TableHead className="text-right">Lines</TableHead>
               <TableHead>Pushed</TableHead>
+              <TableHead className="text-right">AI review</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
+            {repos.length === 0 && (
+              <TableRow>
+                <TableCell
+                  colSpan={7}
+                  className="py-8 text-center text-muted-foreground"
+                >
+                  No repos pushed in the last 30 days.
+                </TableCell>
+              </TableRow>
+            )}
             {repos.map((repo) => (
               <TableRow key={repo.id}>
                 <TableCell className="max-w-sm">
@@ -130,6 +144,9 @@ export const GithubBoard = ({ overview }: GithubBoardProps) => {
                 </TableCell>
                 <TableCell className="text-sm text-muted-foreground">
                   {new Date(repo.pushedAt).toLocaleDateString("en-GB")}
+                </TableCell>
+                <TableCell className="text-right">
+                  <RepoReview repo={repo.name} />
                 </TableCell>
               </TableRow>
             ))}

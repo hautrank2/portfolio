@@ -20,6 +20,28 @@ export type GithubRepoModel = {
   linesDeleted: number | null;
 };
 
+/** What a client sends to have a repo's latest commit reviewed. */
+export type GithubReviewInputModel = {
+  /** Repo name under the handle, e.g. `portfolio` — not `owner/name`. */
+  repo: string;
+};
+
+/** Claude's review of one repo's latest commit on its default branch. */
+export type GithubCommitReviewModel = {
+  repo: string;
+  sha: string;
+  /** First line of the commit message. */
+  title: string;
+  url: string;
+  committedAt: string;
+  /** Plain text — shown as-is, not rendered as markdown. */
+  review: string;
+  /** The model that wrote the review; differs from the requested one after a fallback. */
+  model: string;
+  /** Files left out of the diff: lockfiles and binaries with no patch. */
+  skippedFiles: string[];
+};
+
 /** What the GitHub admin page shows — one request's worth of GitHub data. */
 export type GithubOverviewModel = {
   handle: string;

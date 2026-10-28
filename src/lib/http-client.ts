@@ -17,6 +17,8 @@ export type ApiResult<T> =
 type RequestOptions = {
   method?: "GET" | "POST" | "PUT" | "DELETE";
   body?: unknown;
+  /** Milliseconds; only for endpoints known to be slow, like a code review. */
+  timeout?: number;
 };
 
 const errorFromPayload = (payload: unknown, fallback: string) =>
@@ -30,10 +32,10 @@ const errorFromPayload = (payload: unknown, fallback: string) =>
  */
 export const requestJson = async <T>(
   url: string,
-  { method = "GET", body }: RequestOptions = {}
+  { method = "GET", body, timeout }: RequestOptions = {}
 ): Promise<ApiResult<T>> => {
   try {
-    const response = await httpClient.request<T>({ url, method, data: body });
+    const response = await httpClient.request<T>({ url, method, data: body, timeout });
     return { ok: true, data: response.data };
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {

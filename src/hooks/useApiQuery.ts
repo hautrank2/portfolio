@@ -1,6 +1,6 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { requestJson } from "~/lib/http-client";
+import { requestJson, type ApiResult } from "~/lib/http-client";
 
 type QueryState<T> = {
   /** Which request the rest of the state belongs to. */
@@ -11,8 +11,28 @@ type QueryState<T> = {
 
 const listeners = new Set<() => void>();
 
+/**
+ * Requests still in flight, by URL. Strict Mode runs every effect twice in
+ * development, and the panel layout and a page can ask for the same URL —
+ * both share one request instead of each sending their own.
+ */
+const inFlight = new Map<string, Promise<ApiResult<unknown>>>();
+
+const requestShared = <T>(url: string) => {
+  const pending = inFlight.get(url);
+  if (pending) return pending as Promise<ApiResult<T>>;
+
+  const request = requestJson<T>(url).finally(() => {
+    if (inFlight.get(url) === request) inFlight.delete(url);
+  });
+  inFlight.set(url, request);
+  return request;
+};
+
 /** Makes every mounted `useApiQuery` fetch again — call it after a write. */
 export const refreshApiQueries = () => {
+  // A request sent before the write may answer with the old data.
+  inFlight.clear();
   for (const listener of listeners) listener();
 };
 
@@ -40,7 +60,7 @@ export const useApiQuery = <T>(url: string | null) => {
     if (url === null) return;
     let cancelled = false;
 
-    void requestJson<T>(url).then((result) => {
+    void requestShared<T>(url).then((result) => {
       // A newer request has started; this answer is for a URL nobody shows.
       if (cancelled) return;
       if (result.ok) {

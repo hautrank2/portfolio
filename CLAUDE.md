@@ -45,12 +45,20 @@ only applies to that one situation; see *Source Code Rules* below.
 | Markdown | `unified` — remark to rehype to **React elements** (`src/components/blog/markdown.tsx`) |
 | Database | **MongoDB** via the official `mongodb` driver — admin area only |
 | HTTP client | **axios** — browser calls via `~/lib/http-client`, server-to-external-API calls via `~/lib/http-server` |
+| LLM | **`@anthropic-ai/sdk`** — Claude, server only, through `~/lib/anthropic` |
 | Auth | `jose` (HS256 JWT in an httpOnly cookie) + `bcryptjs` |
 | Forms & validation | `react-hook-form` + `zod` |
 | Package manager | **pnpm** |
 | Tests | none configured — do not invent a test command |
 
-There is no Vite, no MUI, no TanStack, no Zustand, no ORM.
+There is no Vite, no MUI, no Zustand, no ORM.
+
+**TanStack is allowed on the client side only** (e.g. `@tanstack/react-query`,
+`@tanstack/react-table`) — inside Client Components, i.e. the admin UI. Never
+in a public page or a Server Component, and it does not replace the HTTP
+clients below: a TanStack query still calls `~/lib/http-client`. It is not
+installed yet; until admin data fetching moves to it, `useApiQuery` stays the
+way admin pages read.
 
 Two halves with different rules:
 
@@ -218,8 +226,10 @@ database out of everything else.
 - **`lib/` is only for code that talks to something outside the app:** MongoDB
   (`db`, `task`, `logtime`, `project`, `label`), HTTP (`http-client` for the
   browser, `http-server` for server-to-external-API calls), and one file per
-  external service built on `http-server` (`github`, for now — the GitHub
-  admin page's PR/comment/line counts; no Claude-based review yet).
+  external service built on `http-server` (`github` — the GitHub admin page's
+  PR/comment/line counts and commit diffs). `anthropic` is the one service
+  that uses its vendor SDK instead of `http-server`; `code-review` joins the
+  two for the GitHub page's on-demand review of a repo's latest commit.
   Everything else — content loaders, auth, schemas, date and paging helpers,
   route-handler helpers — lives in `utils/`. The one exception is
   `lib/utils.ts` (`cn`), which stays put because shadcn's CLI writes imports
@@ -284,7 +294,9 @@ database out of everything else.
   Never import this from a Client Component; it is where secrets such as API
   keys get attached as headers.
 - Do not add `fetch` calls anywhere in `src/` — go through one of the two
-  clients above so timeouts, headers and error shape stay consistent.
+  clients above so timeouts, headers and error shape stay consistent. The
+  exception is Claude: `~/lib/anthropic` uses `@anthropic-ai/sdk`, which owns
+  its own retries, streaming and typed errors.
 
 ### Environment
 
@@ -295,6 +307,7 @@ database out of everything else.
 | `AUTH_SECRET` | `utils/auth.ts` | at least 32 characters |
 | `ADMIN_USERNAME`, `ADMIN_PASSWORD` | `scripts/seed-admin.mjs` only | never read by the app |
 | `GITHUB_TOKEN` | `lib/github.ts` | optional — raises the GitHub API rate limit; works unauthenticated without it |
+| `ANTHROPIC_API_KEY` | `lib/anthropic.ts` | optional — without it `POST /api/github/review` answers `503`; each review is a paid Claude call |
 
 - `.env*` is gitignored. Never commit a secret, print one, or paste one into a
   note. Only the bcrypt hash of the admin password is stored.
@@ -323,7 +336,7 @@ src/
 │   ├── _components/   # sections used only by the home page
 │   ├── <route>/_components/  # components used only by that route
 │   ├── admin/         # login, plus the (panel) group: sidebar, logtime, tasks, projects, github
-│   ├── api/           # route handlers: auth, projects, tasks, logtimes, categories, tags, cv, github
+│   ├── api/           # route handlers: auth, projects, tasks, logtimes, categories, tags, cv, github (overview, review)
 │   └── code/[slug]/   # builds the exercise zip
 ├── assets/fonts/
 ├── components/        # only what more than one route uses
@@ -337,7 +350,7 @@ src/
 │   └── icons/
 ├── data/              # static site content (profile, projects, cv.json)
 ├── hooks/             # shared hooks + barrel (useXxx.ts)
-├── lib/               # talks to the outside: db, http-client, http-server, task, logtime, project, label, github (+ cn)
+├── lib/               # talks to the outside: db, http-client, http-server, task, logtime, project, label, github, anthropic, code-review (+ cn)
 ├── styles/
 ├── types/             # shared types + barrel
 └── utils/             # everything else: content loaders, auth, schema, admin-time, local, …
