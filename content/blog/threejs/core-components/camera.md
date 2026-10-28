@@ -69,6 +69,9 @@ isometric, và mọi thứ cần đo đạc chính xác trên màn hình.
 
 ## Bài tập
 
+> Code dưới import `createLab` từ `./lab` — bộ khung dùng chung viết ở
+> [Bài 8](/blog/threejs/getting-started/course-boilerplate). Chưa có thì chép `src/lab.ts` ở đó trước.
+
 Bốn khối **giống hệt nhau** đặt xa dần. Chỉ phối cảnh mới làm chúng khác kích thước.
 
 ```ts

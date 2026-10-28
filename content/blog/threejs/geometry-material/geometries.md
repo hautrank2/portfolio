@@ -49,6 +49,9 @@ thật sự cần dời từng đỉnh.
 
 ## Bài tập 1 — bảng tra geometry dựng sẵn
 
+> Code dưới import `createLab` từ `./lab` — bộ khung dùng chung viết ở
+> [Bài 8](/blog/threejs/getting-started/course-boilerplate). Chưa có thì chép `src/lab.ts` ở đó trước.
+
 Mười hai loại đứng cạnh nhau, kèm số đỉnh và số tam giác của từng loại.
 
 ```ts

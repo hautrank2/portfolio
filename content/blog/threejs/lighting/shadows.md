@@ -74,6 +74,9 @@ bay. `normalBias` ít gây chuyện đó hơn, nên thử nó trước.
 
 ## Bài tập
 
+> Code dưới import `createLab` từ `./lab` — bộ khung dùng chung viết ở
+> [Bài 8](/blog/threejs/getting-started/course-boilerplate). Chưa có thì chép `src/lab.ts` ở đó trước.
+
 Năm quả cầu nhấp nhô trên sàn, có helper vẽ khung shadow camera.
 
 ```ts

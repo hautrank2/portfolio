@@ -57,6 +57,9 @@ tam giác chứ không ở toạ độ.
 
 ## Bài tập
 
+> Code dưới import `createLab` từ `./lab` — bộ khung dùng chung viết ở
+> [Bài 8](/blog/threejs/getting-started/course-boilerplate). Chưa có thì chép `src/lab.ts` ở đó trước.
+
 Một nút thắt, một mặt phẳng phía sau, và panel để vặn từng thuộc tính.
 
 ```ts

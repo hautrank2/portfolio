@@ -52,6 +52,9 @@ ra thì lỗi nằm ở **ánh sáng**, không phải ở hình học hay camera
 
 ## Bài tập
 
+> Code dưới import `createLab` từ `./lab` — bộ khung dùng chung viết ở
+> [Bài 8](/blog/threejs/getting-started/course-boilerplate). Chưa có thì chép `src/lab.ts` ở đó trước.
+
 Tám loại, cùng một quả cầu, có nhãn tên bên dưới.
 
 ```ts

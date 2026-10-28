@@ -82,6 +82,9 @@ Bước 6 quan trọng vì trình duyệt giới hạn số WebGL context đồn
 
 ## Bài tập — máy đo rò rỉ
 
+> Code dưới import `createLab` từ `./lab` — bộ khung dùng chung viết ở
+> [Bài 8](/blog/threejs/getting-started/course-boilerplate). Chưa có thì chép `src/lab.ts` ở đó trước.
+
 Sinh 40 mesh mới mỗi nửa giây và vứt lô cũ đi. Bấm chuột để đổi giữa `remove()` và
 `dispose()`, rồi nhìn con số `geometries` ở góc trái.
 

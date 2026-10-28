@@ -80,6 +80,9 @@ Kiểu cũ, gặp trong tutorial đời trước. Vẫn chạy, nhưng HDR tiệ
 
 ## Bài tập
 
+> Code dưới import `createLab` từ `./lab` — bộ khung dùng chung viết ở
+> [Bài 8](/blog/threejs/getting-started/course-boilerplate). Chưa có thì chép `src/lab.ts` ở đó trước.
+
 Năm quả cầu kim loại, `roughness` tăng dần từ trái sang phải, và **không một cái đèn nào**.
 
 ```ts

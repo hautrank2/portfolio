@@ -3,8 +3,8 @@
 Personal portfolio for Hậu Trần. Four parts share one Next.js app:
 
 - **Public site** — home, about, showcase, CV / resume.
-- **Blog** — learning notes that grow into per-topic roadmaps. Kubernetes is
-  live; Three.js exists but is hidden with `draft: true`.
+- **Blog** — learning notes that grow into per-topic roadmaps. Kubernetes and
+  Three.js are live.
 - **Recipes** — a flat shelf of food and coffee notes.
 - **Admin** — a private, signed-in area (`/admin`) for the owner's work log.
   It is the only part backed by a database.
@@ -176,6 +176,8 @@ Code that predates a convention and is deliberately **not** being renamed:
   object, manifest, Pod, Deployment, Service, volume, mount target, rollout.
   Do not coin Vietnamese replacements ("bản khai" for a Kubernetes object) —
   the reader will meet the English word in `kubectl` output and in the docs.
+  Full guide with examples: the `blog-writing` skill
+  (`.claude/skills/blog-writing/SKILL.md`).
 - Use one term for one thing across a track. In the k8s notes, *object* is a
   thing that exists in the cluster and *manifest* is the YAML file that
   declares it; do not swap them.

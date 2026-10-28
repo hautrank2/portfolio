@@ -39,6 +39,9 @@ Bấm vào panel để đổi bảng.
 
 ## Bài tập — nhìn FPS tụt theo thời gian thực
 
+> Code dưới import `createLab` từ `./lab` — bộ khung dùng chung viết ở
+> [Bài 8](/blog/threejs/getting-started/course-boilerplate). Chưa có thì chép `src/lab.ts` ở đó trước.
+
 Bấm chuột vào scene để thêm 20 khối mỗi lần, và nhìn con số ở góc trái trôi xuống.
 
 ```ts

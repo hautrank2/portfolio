@@ -61,6 +61,9 @@ scene.attach(mesh);   // giữ WORLD transform -> mesh đứng yên, local đư�
 
 ## Bài tập 1 — hệ mặt trời hai tầng
 
+> Code dưới import `createLab` từ `./lab` — bộ khung dùng chung viết ở
+> [Bài 8](/blog/threejs/getting-started/course-boilerplate). Chưa có thì chép `src/lab.ts` ở đó trước.
+
 Mặt trăng quay quanh trái đất đang quay quanh mặt trời. **Không một dòng lượng giác nào.**
 
 ```ts

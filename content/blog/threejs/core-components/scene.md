@@ -1,6 +1,6 @@
 ---
 title: "Bài 9 — Scene"
-description: Scene chỉ là node gốc của một cái cây, cộng ba thuộc tính toàn cục.
+description: Scene chỉ là node gốc của một cái cây, cộng ba global property.
 status: seed
 created: 2026-08-23
 updated: 2026-08-23
@@ -8,10 +8,10 @@ tags: [threejs, basics]
 ---
 
 `Scene` kế thừa `Object3D`. Nó không vẽ, không tính, không giữ trạng thái WebGL nào —
-chỉ là **node gốc của một cái cây**, cộng thêm ba thuộc tính có tác dụng lên toàn bộ
+chỉ là **node gốc của một cái cây**, cộng thêm ba property có tác dụng lên toàn bộ
 scene.
 
-## Ba thuộc tính toàn cục
+## Global properties
 
 ```ts
 scene.background = new THREE.Color(0x0e1116);   // màu, Texture, hoặc CubeTexture
@@ -56,6 +56,9 @@ không nói tới. Có một note riêng ở
 
 ## Bài tập
 
+> Code dưới import `createLab` từ `./lab` — bộ khung dùng chung viết ở
+> [Bài 8](/blog/threejs/getting-started/course-boilerplate). Chưa có thì chép `src/lab.ts` ở đó trước.
+
 Một hàng khối chạy về phía xa, để nhìn thấy fog đang làm gì.
 
 ```ts
@@ -66,7 +69,7 @@ import { createLab } from "./lab";
 const { scene, camera, readout } = createLab({ helpers: false });
 camera.position.set(0, 2, 8);
 
-// Scene chỉ là node gốc, cộng ba thuộc tính toàn cục: background, fog, environment
+// Scene chỉ là node gốc, cộng ba global property: background, fog, environment
 scene.background = new THREE.Color(0x0e1116);
 scene.fog = new THREE.Fog(0x0e1116, 6, 40);
 

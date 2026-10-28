@@ -56,6 +56,9 @@ thì có chỗ chưa `dispose()`.
 
 ## Bài tập
 
+> Code dưới import `createLab` từ `./lab` — bộ khung dùng chung viết ở
+> [Bài 8](/blog/threejs/getting-started/course-boilerplate). Chưa có thì chép `src/lab.ts` ở đó trước.
+
 ```ts
 import * as THREE from "three";
 import GUI from "three/addons/libs/lil-gui.module.min.js";

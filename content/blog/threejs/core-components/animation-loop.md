@@ -91,6 +91,9 @@ không phải khung hình sắp vẽ.
 
 ## Bài tập — đặt hai cách viết cạnh nhau
 
+> Code dưới import `createLab` từ `./lab` — bộ khung dùng chung viết ở
+> [Bài 8](/blog/threejs/getting-started/course-boilerplate). Chưa có thì chép `src/lab.ts` ở đó trước.
+
 Khối **đỏ** cộng hằng số, khối **xanh** nhân delta.
 
 ```ts
