@@ -37,11 +37,6 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          {/* Blurred gradient blob, parked behind everything. */}
-          <div
-            aria-hidden
-            className="pointer-events-none fixed inset-0 -z-10 print:hidden bg-[url(/svg/bg-gr.svg)] bg-[length:150vw_auto] bg-[-20vw_-60vh] bg-no-repeat opacity-30 dark:opacity-60"
-          />
           <SiteFrame
             header={<Header />}
             footer={<Footer />}

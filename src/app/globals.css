@@ -44,6 +44,8 @@
 }
 
 :root {
+  --portrait-scrim: oklch(0.19 0.025 250 / 85%);
+  --portrait-caption: oklch(0.97 0.01 250);
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.129 0.042 264.695);

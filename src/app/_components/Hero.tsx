@@ -1,99 +1,71 @@
-import { ArrowRight, MapPin } from "lucide-react";
+import { ArrowDown, ArrowRight, Braces, Code2, MapPin, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
 import { Button } from "~/components/ui/button";
 import { Reveal } from "~/components/ui/reveal";
-import { Typography } from "~/components/ui/typography";
 import { profileData, stackData } from "~/data/site";
 
-function Hero() {
+const Hero = () => {
   return (
-    <section id="banner" className="relative overflow-hidden">
-      <div
-        aria-hidden
-        className="bg-grid pointer-events-none absolute inset-0 -z-10 [mask-image:radial-gradient(ellipse_at_top,black,transparent_75%)]"
-      />
-
-      <div className="mx-auto w-full max-w-6xl px-4 pb-16 pt-20 sm:px-8 lg:px-16 lg:pb-24 lg:pt-28">
-        <div className="grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-16">
+    <section id="banner" className="studio-hero relative overflow-hidden">
+      <div aria-hidden="true" className="studio-aurora" />
+      <div className="mx-auto w-full max-w-6xl px-4 pb-10 pt-14 sm:px-8 lg:px-16 lg:pt-24">
+        <div className="mb-12 flex items-center justify-between gap-4 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground sm:text-xs">
+          <span className="flex items-center gap-2"><span className="studio-status" /> Personal portfolio / {profileData.handle}</span>
+          <span className="hidden sm:block">Design meets development</span>
+        </div>
+        <div className="grid items-center gap-14 lg:grid-cols-[1.2fr_1fr] lg:gap-10">
           <Reveal>
-            <p className="surface inline-flex items-center gap-2 rounded-full border border-border/60 px-3 py-1.5 text-xs font-medium text-muted-foreground">
-              <MapPin size={14} className="text-primary" />
-              {profileData.role} · {profileData.location}
-            </p>
-
-            <Typography
-              variant="h1"
-              className="mt-6 text-5xl font-extrabold uppercase leading-[0.95] tracking-tight sm:text-7xl xl:text-8xl"
-            >
-              <span className="block text-2xl font-medium normal-case tracking-normal text-muted-foreground sm:text-3xl">
-                I am
-              </span>
-              <span className="text-gradient block">{profileData.name}</span>
-            </Typography>
-
-            <Typography
-              variant="p"
-              className="mt-6 max-w-xl text-lg leading-relaxed text-foreground/80 sm:text-xl"
-            >
-              {profileData.tagline}
-            </Typography>
-
-            <div className="mt-8 flex flex-wrap gap-2">
-              {stackData.map((stack) => (
-                <span
-                  key={stack.title}
-                  className="surface rounded-full border border-border/60 px-4 py-1.5 text-sm font-medium"
-                >
-                  {stack.title}
-                </span>
-              ))}
+            <p className="mb-5 flex items-center gap-2 text-sm text-muted-foreground"><MapPin size={14} className="text-primary" /> {profileData.location}</p>
+            <h1 className="studio-title"><span className="studio-intro">Hello, I’m</span>Hau<span className="text-primary"> Tran.</span></h1>
+            <p className="mt-6 flex items-center gap-3 text-lg font-medium sm:text-xl"><span className="h-px w-8 bg-primary" /> {profileData.role}<span className="studio-caret" aria-hidden="true">_</span></p>
+            <p className="mt-5 max-w-lg text-base leading-relaxed text-muted-foreground sm:text-lg">{profileData.tagline}</p>
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <Button asChild size="lg" className="studio-button group rounded-full"><Link href="/showcase">Explore my work <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" /></Link></Button>
+              <Button asChild size="lg" variant="outline" className="rounded-full border-border/70 bg-background/30"><Link href="/about">A little about me <span aria-hidden="true">↗</span></Link></Button>
             </div>
-
-            <div className="mt-10 flex flex-wrap items-center gap-3">
-              <Button asChild size="lg" className="group rounded-full">
-                <Link href="/showcase">
-                  View showcase
-                  <ArrowRight
-                    size={16}
-                    className="transition-transform group-hover:translate-x-1"
-                  />
-                </Link>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="rounded-full"
-              >
-                <Link href="/about">More about me</Link>
-              </Button>
+            <div className="mt-9 flex flex-wrap gap-x-5 gap-y-2 font-mono text-xs text-muted-foreground">
+              {stackData.map((stack, i) => <span key={stack.title} className="flex items-center gap-2"><span className="text-primary/60">0{i + 1}</span>{stack.title}</span>)}
             </div>
           </Reveal>
-
-          <Reveal delay={120} className="order-first lg:order-none">
-            <div className="relative mx-auto w-fit">
-              <div
-                aria-hidden
-                className="absolute -inset-8 rounded-full bg-primary/25 blur-3xl"
-              />
-              <div className="relative rounded-full bg-gradient-to-br from-primary via-primary/40 to-transparent p-[3px]">
+          <Reveal delay={160} className="studio-visual">
+            <div className="studio-orbit studio-orbit-one" aria-hidden="true"><span /></div>
+            <div className="studio-orbit studio-orbit-two" aria-hidden="true"><span /></div>
+            <div className="studio-portrait">
+              <div className="studio-window">
+                <span /><span /><span />
+                <span className="ml-auto font-mono text-[10px] tracking-wider text-muted-foreground">hello_world.tsx</span>
+                <Code2 size={13} className="ml-2 text-primary" />
+              </div>
+              <div className="studio-photo">
                 <Image
-                  className="size-48 rounded-full object-cover sm:size-64 lg:size-80"
+                  className="h-full w-full object-cover"
                   src={profileData.avatar}
                   alt={profileData.name}
-                  width={320}
-                  height={320}
+                  width={420}
+                  height={460}
                   priority
                 />
+                <div className="studio-photo-caption"><span className="studio-status" /> The human behind the pixels</div>
+              </div>
+              <div className="studio-code">
+                <span className="text-primary">const</span> developer = <span className="text-primary">&#123;</span><br />
+                <span className="pl-4">craft: <span className="text-foreground">&quot;thoughtful websites&quot;</span>,</span><br />
+                <span className="pl-4">always: <span className="text-foreground">&quot;learning&quot;</span></span><br />
+                <span className="text-primary">&#125;;</span>
               </div>
             </div>
+            <div className="studio-float studio-float-top"><Braces size={19} /><span>Built with curiosity</span></div>
+            <div className="studio-float studio-float-bottom"><Sparkles size={18} /><span>A little detail. A lot of care.</span></div>
           </Reveal>
+        </div>
+        <div className="studio-hero-footer mt-16 flex items-center justify-between gap-4 border-t border-border/60 pt-6">
+          <Link href="#experiences" className="group inline-flex items-center gap-3 text-xs text-muted-foreground"><span className="studio-scroll"><ArrowDown size={14} /></span> Scroll to discover</Link>
+          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Thoughtfully designed. Carefully built.</span>
         </div>
       </div>
     </section>
   );
-}
+};
 
 export default Hero;

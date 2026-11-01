@@ -9,12 +9,15 @@ import AboutCta from "./_components/AboutCta";
 import Hero from "./_components/Hero";
 import ProjectSection from "./_components/ProjectSection";
 import QuickFacts from "./_components/QuickFacts";
+import ThemeEffects from "./_components/theme-effects";
+import "./theme.css";
 
 export default function Home() {
   const moreProjects = projectData.length - featuredProjectData.length;
 
   return (
-    <div className="flex flex-col gap-24 pb-24 sm:gap-32">
+    <div className="portfolio-home relative flex flex-col gap-24 pb-24 sm:gap-32">
+      <ThemeEffects />
       <Hero />
 
       <QuickFacts />
@@ -36,7 +39,7 @@ export default function Home() {
 
       <section
         id="projects"
-        className="scroll-mt-24 border-y border-border/60 bg-primary/5 py-16 sm:py-20"
+        className="portfolio-projects relative scroll-mt-24 border-y border-border/60 py-16 sm:py-20"
       >
         <div className="mx-auto w-full max-w-6xl px-4 sm:px-8 lg:px-16">
           <Reveal>
