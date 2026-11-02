@@ -1,5 +1,6 @@
 "use client";
 
+import { FormField } from "~/app/admin/_components/form-field";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -10,9 +11,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "~/components/ui/select";
 import { Textarea } from "~/components/ui/textarea";
 import { useTaskImport } from "./hook";
 import type { TaskImportDialogProps } from "./type";
+
+// Radix Select cannot hold an empty-string value, so "no project" needs a name.
+const NO_PROJECT = "none";
 
 const EXAMPLE = `[
   {
@@ -26,8 +37,16 @@ const EXAMPLE = `[
 ]`;
 
 export const TaskImportDialog = (props: TaskImportDialogProps) => {
-  const { text, handleTextChange, count, error, isSubmitting, handleSubmit } =
-    useTaskImport(props);
+  const {
+    text,
+    handleTextChange,
+    projectId,
+    setProjectId,
+    count,
+    error,
+    isSubmitting,
+    handleSubmit,
+  } = useTaskImport(props);
 
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
@@ -37,13 +56,34 @@ export const TaskImportDialog = (props: TaskImportDialogProps) => {
             <DialogTitle>Import tasks</DialogTitle>
             <DialogDescription>
               Paste a JSON array. Only <code>title</code> is required; status defaults
-              to TODO and priority to MEDIUM
-              {props.defaultProjectId && ", and tasks without a projectId join the filtered project"}
-              .
+              to TODO and priority to MEDIUM.
             </DialogDescription>
           </DialogHeader>
 
           <div className="flex-1 space-y-3 overflow-y-auto px-6 py-4">
+            <FormField
+              label="Project"
+              htmlFor="task-import-project"
+              hint="For tasks without a projectId."
+            >
+              <Select
+                value={projectId || NO_PROJECT}
+                onValueChange={(value) => setProjectId(value === NO_PROJECT ? "" : value)}
+              >
+                <SelectTrigger id="task-import-project" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={NO_PROJECT}>No project</SelectItem>
+                  {props.projects.map((project) => (
+                    <SelectItem key={project.id} value={project.id}>
+                      {project.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FormField>
+
             <Textarea
               aria-label="Tasks as JSON"
               rows={14}

@@ -303,8 +303,10 @@ export const TaskBoard = (props: TaskBoardProps) => {
       />
 
       <TaskImportDialog
+        key={filter.projectId ?? ALL_PROJECTS}
         open={importOpen}
         onOpenChange={setImportOpen}
+        projects={props.projects}
         defaultProjectId={filter.projectId}
       />
 

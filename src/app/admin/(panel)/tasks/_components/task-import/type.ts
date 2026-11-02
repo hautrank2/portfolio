@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { taskPriorityData, taskStatusData } from "~/data/admin";
+import type { WorkProjectModel } from "~/types";
+
 /** Same cap as `POST /api/tasks/bulk`. */
 export const MAX_IMPORT_TASKS = 100;
 
@@ -30,7 +32,8 @@ export type TaskImportItem = z.infer<typeof taskImportItemSchema>;
 export type TaskImportDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  /** Tasks without a `projectId` go to this one — the project being filtered. */
+  projects: WorkProjectModel[];
+  /** Starting choice for tasks without a `projectId` — the project being filtered. */
   defaultProjectId?: string;
 };
 

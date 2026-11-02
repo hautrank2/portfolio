@@ -62,15 +62,16 @@ const parse = (
 export const useTaskImport = ({ onOpenChange, defaultProjectId }: UseTaskImportProps) => {
   const router = useRouter();
   const [text, setText] = useState("");
+  const [projectId, setProjectId] = useState(defaultProjectId ?? "");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const preview = text.trim() ? parse(text, defaultProjectId) : null;
+  const preview = text.trim() ? parse(text, projectId) : null;
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setError(null);
-    const result = parse(text, defaultProjectId);
+    const result = parse(text, projectId);
     if (result.error) return setError(result.error);
 
     setIsSubmitting(true);
@@ -97,6 +98,8 @@ export const useTaskImport = ({ onOpenChange, defaultProjectId }: UseTaskImportP
   return {
     text,
     handleTextChange,
+    projectId,
+    setProjectId,
     count: preview?.inputs?.length ?? 0,
     error: error ?? preview?.error ?? null,
     isSubmitting,
