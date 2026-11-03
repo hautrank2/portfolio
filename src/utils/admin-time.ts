@@ -71,6 +71,10 @@ export const shiftDay = (day: string, delta: number) =>
     .toISOString()
     .slice(0, 10);
 
+/** Whole days from `from` to `to`; negative when `to` comes first. */
+export const daysBetween = (from: string, to: string) =>
+  (Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86_400_000;
+
 /** Every day from `from` to `to`, both inclusive, in order. */
 export const daysInRange = (from: string, to: string) => {
   const days: string[] = [];

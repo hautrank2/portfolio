@@ -14,17 +14,17 @@ import {
 
 const isDay = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value);
 
+// A plain day is read in the admin zone, like the date picker does.
+const toIsoDate = (value: string) =>
+  isDay(value) ? toIso(value) : new Date(value).toISOString();
+
 const toInput = (item: TaskImportItem, defaultProjectId?: string): TaskInputModel => ({
   title: item.title,
   description: item.description?.trim() || undefined,
   status: item.status ?? "TODO",
   priority: item.priority ?? "MEDIUM",
-  // A plain day is read in the admin zone, like the date picker does.
-  dueDate: item.dueDate
-    ? isDay(item.dueDate)
-      ? toIso(item.dueDate)
-      : new Date(item.dueDate).toISOString()
-    : undefined,
+  startDate: item.startDate ? toIsoDate(item.startDate) : undefined,
+  dueDate: item.dueDate ? toIsoDate(item.dueDate) : undefined,
   projectId: item.projectId || defaultProjectId || undefined,
   tagIds: item.tagIds ?? [],
   categoryIds: item.categoryIds ?? [],

@@ -48,7 +48,13 @@ const TasksContent = () => {
   if (filter.status) listQuery.set("status", filter.status);
   if (filter.projectId) listQuery.set("project", filter.projectId);
 
+  // Gantt is the default view; the table is `?view=table`.
+  const isGantt = searchParams.get("view") !== "table";
+
   const tasks = useApiQuery<PageModel<TaskModel>>(`/api/tasks?${listQuery}`);
+  // A timeline cut off at a page would be misleading, so the Gantt view reads
+  // the whole list.
+  const allTasks = useApiQuery<{ items: TaskModel[] }>(isGantt ? "/api/tasks" : null);
   const statusCounts = useApiQuery<Record<TaskStatusType, number>>(
     filter.projectId
       ? `/api/tasks/status-counts?project=${filter.projectId}`
@@ -60,6 +66,7 @@ const TasksContent = () => {
 
   if (
     !tasks.data ||
+    (isGantt && !allTasks.data) ||
     !statusCounts.data ||
     !projects.data ||
     !tags.data ||
@@ -69,6 +76,7 @@ const TasksContent = () => {
       <QueryStatus
         error={
           tasks.error ??
+          allTasks.error ??
           statusCounts.error ??
           projects.error ??
           tags.error ??
@@ -81,6 +89,7 @@ const TasksContent = () => {
   return (
     <TaskBoard
       tasks={tasks.data}
+      allTasks={isGantt ? allTasks.data?.items : undefined}
       filter={filter}
       statusCounts={statusCounts.data}
       projects={projects.data.items}

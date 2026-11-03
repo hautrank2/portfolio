@@ -90,7 +90,7 @@ export const TaskForm = (props: TaskFormProps) => {
           />
         </FormField>
 
-        <div className="grid gap-5 sm:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2">
           <FormField label="Status" htmlFor="task-status">
             <Controller
               control={form.control}
@@ -129,6 +129,27 @@ export const TaskForm = (props: TaskFormProps) => {
                     ))}
                   </SelectContent>
                 </Select>
+              )}
+            />
+          </FormField>
+
+          <FormField
+            label="Start date"
+            htmlFor="task-start"
+            error={errors.startDate?.message}
+          >
+            <Controller
+              control={form.control}
+              name="startDate"
+              render={({ field }) => (
+                <DatePicker
+                  id="task-start"
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="No start date"
+                  clearable
+                  aria-invalid={Boolean(errors.startDate)}
+                />
               )}
             />
           </FormField>

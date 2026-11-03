@@ -1,6 +1,6 @@
 "use client";
 
-import { Braces, Clock, Plus } from "lucide-react";
+import { Braces, ChartGantt, Clock, Plus, Rows3 } from "lucide-react";
 import { DataTableShell } from "~/app/admin/_components/data-table-shell";
 import { LabelChip } from "~/app/admin/_components/label-chip";
 import { RowActions } from "~/app/admin/_components/row-actions";
@@ -40,6 +40,7 @@ import { cn } from "~/lib/utils";
 import type { TaskPriorityType, TaskStatusType } from "~/types";
 import { LogFormDialog } from "~/app/admin/(panel)/logtime/_components/log-form";
 import { TaskFormDialog } from "../task-form";
+import { TaskGantt } from "../task-gantt";
 import { TaskImportDialog } from "../task-import";
 import { ALL_PROJECTS, useTaskBoard } from "./hook";
 import type { TaskBoardProps } from "./type";
@@ -53,6 +54,11 @@ const PRIORITY_VARIANTS: Record<
   HIGH: "default",
   URGENT: "destructive",
 };
+
+const VIEW_OPTIONS = [
+  { value: "table", label: "Table", icon: Rows3 },
+  { value: "gantt", label: "Gantt", icon: ChartGantt },
+] as const;
 
 const STATUS_OPTIONS: StatusOption<TaskStatusType>[] = taskStatusData.map(
   (status) => ({
@@ -85,9 +91,12 @@ export const TaskBoard = (props: TaskBoardProps) => {
     handleStatusChange,
     handleStatusFilter,
     handleProjectFilter,
+    handleViewChange,
+    ganttTasks,
   } = useTaskBoard(props);
   const { tasks, filter } = props;
   const activeStatus = filter.status ?? null;
+  const activeView = ganttTasks ? "gantt" : "table";
 
   return (
     <div className="space-y-4">
@@ -141,7 +150,31 @@ export const TaskBoard = (props: TaskBoardProps) => {
           )}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <div
+            role="group"
+            aria-label="View"
+            className="surface flex gap-1 rounded-xl border border-border/60 p-1"
+          >
+            {VIEW_OPTIONS.map(({ value, label, icon: Icon }) => (
+              <button
+                key={value}
+                type="button"
+                aria-pressed={activeView === value}
+                aria-label={label}
+                title={label}
+                onClick={() => handleViewChange(value)}
+                className={cn(
+                  "rounded-lg p-1.5 transition-colors [&_svg]:size-4",
+                  activeView === value
+                    ? "bg-primary/15 text-primary"
+                    : "text-foreground/70 hover:bg-foreground/5 hover:text-foreground"
+                )}
+              >
+                <Icon />
+              </button>
+            ))}
+          </div>
           <Button variant="outline" onClick={() => setImportOpen(true)}>
             <Braces />
             Import JSON
@@ -159,135 +192,139 @@ export const TaskBoard = (props: TaskBoardProps) => {
         </p>
       )}
 
-      <DataTableShell
-        scrollable
-        total={tasks.total}
-        page={tasks.page}
-        pageSize={tasks.pageSize}
-        isEmpty={tasks.items.length === 0}
-        emptyMessage={
-          tasks.total === 0 ? "No tasks match these filters." : "No tasks on this page."
-        }
-        footer={<SelectionBar rows={selectedJson} onClear={selection.clear} />}
-      >
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-0 pl-4">
-                <RowCheckbox
-                  aria-label="Select all tasks on this page"
-                  checked={selection.allSelected}
-                  indeterminate={selection.someSelected}
-                  onChange={selection.toggleAll}
-                />
-              </TableHead>
-              <TableHead>Title</TableHead>
-              <TableHead>Project</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Priority</TableHead>
-              <TableHead>Due</TableHead>
-              <TableHead>Labels</TableHead>
-              <TableHead className="pr-4 text-right">
-                <span className="sr-only">Actions</span>
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {tasks.items.map((task) => {
-              const closed = task.status === "DONE" || task.status === "CANCELLED";
-              const overdue = isOverdue(task);
-              const project = task.projectId
-                ? projectById.get(task.projectId)
-                : undefined;
+      {ganttTasks ? (
+        <TaskGantt tasks={ganttTasks} projectById={projectById} onOpen={openForm} />
+      ) : (
+        <DataTableShell
+          scrollable
+          total={tasks.total}
+          page={tasks.page}
+          pageSize={tasks.pageSize}
+          isEmpty={tasks.items.length === 0}
+          emptyMessage={
+            tasks.total === 0 ? "No tasks match these filters." : "No tasks on this page."
+          }
+          footer={<SelectionBar rows={selectedJson} onClear={selection.clear} />}
+        >
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-0 pl-4">
+                  <RowCheckbox
+                    aria-label="Select all tasks on this page"
+                    checked={selection.allSelected}
+                    indeterminate={selection.someSelected}
+                    onChange={selection.toggleAll}
+                  />
+                </TableHead>
+                <TableHead>Title</TableHead>
+                <TableHead>Project</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Priority</TableHead>
+                <TableHead>Due</TableHead>
+                <TableHead>Labels</TableHead>
+                <TableHead className="pr-4 text-right">
+                  <span className="sr-only">Actions</span>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {tasks.items.map((task) => {
+                const closed = task.status === "DONE" || task.status === "CANCELLED";
+                const overdue = isOverdue(task);
+                const project = task.projectId
+                  ? projectById.get(task.projectId)
+                  : undefined;
 
-              return (
-                <TableRow
-                  key={task.id}
-                  data-state={selection.isSelected(task.id) ? "selected" : undefined}
-                >
-                  <TableCell className="pl-4">
-                    <RowCheckbox
-                      aria-label={`Select ${task.title}`}
-                      checked={selection.isSelected(task.id)}
-                      onChange={() => selection.toggle(task.id)}
-                    />
-                  </TableCell>
-                  <TableCell className="min-w-56 max-w-sm whitespace-normal">
-                    <p
+                return (
+                  <TableRow
+                    key={task.id}
+                    data-state={selection.isSelected(task.id) ? "selected" : undefined}
+                  >
+                    <TableCell className="pl-4">
+                      <RowCheckbox
+                        aria-label={`Select ${task.title}`}
+                        checked={selection.isSelected(task.id)}
+                        onChange={() => selection.toggle(task.id)}
+                      />
+                    </TableCell>
+                    <TableCell className="min-w-56 max-w-sm whitespace-normal">
+                      <p
+                        className={cn(
+                          "font-medium",
+                          closed && "text-foreground/50 line-through"
+                        )}
+                      >
+                        {task.title}
+                      </p>
+                      {task.description && (
+                        <p
+                          className="mt-0.5 line-clamp-1 text-xs text-muted-foreground"
+                          title={task.description}
+                        >
+                          {task.description}
+                        </p>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {project ? <LabelChip label={project} /> : "—"}
+                    </TableCell>
+                    <TableCell>
+                      <StatusSelect
+                        aria-label="Status"
+                        value={task.status}
+                        options={STATUS_OPTIONS}
+                        onChange={(status) => void handleStatusChange(task, status)}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={PRIORITY_VARIANTS[task.priority]}>
+                        {taskPriorityLabelData[task.priority]}
+                      </Badge>
+                    </TableCell>
+                    <TableCell
                       className={cn(
-                        "font-medium",
-                        closed && "text-foreground/50 line-through"
+                        "tabular-nums",
+                        overdue ? "font-semibold text-destructive" : "text-muted-foreground"
                       )}
                     >
-                      {task.title}
-                    </p>
-                    {task.description && (
-                      <p
-                        className="mt-0.5 line-clamp-1 text-xs text-muted-foreground"
-                        title={task.description}
-                      >
-                        {task.description}
-                      </p>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {project ? <LabelChip label={project} /> : "—"}
-                  </TableCell>
-                  <TableCell>
-                    <StatusSelect
-                      aria-label="Status"
-                      value={task.status}
-                      options={STATUS_OPTIONS}
-                      onChange={(status) => void handleStatusChange(task, status)}
-                    />
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={PRIORITY_VARIANTS[task.priority]}>
-                      {taskPriorityLabelData[task.priority]}
-                    </Badge>
-                  </TableCell>
-                  <TableCell
-                    className={cn(
-                      "tabular-nums",
-                      overdue ? "font-semibold text-destructive" : "text-muted-foreground"
-                    )}
-                  >
-                    {task.dueDate ? formatDay(dayOf(task.dueDate)) : "—"}
-                    {overdue && <span className="sr-only"> (overdue)</span>}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1.5">
-                      {task.categories.map((category) => (
-                        <LabelChip key={category.id} label={category} />
-                      ))}
-                      {task.tags.map((tag) => (
-                        <LabelChip key={tag.id} label={tag} className="rounded-full" />
-                      ))}
-                      <TechnologyList
-                        technologies={task.technologies}
-                        className="flex-nowrap"
-                      />
-                    </div>
-                  </TableCell>
-                  <TableCell className="pr-4">
-                    <RowActions noun="task" onEdit={() => openForm(task)}>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        aria-label="Log time on task"
-                        title="Logtime"
-                        onClick={() => handleLogtime(task)}
-                      >
-                        <Clock />
-                      </Button>
-                    </RowActions>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </DataTableShell>
+                      {task.dueDate ? formatDay(dayOf(task.dueDate)) : "—"}
+                      {overdue && <span className="sr-only"> (overdue)</span>}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1.5">
+                        {task.categories.map((category) => (
+                          <LabelChip key={category.id} label={category} />
+                        ))}
+                        {task.tags.map((tag) => (
+                          <LabelChip key={tag.id} label={tag} className="rounded-full" />
+                        ))}
+                        <TechnologyList
+                          technologies={task.technologies}
+                          className="flex-nowrap"
+                        />
+                      </div>
+                    </TableCell>
+                    <TableCell className="pr-4">
+                      <RowActions noun="task" onEdit={() => openForm(task)}>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          aria-label="Log time on task"
+                          title="Logtime"
+                          onClick={() => handleLogtime(task)}
+                        >
+                          <Clock />
+                        </Button>
+                      </RowActions>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </DataTableShell>
+      )}
 
       <TaskFormDialog
         key={formKey}

@@ -32,6 +32,7 @@ type TaskDoc = TimestampsDoc & {
   description?: string;
   status: TaskStatusType;
   priority: TaskPriorityType;
+  startDate?: Date;
   dueDate?: Date;
   projectId?: ObjectId;
   tagIds: ObjectId[];
@@ -50,6 +51,7 @@ export const taskInputSchema = z.object({
   description: optionalText(5000),
   status: z.enum(taskStatusData),
   priority: z.enum(taskPriorityData),
+  startDate: isoDateTimeSchema.optional(),
   dueDate: isoDateTimeSchema.optional(),
   projectId: objectIdSchema.optional(),
   tagIds: z.array(objectIdSchema).max(30),
@@ -80,6 +82,7 @@ const toModel = (doc: WithId<TaskDoc>, labels: LabelLookup): TaskModel => ({
   description: doc.description,
   status: doc.status,
   priority: doc.priority,
+  startDate: doc.startDate?.toISOString(),
   dueDate: doc.dueDate?.toISOString(),
   projectId: doc.projectId?.toHexString(),
   tags: resolve(doc.tagIds, labels.tags),
@@ -99,6 +102,7 @@ const toFields = (input: TaskInputModel) => ({
   description: input.description,
   status: input.status,
   priority: input.priority,
+  startDate: input.startDate ? new Date(input.startDate) : undefined,
   dueDate: input.dueDate ? new Date(input.dueDate) : undefined,
   projectId: (input.projectId && toObjectId(input.projectId)) || undefined,
   tagIds: toObjectIds(input.tagIds),

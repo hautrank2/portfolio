@@ -17,6 +17,8 @@ export const taskImportItemSchema = z.object({
   status: z.enum(taskStatusData).nullish(),
   priority: z.enum(taskPriorityData).nullish(),
   /** `YYYY-MM-DD` or a full ISO date-time. */
+  startDate: z.union([z.iso.date(), z.iso.datetime({ offset: true })]).nullish(),
+  /** `YYYY-MM-DD` or a full ISO date-time. */
   dueDate: z.union([z.iso.date(), z.iso.datetime({ offset: true })]).nullish(),
   projectId: idSchema.nullish(),
   tagIds: z.array(idSchema).max(30, "At most 30").nullish(),

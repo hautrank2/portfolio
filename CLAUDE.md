@@ -267,7 +267,9 @@ database out of everything else.
   `<Suspense>`), passes them on to the list endpoint and gets a `PageModel`
   back. Client code changes them through `useQueryParams`, never local state.
   A list endpoint answers with one page when `?page=` is present and with the
-  whole list otherwise.
+  whole list otherwise. The tasks page's Gantt view (the default; `?view=table` for the table) reads the
+  whole list and applies the same filters on the client, since a timeline cannot
+  be paged.
 - **There is no middleware, and the UI is not the lock.** Every `/api` handler
   checks the session itself (`requireAdmin`) and returns `401`; a new handler
   without that check is public. The `(panel)` layout only hides the pages until

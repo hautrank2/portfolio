@@ -11,6 +11,8 @@ import type {
 export type TaskBoardProps = {
   /** The rows on screen — one page of the filtered list. */
   tasks: PageModel<TaskModel>;
+  /** Every task, unpaged. Passed only in the Gantt view (the default; the table is `?view=table`). */
+  allTasks?: TaskModel[];
   /** The filters in the URL (`?status=`, `?project=`), already validated. */
   filter: TaskFilterModel;
   /** Task count per status within the chosen project, for the filter tabs. */

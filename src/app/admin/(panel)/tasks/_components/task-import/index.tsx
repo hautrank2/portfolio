@@ -31,6 +31,7 @@ const EXAMPLE = `[
     "description": "Optional",
     "status": "TODO",
     "priority": "HIGH",
+    "startDate": "2026-11-10",
     "dueDate": "2026-11-15",
     "technologies": ["Docker", "Kubernetes"]
   }

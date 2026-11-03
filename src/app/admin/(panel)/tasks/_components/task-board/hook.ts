@@ -32,6 +32,7 @@ const toValues = (task: TaskModel): TaskFormValues => ({
   description: task.description ?? "",
   status: task.status,
   priority: task.priority,
+  startDate: task.startDate ? dayOf(task.startDate) : "",
   dueDate: task.dueDate ? dayOf(task.dueDate) : "",
   projectId: task.projectId ?? "",
   tagIds: task.tags.map((tag) => tag.id),
@@ -44,6 +45,7 @@ const toInput = (values: TaskFormValues): TaskInputModel => ({
   description: values.description.trim() || undefined,
   status: values.status,
   priority: values.priority,
+  startDate: values.startDate ? toIso(values.startDate) : undefined,
   dueDate: values.dueDate ? toIso(values.dueDate) : undefined,
   projectId: values.projectId || undefined,
   tagIds: values.tagIds,
@@ -56,6 +58,7 @@ const isOpen = (status: TaskStatusType) =>
 
 export const useTaskBoard = ({
   tasks,
+  allTasks,
   filter,
   statusCounts,
   projects,
@@ -75,6 +78,7 @@ export const useTaskBoard = ({
       description: "",
       status: "TODO",
       priority: "MEDIUM",
+      startDate: "",
       dueDate: "",
       projectId: filter.projectId ?? "",
       tagIds: [],
@@ -109,6 +113,17 @@ export const useTaskBoard = ({
   // Filters live in the URL; a new filter has its own pages, so page resets.
   const handleStatusFilter = (status: TaskStatusType | null) =>
     setParams({ status, page: null });
+
+  const handleViewChange = (view: "table" | "gantt") =>
+    setParams({ view: view === "table" ? view : null, page: null });
+
+  // The same rule as `listTasksPage`, so both views show one set of tasks and
+  // the counts on the status tabs hold for either.
+  const ganttTasks = allTasks?.filter(
+    (task) =>
+      (filter.status ? task.status === filter.status : task.status !== "DONE") &&
+      (!filter.projectId || task.projectId === filter.projectId)
+  );
 
   const handleProjectFilter = (value: string) => {
     const projectId = value === ALL_PROJECTS ? null : value;
@@ -164,5 +179,7 @@ export const useTaskBoard = ({
     handleStatusChange,
     handleStatusFilter,
     handleProjectFilter,
+    handleViewChange,
+    ganttTasks,
   };
 };

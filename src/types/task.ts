@@ -11,6 +11,8 @@ export type TaskModel = {
   description?: string;
   status: TaskStatusType;
   priority: TaskPriorityType;
+  /** When work is planned to begin; the Gantt falls back to `createdAt`. */
+  startDate?: string;
   dueDate?: string;
   /** Optional: a task does not have to belong to a project. */
   projectId?: string;
@@ -37,6 +39,7 @@ export type TaskInputModel = Pick<
   | "description"
   | "status"
   | "priority"
+  | "startDate"
   | "dueDate"
   | "projectId"
   | "technologies"
