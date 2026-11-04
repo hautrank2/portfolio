@@ -1,10 +1,9 @@
 "use client";
 
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, BookOpen, Code2, Gamepad2, House, Mail, Moon, UserRound } from "lucide-react";
-import Link from "next/link";
+import { ArrowDown, ArrowLeft, ArrowRight, BookOpen, Code2, Gamepad2, House, Mail, Moon, UserRound } from "lucide-react";
 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "~/components/ui/dialog";
-import { navData, profileData } from "~/data/site";
+import { profileData } from "~/data/site";
 
 import { chapters, detailDescriptions, detailTitles } from "./chapters";
 import { RoomDetails } from "./details";
@@ -19,12 +18,6 @@ export const Room = () => {
     <section className="room-home dark" data-chapter={chapter.id} data-popup={selected ? "open" : "closed"} aria-label="Hậu’s room — an interactive night tour">
       <div className="room-image-backdrop" aria-hidden="true"><div className="room-backdrop-print room-backdrop-luffy" /></div>
       <div className="room-atmosphere" aria-hidden="true" />
-
-      <header className="room-header">
-        <button className="room-brand" onClick={() => goTo(0)} aria-label="Back to room overview"><span>ht.</span><span>HAU TRAN<small>PERSONAL SPACE / 2026</small></span></button>
-        <nav aria-label="Main">{navData.filter(item => ["/blog", "/showcase", "/about"].includes(item.href)).map(item => <Link key={item.href} href={item.href}>{item.title}<ArrowUpRight size={11} /></Link>)}</nav>
-        <div className="room-night-label"><span /><Moon size={12} />AFTER HOURS<span className="room-timezone"> / GMT+7</span></div>
-      </header>
 
       <div className="room-tour-heading" key={chapter.id}>
         <p className="room-eyebrow"><span />{chapter.subtitle}</p>

@@ -53,6 +53,7 @@ export const useRoom = () => {
       return node && (delta > 0 ? node.scrollTop + node.clientHeight < node.scrollHeight - 2 : node.scrollTop > 2);
     };
     const wheel = (event: WheelEvent) => {
+      if (event.target instanceof Element && event.target.closest("header")) return;
       if (event.ctrlKey || Math.abs(event.deltaY) < Math.abs(event.deltaX) || scrollable(event.target, event.deltaY)) return;
       event.preventDefault();
       const now = performance.now();
@@ -67,7 +68,7 @@ export const useRoom = () => {
       goTo(next); lockedUntil = now + 1900;
     };
     const key = (event: KeyboardEvent) => {
-      if (event.target instanceof Element && event.target.closest("input, textarea, select, [contenteditable=true]")) return;
+      if (event.target instanceof Element && event.target.closest("header, input, textarea, select, [contenteditable=true]")) return;
       if (["ArrowDown", "ArrowRight", "PageDown", "ArrowUp", "ArrowLeft", "PageUp", "Home", "End"].includes(event.key)) {
         event.preventDefault();
         if (event.key === "Home") goTo(0);
