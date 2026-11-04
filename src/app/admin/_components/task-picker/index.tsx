@@ -19,7 +19,10 @@ export const TaskPicker = (props: TaskPickerProps) => {
     useTaskPicker(props);
 
   return (
+    // `modal`: the content is portaled outside the dialog, whose scroll lock
+    // would otherwise swallow wheel events on the list.
     <Popover
+      modal
       open={open}
       onOpenChange={(next) => {
         setOpen(next);
