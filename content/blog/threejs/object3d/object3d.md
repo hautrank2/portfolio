@@ -3,11 +3,11 @@ title: "Bài 13 — Object3D"
 description: position, rotation, scale chỉ là lớp vỏ. Bên dưới là một ma trận 4×4.
 status: seed
 created: 2026-08-23
-updated: 2026-08-23
+updated: 2026-11-05
 tags: [threejs, math, basics]
 ---
 
-`Object3D` là lớp cha của gần như mọi thứ: `Mesh`, `Group`, `Camera`, `Light`, `Sprite`,
+`Object3D` là base class của gần như mọi thứ: `Mesh`, `Group`, `Camera`, `Light`, `Sprite`,
 và cả `Scene`. Học nó một lần là dùng được cho tất cả.
 
 ## Ba thuộc tính, một ma trận
@@ -18,7 +18,7 @@ Three.js **dựng lại** ma trận 4×4 của object từ ba thành phần rờ
 | Thuộc tính | Là gì |
 |---|---|
 | `position`, `quaternion`, `scale` | Ba thành phần rời, thứ bạn sửa |
-| `matrix` | Ma trận **local** — so với node cha |
+| `matrix` | Ma trận **local** — so với parent |
 | `matrixWorld` | Ma trận **world** — so với gốc toạ độ |
 
 Mỗi frame, nếu `matrixAutoUpdate` còn bật (mặc định bật):
@@ -58,7 +58,7 @@ phình ra tại chỗ chứ không bị bắn đi xa gấp đôi.
 mesh.translateX(1);          // dịch theo trục CỦA CHÍNH NÓ, không phải trục thế giới
 mesh.rotateOnAxis(axis, a);  // xoay quanh một trục bất kỳ
 mesh.lookAt(0, 0, 0);        // xoay để trục -Z hướng về điểm đó
-mesh.getWorldPosition(v);    // vị trí thật, sau khi tính cả cha ông
+mesh.getWorldPosition(v);    // vị trí trong world space, đã tính qua mọi ancestor
 mesh.clone();                // bản sao — DÙNG CHUNG geometry và material
 ```
 

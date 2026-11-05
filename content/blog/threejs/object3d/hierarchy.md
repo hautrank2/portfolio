@@ -3,14 +3,14 @@ title: "Bài 14 — Object3D hierarchy"
 description: Cây scene chính là phép nhân ma trận dây chuyền. Hệ mặt trời không cần một dòng lượng giác.
 status: seed
 created: 2026-08-23
-updated: 2026-08-23
+updated: 2026-11-05
 tags: [threejs, math]
 ---
 
 Đây là bài đáng làm nhất trong cả khoá. Làm một lần, `matrixWorld` hết trừu tượng vĩnh
 viễn.
 
-## Con thừa hưởng biến hình của cha
+## Child thừa hưởng transform của parent
 
 ```ts
 group.position.set(10, 0, 0);
@@ -21,7 +21,7 @@ mesh.position.x;                                 // 1  — không đổi, và s�
 mesh.getWorldPosition(new THREE.Vector3()).x;    // 11
 ```
 
-`position` **luôn** là toạ độ so với node cha. Vị trí thật nằm trong `matrixWorld`, đọc
+`position` **luôn** là toạ độ so với parent. Vị trí thật nằm trong `matrixWorld`, đọc
 ra bằng `getWorldPosition`.
 
 Một chú ý: `matrixWorld` chỉ được cập nhật lúc render. Vừa đổi `position` xong mà đọc
@@ -38,17 +38,17 @@ group.updateMatrixWorld(true);
 `Group` (và `Object3D` rỗng) **không được vẽ** — nó chỉ đóng góp một ma trận. Không tốn
 draw call, dùng thoải mái làm điểm neo và tâm quay.
 
-## Cái bẫy: scale không đều ở node cha
+## Cái bẫy: scale không đều ở parent
 
 ```ts
 parent.scale.set(2, 1, 1);        // scale không đều
-child.rotation.z = Math.PI / 4;   // con xoay 45°
+child.rotation.z = Math.PI / 4;   // child xoay 45°
 ```
 
-Con bị **kéo xiên**, không còn là hình vuông xoay nữa. Vì phép scale không đều không giao
+Child bị **kéo xiên**, không còn là hình vuông xoay nữa. Vì phép scale không đều không giao
 hoán với phép xoay.
 
-> Quy tắc: node có con thì chỉ scale đều, hoặc không scale. Cần bóp méo thì bóp ở mesh lá.
+> Quy tắc: node có children thì chỉ scale đều, hoặc không scale. Cần bóp méo thì bóp ở mesh lá.
 
 ## add và attach
 
@@ -173,4 +173,4 @@ onTick((delta) => {
   tên co lại rồi biến mất, vì `normalize()` **sửa luôn** `world` thành vector dài 1. Gần
   như mọi phương thức của `Vector3` đều sửa tại chỗ
 - Thay `group.rotation.y += ...` bằng `group.position.x += delta` — mũi tên vẫn bám đúng,
-  vì `getWorldPosition` không quan tâm cha đang xoay hay đang trượt
+  vì `getWorldPosition` không quan tâm parent đang xoay hay đang trượt

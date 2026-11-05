@@ -83,7 +83,7 @@ scene.remove(mesh);         // gỡ khỏi cây — KHÔNG giải phóng bộ nh
 mesh.removeFromParent();    // tiện hơn khi không giữ tham chiếu tới cha
 
 scene.getObjectByName("hang-khoi");   // tìm theo obj.name
-scene.traverse((obj) => { ... });      // duyệt CẢ CÂY, kể cả cháu chắt
+scene.traverse((obj) => { ... });      // duyệt CẢ CÂY, kể cả descendants nhiều tầng
 ```
 
 Khác nhau giữa `scene.children.length` và số node `traverse` đếm được chính là số node
