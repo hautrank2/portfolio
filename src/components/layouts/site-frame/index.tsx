@@ -4,7 +4,7 @@ import { useSiteFrame } from "./hook";
 import type { SiteFrameProps } from "./type";
 
 export const SiteFrame = ({ children, header, footer, effects }: SiteFrameProps) => {
-  const { standalone } = useSiteFrame();
+  const { roomHome, standalone } = useSiteFrame();
 
   if (standalone) return <main>{children}</main>;
 
@@ -12,8 +12,8 @@ export const SiteFrame = ({ children, header, footer, effects }: SiteFrameProps)
     <>
       {header}
       <main className="pt-16 print:pt-0">{children}</main>
-      {footer}
-      {effects}
+      {!roomHome && footer}
+      {!roomHome && effects}
     </>
   );
 };

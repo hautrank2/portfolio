@@ -1,0 +1,63 @@
+import type { FigureSpec } from "./type";
+
+// Rows are ordered from top to bottom. Colors describe the characters, not UI tokens.
+export const collectionRows: { title: string; figures: FigureSpec[] }[] = [
+  { title: "Attack on Titan", figures: [
+    { name: "Eren", hair: "#3c2d24", outfit: "#526248", accessory: "cloak" },
+    { name: "Mikasa", hair: "#171c24", outfit: "#655949", accessory: "scarf" },
+    { name: "Armin", hair: "#dec376", outfit: "#8b7154", accessory: "cloak" },
+    { name: "Levi", hair: "#212630", outfit: "#526248", accessory: "blades" },
+    { name: "Hange", hair: "#63442f", outfit: "#8b7154", accessory: "glasses" },
+    { name: "Erwin", hair: "#c6a35e", outfit: "#526248", accessory: "cloak" },
+    { name: "Sasha", hair: "#76513a", outfit: "#8b7154", accessory: "ponytail" },
+    { name: "Jean", hair: "#8c7660", outfit: "#8b7154" },
+  ] },
+  { title: "One Piece · after the timeskip", figures: [
+    { name: "Luffy", hair: "#171c24", outfit: "#c73b35", pants: "#3d78a2", accessory: "straw-hat" },
+    { name: "Zoro", hair: "#66935b", outfit: "#42765a", accessory: "swords" },
+    { name: "Nami", hair: "#e68a33", outfit: "#69a963", pants: "#447ca6", accessory: "long-hair" },
+    { name: "Usopp", hair: "#302822", outfit: "#d4b268", accessory: "goggles" },
+    { name: "Sanji", hair: "#eccb69", outfit: "#202938", accessory: "suit" },
+    { name: "Chopper", hair: "#aa7d55", outfit: "#c38e65", pants: "#dc6d54", accessory: "antlers" },
+    { name: "Robin", hair: "#171c24", outfit: "#8b609f", pants: "#d28a48", accessory: "long-hair" },
+    { name: "Franky", hair: "#58b5d2", outfit: "#b94b40", accessory: "cyborg" },
+    { name: "Brook", hair: "#171c24", skin: "#e9e7d9", outfit: "#222b38", accessory: "top-hat" },
+    { name: "Jinbe", hair: "#222b38", skin: "#7eafb9", outfit: "#cd9147", accessory: "kimono" },
+  ] },
+  { title: "Naruto", figures: [
+    { name: "Naruto", hair: "#efd36e", outfit: "#ee8b32", accessory: "headband" },
+    { name: "Sasuke", hair: "#24283b", outfit: "#8e9ba9", pants: "#393c64", accessory: "sword" },
+    { name: "Sakura", hair: "#da899f", outfit: "#bd4c63", accessory: "headband" },
+    { name: "Kakashi", hair: "#b9c6cc", outfit: "#587257", accessory: "mask" },
+    { name: "Hinata", hair: "#3c3854", outfit: "#b3a5d2", accessory: "long-hair" },
+    { name: "Itachi", hair: "#202530", outfit: "#282a34", accessory: "akatsuki" },
+    { name: "Gaara", hair: "#984e3d", outfit: "#985f53", accessory: "gourd" },
+  ] },
+  { title: "Dragon Ball", figures: [
+    { name: "Goku", hair: "#1a202b", outfit: "#ed8635", pants: "#ed8635", accessory: "spikes" },
+    { name: "Vegeta", hair: "#1a202b", outfit: "#40639b", accessory: "armor" },
+    { name: "Gohan", hair: "#1a202b", outfit: "#8265a2", accessory: "spikes" },
+    { name: "Trunks", hair: "#b1a0d2", outfit: "#5f7fbc", accessory: "sword" },
+    { name: "Goten", hair: "#1a202b", outfit: "#ed8635", accessory: "spikes" },
+    { name: "Piccolo", hair: "#76a366", skin: "#76a366", outfit: "#8061a2", accessory: "cape" },
+    { name: "Krillin", hair: "#e5b794", outfit: "#ed8635", accessory: "bald" },
+  ] },
+  { title: "Stranger Things", figures: [
+    { name: "Eleven", hair: "#80533b", outfit: "#dc9ba9", accessory: "waffle" },
+    { name: "Mike", hair: "#302821", outfit: "#557a9c", accessory: "walkie" },
+    { name: "Dustin", hair: "#76513b", outfit: "#c6b795", accessory: "cap" },
+    { name: "Lucas", hair: "#252723", skin: "#9d7152", outfit: "#a86e51", accessory: "headband" },
+    { name: "Will", hair: "#805c40", outfit: "#779379" },
+    { name: "Max", hair: "#b9683f", outfit: "#b4574d", accessory: "skateboard" },
+    { name: "Steve", hair: "#5e4635", outfit: "#617da6", accessory: "bat" },
+    { name: "Hopper", hair: "#80634a", outfit: "#9d8c69", accessory: "fedora" },
+  ] },
+  { title: "Breaking Bad", figures: [
+    { name: "Walter White", hair: "#d9bc9f", outfit: "#b3ac74", accessory: "heisenberg" },
+    { name: "Jesse Pinkman", hair: "#76533b", outfit: "#a38a45", accessory: "beanie" },
+    { name: "Saul Goodman", hair: "#79503a", outfit: "#8c6677", accessory: "suit" },
+    { name: "Gus Fring", hair: "#38322a", skin: "#ad8060", outfit: "#c3ad64", accessory: "glasses" },
+    { name: "Mike Ehrmantraut", hair: "#d9bc9f", outfit: "#6f7a78", accessory: "bald" },
+    { name: "Hank Schrader", hair: "#d9bc9f", outfit: "#98715a", accessory: "bald" },
+  ] },
+];
