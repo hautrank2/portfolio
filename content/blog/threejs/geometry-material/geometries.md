@@ -1,58 +1,58 @@
 ---
 title: "Bài 15 — Geometries"
-description: Hình dạng chỉ là mảng số. Biết vậy thì tự dựng hình và tối ưu đỉnh là cùng một việc.
+description: Hình dạng chỉ là mảng số. Biết vậy thì tự dựng hình và tối ưu vertices là cùng một việc.
 status: seed
 created: 2026-08-23
-updated: 2026-08-23
+updated: 2026-11-05
 tags: [threejs, geometry]
 ---
 
 `BoxGeometry` nghe như một khối hộp. Thật ra nó là một hàm sinh ra vài mảng
-`Float32Array` rồi gói lại. Không có "khối hộp" nào cả — chỉ có toạ độ đỉnh và thứ tự
-nối chúng thành tam giác.
+`Float32Array` rồi gói lại. Không có "khối hộp" nào cả — chỉ có toạ độ vertex và thứ tự
+nối chúng thành triangles.
 
 ## Bốn attribute cần biết
 
 | Tên | itemSize | Nội dung |
 |---|---|---|
-| `position` | 3 | Toạ độ đỉnh, trong **local space** |
+| `position` | 3 | Toạ độ vertex, trong **local space** |
 | `normal` | 3 | Pháp tuyến — quyết định ánh sáng chiếu vào ra sao |
 | `uv` | 2 | Toạ độ texture, từ 0 tới 1 |
-| `color` | 3 | Màu theo từng đỉnh, cần `vertexColors: true` ở material |
+| `color` | 3 | Màu theo từng vertex, cần `vertexColors: true` ở material |
 
 Chỉ `position` là bắt buộc. Thiếu `normal` thì mọi material cần ánh sáng đều đen, thiếu
 `uv` thì texture không biết dán vào đâu.
 
-Các attribute **song song theo chỉ số**: đỉnh thứ `i` có toạ độ ở `position[3i..3i+2]`,
+Các attribute **song song theo chỉ số**: vertex thứ `i` có toạ độ ở `position[3i..3i+2]`,
 pháp tuyến ở `normal[3i..3i+2]`, uv ở `uv[2i..2i+1]`.
 
-## Vì sao hộp 8 góc lại có 24 đỉnh
+## Vì sao hộp 8 góc lại có 24 vertices
 
 Mỗi góc thuộc về ba mặt, mà ba mặt đó có pháp tuyến khác nhau và uv khác nhau. Đỉnh
 trong GPU không phải "một điểm trong không gian", nó là **một bộ đầy đủ các attribute** —
 khác nhau dù chỉ ở một attribute là phải tách ra.
 
-Hệ quả: hình cần cạnh sắc không tiết kiệm được đỉnh nhiều; hình mượt (cầu, mặt phẳng) thì
+Hệ quả: hình cần cạnh sắc không tiết kiệm được nhiều vertices; hình mượt (cầu, mặt phẳng) thì
 `index` tiết kiệm rất đáng kể.
 
 ## Segments — chỗ đốt hiệu năng dễ nhất
 
-Số đỉnh tăng theo **tích**, không phải theo tổng:
+Số vertices tăng theo **tích**, không phải theo tổng:
 
 ```ts
-new THREE.PlaneGeometry(10, 10, 512, 512);   // 263 nghìn đỉnh cho một mặt phẳng
-new THREE.PlaneGeometry(10, 10, 1, 1);       // 4 đỉnh, nhìn GIỐNG HỆT nếu không biến dạng
+new THREE.PlaneGeometry(10, 10, 512, 512);   // 263 nghìn vertices cho một mặt phẳng
+new THREE.PlaneGeometry(10, 10, 1, 1);       // 4 vertices, nhìn GIỐNG HỆT nếu không biến dạng
 ```
 
 Mặt phẳng không biến dạng thì thêm segments **không đẹp hơn một chút nào**. Chỉ tăng khi
-thật sự cần dời từng đỉnh.
+thật sự cần dời từng vertex.
 
 ## Bài tập 1 — bảng tra geometry dựng sẵn
 
 > Code dưới import `createLab` từ `./lab` — bộ khung dùng chung viết ở
 > [Bài 8](/blog/threejs/getting-started/course-boilerplate). Chưa có thì chép `src/lab.ts` ở đó trước.
 
-Mười hai loại đứng cạnh nhau, kèm số đỉnh và số tam giác của từng loại.
+Mười hai loại đứng cạnh nhau, kèm số vertices và số triangles của từng loại.
 
 ```ts
 import * as THREE from "three";
@@ -93,13 +93,13 @@ const params = { wireframe: false };
 const gui = new GUI({ title: "Bài 15 — Geometries" });
 gui.add(params, "wireframe").onChange((v) => (material.wireframe = v));
 
-// đếm đỉnh và tam giác của từng loại
+// đếm vertices và triangles của từng loại
 const lines = names.map((name) => {
   const geometry = geometries[name];
   const index = geometry.getIndex();
   const vertices = geometry.attributes.position.count;
   const triangles = (index ? index.count : vertices) / 3;
-  return `${name.padEnd(13)} ${String(vertices).padStart(5)} đỉnh  ${String(triangles).padStart(5)} tam giác`;
+  return `${name.padEnd(13)} ${String(vertices).padStart(5)} vertices  ${String(triangles).padStart(5)} triangles`;
 });
 
 readout(lines.join("\n"));
@@ -110,14 +110,14 @@ khi thấy `SphereGeometry` tốn gấp mấy chục lần `BoxGeometry`.
 
 **Thử phá:**
 
-- Bật `wireframe` để thấy từng loại được chia tam giác thế nào. `Plane` chỉ có 2 tam
-  giác, `TorusKnot` có hàng nghìn
+- Bật `wireframe` để thấy từng loại được chia triangles thế nào. `Plane` chỉ có 2
+  triangles, `TorusKnot` có hàng nghìn
 - Đổi `SphereGeometry(0.8, 32, 16)` thành `(0.8, 128, 64)` rồi nhìn lại con số — tăng
   khoảng 16 lần, mà mắt gần như không phân biệt được
 - Đổi `IcosahedronGeometry(0.9, 0)` thành `(0.9, 3)`: tham số thứ hai là số lần chia nhỏ,
   và nó là cách rẻ nhất để có một quả cầu nhìn "hình học"
 
-## Bài tập 2 — tự dựng một tam giác
+## Bài tập 2 — tự dựng một triangle
 
 Không dùng geometry dựng sẵn. Bài này nên làm đúng một lần.
 
@@ -151,13 +151,13 @@ onTick((delta) => {
 
 **Thử phá:**
 
-- Bỏ `side: THREE.DoubleSide` — tam giác **biến mất một nửa vòng quay**, vì lúc đó bạn
-  đang nhìn vào mặt sau. Ba đỉnh xếp ngược chiều kim đồng hồ mới là mặt trước
-- Đảo hai đỉnh cuối trong mảng — mặt trước thành mặt sau, hiện ngược lại
-- Bỏ `computeVertexNormals()` — tam giác đen thui, vì không có pháp tuyến thì ánh sáng
+- Bỏ `side: THREE.DoubleSide` — triangle **biến mất một nửa vòng quay**, vì lúc đó bạn
+  đang nhìn vào mặt sau. Ba vertices xếp ngược chiều kim đồng hồ mới là mặt trước
+- Đảo hai vertices cuối trong mảng — mặt trước thành mặt sau, hiện ngược lại
+- Bỏ `computeVertexNormals()` — triangle đen thui, vì không có pháp tuyến thì ánh sáng
   không biết chiếu vào đâu
 
-## Bài tập 3 — sửa từng đỉnh lúc chạy
+## Bài tập 3 — sửa từng vertex lúc chạy
 
 Dùng cả bốn thứ: đọc attribute, ghi attribute, `needsUpdate`, `computeVertexNormals`.
 

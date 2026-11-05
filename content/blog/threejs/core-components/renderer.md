@@ -3,7 +3,7 @@ title: "Bài 11 — Renderer"
 description: Nơi duy nhất chạm vào GPU, và ba thiết lập quyết định scene đẹp hay nhoè.
 status: seed
 created: 2026-08-23
-updated: 2026-08-23
+updated: 2026-11-05
 tags: [threejs, basics, performance]
 ---
 
@@ -47,7 +47,7 @@ renderer.toneMappingExposure = 1;
 
 ```ts
 renderer.info.render.calls;       // draw call mỗi frame — dưới 100 là ổn
-renderer.info.render.triangles;   // tam giác mỗi frame — dưới 200 nghìn là ổn
+renderer.info.render.triangles;   // triangles mỗi frame — dưới 200 nghìn là ổn
 renderer.info.memory.geometries;  // đang giữ bao nhiêu trên GPU
 ```
 
@@ -109,7 +109,7 @@ onTick((delta) => {
     readout(
       `FPS        ${Math.round(frames / acc)}\n` +
       `draw call  ${renderer.info.render.calls}\n` +
-      `tam giác   ${renderer.info.render.triangles.toLocaleString("vi-VN")}\n` +
+      `triangles  ${renderer.info.render.triangles.toLocaleString("vi-VN")}\n` +
       `pixel vẽ   ${(innerWidth * innerHeight * params.pixelRatio ** 2 / 1e6).toFixed(1)}M`
     );
     frames = 0;
@@ -118,8 +118,8 @@ onTick((delta) => {
 });
 ```
 
-**Kết quả:** một nút thắt kim loại quay, panel bên phải để đổi pixel ratio và tone
-mapping, góc trái in FPS, draw call, số tam giác và số **triệu pixel** phải vẽ mỗi frame.
+**Kết quả:** một torus knot kim loại quay, panel bên phải để đổi pixel ratio và tone
+mapping, góc trái in FPS, draw call, số triangles và số **triệu pixel** phải vẽ mỗi frame.
 
 **Thử phá:**
 
@@ -128,7 +128,7 @@ mapping, góc trái in FPS, draw call, số tam giác và số **triệu pixel**
 - Đổi tone mapping sang `None` — vùng sáng trên kim loại cháy thành mảng trắng bệt
 - Kéo `exposure` lên 3 — cả scene sáng rực như thiếu sáng bị bù quá tay
 - Đổi `TorusKnotGeometry(1, 0.35, 200, 32)` thành `(1, 0.35, 1000, 64)` rồi nhìn dòng
-  "tam giác". Draw call vẫn là 1, nhưng số tam giác nhân lên nhiều lần — hai chỉ số này
+  "triangles". Draw call vẫn là 1, nhưng số triangles nhân lên nhiều lần — hai chỉ số này
   đo hai thứ khác nhau
 
 ## antialias không đổi được lúc chạy

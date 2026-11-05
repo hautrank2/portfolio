@@ -3,7 +3,7 @@ title: "dispose() và rò rỉ bộ nhớ GPU"
 description: scene.remove() không giải phóng gì cả. Bug số một khi nhét Three.js vào SPA.
 status: seed
 created: 2026-08-23
-updated: 2026-08-23
+updated: 2026-11-05
 tags: [threejs, performance, react]
 ---
 
@@ -20,7 +20,7 @@ không. Phải nói ra.
 scene.remove(mesh);   // chỉ gỡ khỏi cây scene
 ```
 
-Sau dòng này, `mesh` không được vẽ nữa. Nhưng buffer đỉnh vẫn nằm trên GPU, texture vẫn
+Sau dòng này, `mesh` không được vẽ nữa. Nhưng vertex buffer vẫn nằm trên GPU, texture vẫn
 chiếm VRAM, shader vẫn còn trong bộ nhớ đệm chương trình.
 
 Bài kiểm tra 30 giây, chạy trong console:

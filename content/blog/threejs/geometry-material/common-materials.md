@@ -3,7 +3,7 @@ title: "Bài 17 — Các material hay dùng"
 description: Tám loại đặt cạnh nhau, và cây quyết định chọn loại nào.
 status: seed
 created: 2026-08-23
-updated: 2026-08-23
+updated: 2026-11-05
 tags: [threejs, material]
 ---
 
@@ -26,7 +26,7 @@ Three.js có hơn chục material dựng sẵn. Thực tế chỉ dùng đi dùn
 
 | Material | Mô hình | Chi phí | Còn nên dùng? |
 |---|---|---|---|
-| `Lambert` | khuếch tán, tính theo đỉnh | rẻ nhất | chỉ khi cần cực nhẹ |
+| `Lambert` | khuếch tán, tính theo vertex | rẻ nhất | chỉ khi cần cực nhẹ |
 | `Phong` | thêm điểm sáng bóng | vừa | hiếm |
 | `Standard` | PBR: roughness + metalness | đắt hơn | **mặc định** |
 | `Physical` | PBR mở rộng: clearcoat, truyền sáng | đắt nhất | vài vật đặc biệt |
@@ -115,7 +115,7 @@ không cần font loader.
 
 - Xoá hết đèn (`createLab({ lights: false })`): `Basic`, `Normal` và `Depth` vẫn hiện
   bình thường, năm cái còn lại đen thui. Đó là ranh giới "cần đèn / không cần đèn"
-- So `Lambert` với `Standard` khi kéo camera lại gần: `Lambert` tính ánh sáng theo **đỉnh**
+- So `Lambert` với `Standard` khi kéo camera lại gần: `Lambert` tính ánh sáng theo **vertex**
   nên chuyển sắc thô hơn ở quả cầu ít đoạn chia
 - Đổi `metalness` của `Standard` lên 1 — nó tối sầm lại, vì chưa có environment map
 - `MeshDepthMaterial` chuyển từ trắng sang đen theo khoảng cách — chính là thứ dùng để

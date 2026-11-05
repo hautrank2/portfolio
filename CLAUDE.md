@@ -311,6 +311,7 @@ database out of everything else.
 | `AUTH_SECRET` | `utils/auth.ts` | at least 32 characters |
 | `ADMIN_USERNAME`, `ADMIN_PASSWORD` | `scripts/seed-admin.mjs` only | never read by the app |
 | `GITHUB_TOKEN` | `lib/github.ts` | optional — raises the GitHub API rate limit; works unauthenticated without it |
+| `NEXT_PUBLIC_LAB_URL` | `components/blog/lab-demo.tsx` | optional — origin of the deployed threejs-lab; without it `![…](lab:…)` demos render only in dev (pointing at `http://localhost:3005`) and are left out of the build |
 | `ANTHROPIC_API_KEY` | `lib/anthropic.ts` | optional — without it `POST /api/github/review` answers `503`; each review is a paid Claude call |
 
 - `.env*` is gitignored. Never commit a secret, print one, or paste one into a

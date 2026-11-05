@@ -11,6 +11,7 @@ import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
 import { visit } from "unist-util-visit";
+import { LabDemo } from "~/components/blog/lab-demo";
 import { CodeBlock } from "~/components/ui/code-block";
 import {
   Table,
@@ -39,6 +40,49 @@ function rehypeCodeLanguage() {
     });
   };
 }
+
+const LAB_SCHEME = "lab:";
+
+/**
+ * `![Tiêu đề](lab:ba-thanh-phan/scene)` đứng riêng một đoạn -> demo chạy thật
+ * của threejs-lab. Dùng cú pháp ảnh để file .md vẫn đọc được ở chỗ khác; đổi
+ * cả `<p>` thành `<figure>` vì iframe bọc trong `<p>` là HTML sai.
+ */
+function rehypeLabDemo() {
+  return (tree: Root) => {
+    visit(tree, "element", (node) => {
+      if (node.tagName !== "p") return;
+      const children = node.children.filter(
+        (child) => !(child.type === "text" && !child.value.trim())
+      );
+      const [image] = children;
+      if (children.length !== 1 || image.type !== "element") return;
+      if (image.tagName !== "img") return;
+
+      const src = image.properties?.src;
+      if (typeof src !== "string" || !src.startsWith(LAB_SCHEME)) return;
+
+      node.tagName = "figure";
+      node.properties = {
+        dataLabDemo: src.slice(LAB_SCHEME.length),
+        title: image.properties?.alt,
+      };
+      node.children = [];
+    });
+  };
+}
+
+type MarkdownFigureProps = React.ComponentProps<"figure"> & {
+  "data-lab-demo"?: string;
+};
+
+/** Demo của lab; mọi `<figure>` khác (rehype-pretty-code bọc code block) đi qua nguyên vẹn. */
+const MarkdownFigure = ({
+  "data-lab-demo": labPath,
+  title,
+  ...props
+}: MarkdownFigureProps) =>
+  labPath ? <LabDemo path={labPath} title={title} /> : <figure title={title} {...props} />;
 
 type MarkdownLinkProps = React.ComponentProps<"a">;
 
@@ -69,12 +113,14 @@ const processor = unified()
     keepBackground: false,
   })
   .use(rehypeCodeLanguage)
+  .use(rehypeLabDemo)
   .use(rehypeReact, {
     Fragment,
     jsx,
     jsxs,
     components: {
       a: MarkdownLink,
+      figure: MarkdownFigure,
       pre: CodeBlock,
       table: Table,
       thead: TableHeader,

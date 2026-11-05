@@ -3,7 +3,7 @@ title: "Bài 16 — Material"
 description: Thuộc tính chung của mọi material, và hai thứ bắt buộc phải needsUpdate.
 status: seed
 created: 2026-08-23
-updated: 2026-08-23
+updated: 2026-11-05
 tags: [threejs, material]
 ---
 
@@ -19,7 +19,7 @@ material.visible      // ẩn hẳn, khác với opacity = 0
 material.opacity      // CHỈ có tác dụng khi transparent = true
 material.transparent
 material.side         // FrontSide (mặc định) | BackSide | DoubleSide
-material.flatShading  // dùng pháp tuyến của mặt thay vì của đỉnh
+material.flatShading  // dùng pháp tuyến của mặt thay vì của vertex
 material.opacity
 ```
 
@@ -46,12 +46,12 @@ dịch shader là một trong những việc đắt nhất trong WebGL.
 
 ## side và mặt sau
 
-`FrontSide` (mặc định) chỉ vẽ mặt trước, để tiết kiệm một nửa số tam giác. Với vật thể
+`FrontSide` (mặc định) chỉ vẽ mặt trước, để tiết kiệm một nửa số triangles. Với vật thể
 kín thì không ai thấy khác biệt.
 
 Nhưng với mặt phẳng, mặt cắt, hay model xuất từ Blender bị lộn pháp tuyến, kết quả là
 **lỗ thủng**. Cách kiểm tra nhanh: tạm đặt `DoubleSide`, nếu hiện đủ thì lỗi ở hướng
-tam giác chứ không ở toạ độ.
+triangle chứ không ở toạ độ.
 
 `DoubleSide` đắt gấp đôi. Dùng để chẩn đoán, rồi sửa gốc.
 
@@ -118,7 +118,7 @@ gui.add(params, "side", { Front: THREE.FrontSide, Back: THREE.BackSide, Double: 
   `transparent` lên rồi kéo lại
 - Bật `transparent` rồi xoay camera quanh nút thắt: có góc nhìn thấy phần trong của chính
   nó vẽ **sai thứ tự**. Đây là hạn chế cố hữu của alpha blending, không phải bug
-- Bật `flatShading` — bề mặt vỡ thành các mảnh phẳng, thấy rõ từng tam giác
+- Bật `flatShading` — bề mặt vỡ thành các mảnh phẳng, thấy rõ từng triangle
 - Xoá dòng `material.needsUpdate = true` trong `onChange` của `flatShading` rồi bấm lại:
   checkbox đổi, hình không đổi
 - Đổi `side` sang `Back` — chỉ còn thấy mặt trong của nút thắt

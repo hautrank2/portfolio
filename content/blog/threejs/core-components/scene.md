@@ -3,7 +3,7 @@ title: "Bài 9 — Scene"
 description: Scene chỉ là node gốc của một cái cây, cộng ba global property.
 status: seed
 created: 2026-08-23
-updated: 2026-08-23
+updated: 2026-11-05
 tags: [threejs, basics]
 ---
 
@@ -23,12 +23,51 @@ scene.environment = envMap;                     // ánh sáng môi trường cho
 vào `background` thì thấy nền đẹp nhưng vật thể *không* sáng lên. Muốn nó chiếu sáng thì
 phải gán vào `environment`. Bài 21 quay lại chuyện này.
 
+## Fog là gì
+
+Fog (sương mù) **pha màu của vật với một màu cố định, tuỳ theo khoảng cách tới camera**.
+Vật càng xa thì càng bị kéo về màu fog, tới một mức nào đó thì hoà hẳn vào màu fog.
+
+Phép tính này không có gì là "sương" thật: không có hạt nào, không có object nào được
+thêm vào scene. Nó chạy trong fragment shader của từng material. Mỗi pixel sau khi đã
+tính xong ánh sáng sẽ được trộn thêm một bước:
+
+```
+màu cuối = mix(màu vật, màu fog, fogFactor)    // fogFactor: 0 = rõ hẳn, 1 = chìm hẳn
+```
+
+`fogFactor` được tính từ **độ sâu so với camera** (depth). Mỗi loại fog bên dưới chỉ khác
+nhau ở cách quy đổi từ khoảng cách ra `fogFactor`.
+
+Dùng fog vì ba lý do:
+
+- **Cảm giác chiều sâu.** Mắt người đoán khoảng cách một phần nhờ không khí làm vật ở xa
+  nhạt đi. Nếu thiếu nó, một hàng khối dài trông phẳng như được dán lên nền.
+- **Giấu chỗ cảnh bị cắt.** Vật vượt quá `camera.far` sẽ đột ngột biến mất. Nếu fog đã
+  đục hẳn trước khi tới `far`, người xem sẽ không bao giờ thấy chỗ cắt đó. Game thế giới
+  mở dùng mẹo này để không phải vẽ cả bản đồ.
+- **Không khí cho cảnh.** Fog tối màu tạo cảm giác bí ẩn, fog sáng màu tạo cảm giác sáng
+  sớm hay ngày nhiều mây.
+
+Fog chỉ tác động lên **vật được vẽ bằng material**. `scene.background` không bị fog ảnh
+hưởng. Đó là lý do hai màu phải trùng nhau (xem bẫy bên dưới).
+
 ## Fog có hai loại
 
 ```ts
 scene.fog = new THREE.Fog(color, near, far);      // tuyến tính: near trong suốt, far đục hẳn
 scene.fog = new THREE.FogExp2(color, 0.02);       // theo hàm mũ, tự nhiên hơn
 ```
+
+| | `Fog` | `FogExp2` |
+| --- | --- | --- |
+| Tham số | `near`, `far` | `density` |
+| `fogFactor` | 0 trước `near`, tăng đều lên 1 ở `far` | `1 - exp(-(density × depth)²)` |
+| Ưu điểm | Biết chính xác từ đâu tới đâu | Chuyển tiếp mềm, giống sương thật |
+| Hợp khi | Cần khớp với `camera.far`, hoặc muốn một vùng nhìn rõ quanh camera | Cảnh ngoài trời, không cần mốc cụ thể |
+
+`FogExp2` không có mốc "đục hẳn": vật xa tới đâu vẫn còn sót một chút màu, nên muốn giấu
+chỗ cắt `camera.far` thì `Fog` dễ chỉnh hơn.
 
 Bẫy: **màu fog nên trùng màu background**. Lệch nhau thì vật ở xa mờ về một màu, còn nền
 lại là màu khác — nhìn như dán ảnh.
@@ -114,6 +153,8 @@ readout(`scene.children: ${scene.children.length}\ntraverse đếm được: ${t
 
 **Kết quả:** hàng khối nhạt dần về phía xa và tan vào nền. Góc trái in số con trực tiếp
 của scene (rất ít) so với tổng số node (nhiều hơn hẳn).
+
+![Bài 9 — Một hàng khối chạy về phía xa](lab:ba-thanh-phan/scene)
 
 **Thử phá:**
 
