@@ -3,6 +3,7 @@ import { Nunito } from "next/font/google";
 import { ClickBurst } from "~/components/layouts/click-burst";
 import Footer from "~/components/layouts/footer";
 import Header from "~/components/layouts/header";
+import { PerfMeter } from "~/components/layouts/perf-meter";
 import { SiteFrame } from "~/components/layouts/site-frame";
 import { ThemeProvider } from "~/components/layouts/theme-provider";
 import { profileData, titlePrefixData } from "~/data/site";
@@ -41,6 +42,7 @@ export default function RootLayout({
             header={<Header />}
             footer={<Footer />}
             effects={<ClickBurst />}
+            overlay={<PerfMeter />}
           >
             {children}
           </SiteFrame>

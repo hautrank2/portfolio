@@ -3,7 +3,7 @@ title: "Bài 16 — Material"
 description: Thuộc tính chung của mọi material, và hai thứ bắt buộc phải needsUpdate.
 status: seed
 created: 2026-08-23
-updated: 2026-11-05
+updated: 2026-11-06
 tags: [threejs, material]
 ---
 
@@ -111,6 +111,8 @@ gui.add(params, "side", { Front: THREE.FrontSide, Back: THREE.BackSide, Double: 
     material.needsUpdate = true;
   });
 ```
+
+![Bài 16 — Thuộc tính chung, và hai thứ cần needsUpdate](lab:geometry-material/materials)
 
 **Thử phá:**
 

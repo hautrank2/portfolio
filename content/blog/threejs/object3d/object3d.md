@@ -3,7 +3,7 @@ title: "Bài 13 — Object3D"
 description: position, rotation, scale chỉ là lớp vỏ. Bên dưới là một ma trận 4×4.
 status: seed
 created: 2026-08-23
-updated: 2026-11-05
+updated: 2026-11-06
 tags: [threejs, math, basics]
 ---
 
@@ -121,6 +121,8 @@ onTick(() => {
 
 **Kết quả:** ba thư mục thanh trượt. Góc trái in góc xoay quy ra độ, thứ tự Euler, và ba
 phần tử `12..14` của ma trận — chính là cột dịch chuyển.
+
+![Bài 13 — Vặn từng thuộc tính, nhìn ma trận đổi theo](lab:object3d/object3d)
 
 **Thử phá:**
 

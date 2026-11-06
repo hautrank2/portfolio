@@ -1,0 +1,141 @@
+.p3d { position: relative; isolation: isolate; background: var(--background); color: var(--foreground); }
+.p3d button { cursor: pointer; }
+.p3d a:focus-visible, .p3d button:focus-visible { outline: 2px solid var(--primary); outline-offset: 4px; }
+
+/* ── stage: the sticky 3D layer behind the sections ───────────────────── */
+.p3d-stage { position: sticky; top: 4rem; height: calc(100svh - 4rem); margin-bottom: calc(-100svh + 4rem); z-index: 0; overflow: hidden; pointer-events: none; }
+.p3d-canvas { position: absolute; inset: 0; z-index: 2; }
+.p3d-canvas canvas { display: block; width: 100%; height: 100%; }
+
+/* dark tech backdrop: glow behind him, a perspective grid floor, faint scanlines */
+.p3d-grid { position: absolute; inset: 0; background:
+  radial-gradient(ellipse 42% 58% at 50% 52%, color-mix(in oklch, var(--primary) 18%, transparent), transparent 70%),
+  linear-gradient(180deg, var(--background), transparent 18%, transparent 82%, var(--background)); }
+.p3d-grid::before { content: ''; position: absolute; left: -50%; right: -50%; bottom: -10%; height: 55%; transform: perspective(500px) rotateX(62deg); transform-origin: bottom;
+  background-image: linear-gradient(color-mix(in oklch, var(--primary) 22%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in oklch, var(--primary) 22%, transparent) 1px, transparent 1px);
+  background-size: 48px 48px; mask-image: linear-gradient(to top, black, transparent 85%); }
+.p3d-grid::after { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, color-mix(in oklch, var(--foreground) 3%, transparent) 0 1px, transparent 1px 3px); }
+
+/* the big name behind the character, outlined so it reads as part of the backdrop */
+.p3d-name { position: absolute; inset: 0 0 auto; top: 22%; z-index: 1; text-align: center; white-space: nowrap; font-size: clamp(64px, 13.5vw, 230px); line-height: 1; font-weight: 800; letter-spacing: -.055em;
+  color: color-mix(in oklch, var(--primary) 12%, transparent); -webkit-text-stroke: 1.5px color-mix(in oklch, var(--primary) 70%, transparent);
+  opacity: calc(1 - var(--p3d-progress, 0) * 2.5); transform: translateY(calc(var(--p3d-progress, 0) * -80px)); }
+
+/* floating info chips around the character, first screen only */
+.p3d-chips { position: absolute; inset: 0; z-index: 3; opacity: calc(1 - var(--p3d-progress, 0) * 3); }
+.p3d-chips li { position: absolute; display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid color-mix(in oklch, var(--foreground) 18%, transparent); border-radius: 999px;
+  background: color-mix(in oklch, var(--background) 72%, transparent); backdrop-filter: blur(10px); font-size: 12px; white-space: nowrap; animation: p3d-float 5s ease-in-out infinite; }
+.p3d-chips li svg { color: var(--primary); }
+.p3d-chips li small { font: 10px monospace; color: var(--muted-foreground); }
+.p3d-chips li[data-spot="a"] { top: 15%; left: 18%; }
+.p3d-chips li[data-spot="b"] { top: 18%; right: 17%; animation-delay: -1.2s; }
+.p3d-chips li[data-spot="c"] { top: 56%; right: 12%; animation-delay: -2.4s; }
+.p3d-chips li[data-spot="d"] { top: 62%; left: 13%; animation-delay: -3.6s; }
+.p3d-loading { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 12px; font: 11px monospace; letter-spacing: .15em; color: var(--muted-foreground); }
+.p3d-loading span { width: 18px; height: 18px; border: 1px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: p3d-spin 1s linear infinite; }
+
+/* ── HUD: section ticks on the right edge ─────────────────────────────── */
+.p3d-hud { position: absolute; right: 22px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 14px; pointer-events: auto; z-index: 2; }
+.p3d-hud button { display: flex; align-items: center; justify-content: flex-end; gap: 10px; background: none; border: 0; padding: 2px 0; font: 10px monospace; letter-spacing: .14em; text-transform: uppercase; color: var(--muted-foreground); }
+.p3d-hud button span { opacity: 0; transform: translateX(6px); transition: opacity .3s, transform .3s; }
+.p3d-hud button i { width: 14px; height: 1px; background: currentColor; transition: width .3s, background .3s, box-shadow .3s; }
+.p3d-hud button:hover span, .p3d-hud button[data-active="true"] span { opacity: 1; transform: none; }
+.p3d-hud button[data-active="true"] { color: var(--primary); }
+.p3d-hud button[data-active="true"] i { width: 28px; background: var(--primary); box-shadow: 0 0 10px var(--primary); }
+
+/* ── sections: normal flow, scroll over the stage ─────────────────────── */
+.p3d-sections { position: relative; z-index: 1; }
+/* the sections cover the stage; let clicks through to the HUD except on the panels themselves */
+.p3d-section { min-height: calc(100svh - 4rem); display: flex; align-items: center; padding: 8vh 7vw; pointer-events: none; }
+.p3d-section > * { pointer-events: auto; }
+/* keep clear of the HUD on the right edge */
+.p3d-section[data-panel="right"] { justify-content: flex-end; padding-right: max(7vw, 140px); }
+.p3d-section[data-panel="left"] { justify-content: flex-start; }
+.p3d-section[data-panel="bottom"] { justify-content: center; align-items: flex-end; }
+.p3d-section[data-panel="none"] { align-items: flex-end; justify-content: center; padding-bottom: 5vh; }
+
+/* the line under the character: a small glass card in the same language as the panels */
+.p3d-intro { position: relative; max-width: 720px; padding: 18px 28px 16px; text-align: center; border: 1px solid color-mix(in oklch, var(--primary) 28%, transparent); border-radius: 6px;
+  background: color-mix(in oklch, var(--background) 62%, transparent); backdrop-filter: blur(14px);
+  box-shadow: 0 20px 60px -30px color-mix(in oklch, var(--primary) 45%, transparent); }
+.p3d-intro::before, .p3d-intro::after { content: ''; position: absolute; width: 12px; height: 12px; border: 2px solid var(--primary); }
+.p3d-intro::before { top: -4px; left: -4px; border-right: 0; border-bottom: 0; }
+.p3d-intro::after { bottom: -4px; right: -4px; border-left: 0; border-top: 0; }
+.p3d-intro p { font-size: clamp(15px, 1.35vw, 19px); line-height: 1.75; font-weight: 500; color: color-mix(in oklch, var(--foreground) 85%, transparent); }
+.p3d-intro mark { padding: 0 6px; border-radius: 3px; background: color-mix(in oklch, var(--primary) 18%, transparent); color: var(--primary); font-weight: 600; box-shadow: inset 0 -1px 0 color-mix(in oklch, var(--primary) 60%, transparent); }
+.p3d-scroll { display: inline-flex; align-items: center; gap: 18px; margin-top: 22px; padding: 0 0 8px; background: none; border: 0; border-bottom: 1px solid color-mix(in oklch, var(--primary) 50%, transparent); font-size: 12px; color: var(--foreground); }
+.p3d-scroll svg { color: var(--primary); animation: p3d-nudge 1.8s ease-in-out infinite; }
+
+/* ── panel: the tech "dialog" ─────────────────────────────────────────── */
+.p3d-panel { position: relative; width: min(540px, 46vw); border: 1px solid color-mix(in oklch, var(--primary) 32%, transparent); border-radius: 6px;
+  background: linear-gradient(160deg, color-mix(in oklch, var(--card) 78%, transparent), color-mix(in oklch, var(--background) 86%, transparent));
+  backdrop-filter: blur(14px); box-shadow: 0 0 0 1px color-mix(in oklch, var(--background) 60%, transparent), 0 30px 80px -30px color-mix(in oklch, var(--primary) 35%, transparent);
+  opacity: .25; transform: translateY(28px) scale(.98); filter: blur(2px); transition: opacity .6s, transform .6s, filter .6s; }
+.p3d-section[data-active="true"] .p3d-panel { opacity: 1; transform: none; filter: none; }
+.p3d-section[data-panel="bottom"] .p3d-panel { width: min(640px, 100%); }
+/* bracketed corners */
+.p3d-panel::before, .p3d-panel::after { content: ''; position: absolute; width: 16px; height: 16px; border: 2px solid var(--primary); pointer-events: none; }
+.p3d-panel::before { top: -5px; left: -5px; border-right: 0; border-bottom: 0; }
+.p3d-panel::after { bottom: -5px; right: -5px; border-left: 0; border-top: 0; }
+.p3d-panel-bar { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid color-mix(in oklch, var(--primary) 20%, transparent); font: 11px monospace; color: var(--muted-foreground); }
+.p3d-panel-bar code { flex: 1; }
+.p3d-panel-dots { display: flex; gap: 6px; }
+.p3d-panel-dots i { width: 8px; height: 8px; border-radius: 50%; background: color-mix(in oklch, var(--foreground) 22%, transparent); }
+.p3d-panel-dots i:first-child { background: var(--primary); box-shadow: 0 0 8px var(--primary); }
+.p3d-panel-index { color: var(--primary); }
+.p3d-panel-body { position: relative; padding: 22px 24px 26px; display: grid; gap: 14px; }
+.p3d-panel-body::before { content: ''; position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, color-mix(in oklch, var(--primary) 4%, transparent) 0 1px, transparent 1px 4px); }
+.p3d-panel-eyebrow { font: 10px monospace; letter-spacing: .22em; color: var(--primary); }
+.p3d-panel h2 { margin-top: -6px; font-size: clamp(24px, 2.4vw, 34px); font-weight: 500; letter-spacing: -.04em; }
+
+.p3d-entry { display: grid; gap: 6px; padding-top: 14px; border-top: 1px dashed color-mix(in oklch, var(--foreground) 14%, transparent); }
+.p3d-entry-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.p3d-entry-head strong { display: inline-flex; align-items: center; gap: 7px; font-size: 15px; font-weight: 600; }
+.p3d-entry-head strong svg { color: var(--primary); }
+.p3d-entry-head span { flex-shrink: 0; font: 11px monospace; color: var(--primary); }
+.p3d-entry-sub { font-size: 13px; color: color-mix(in oklch, var(--foreground) 75%, transparent); }
+.p3d-muted { font-size: 13px; line-height: 1.65; color: var(--muted-foreground); }
+.p3d-small { display: flex; align-items: center; gap: 6px; font: 10px monospace; letter-spacing: .14em; color: var(--muted-foreground); }
+.p3d-label { margin-top: 6px; font: 10px monospace; letter-spacing: .2em; text-transform: uppercase; color: var(--muted-foreground); }
+.p3d-list { display: grid; gap: 6px; font-size: 13px; line-height: 1.6; color: var(--muted-foreground); }
+.p3d-list li { position: relative; padding-left: 16px; }
+.p3d-list li::before { content: '▸'; position: absolute; left: 0; color: var(--primary); }
+.p3d-tags, .p3d-links { display: flex; flex-wrap: wrap; gap: 6px; }
+.p3d-tags span { padding: 2px 8px; border: 1px solid color-mix(in oklch, var(--primary) 30%, transparent); border-radius: 3px; font: 11px monospace; color: color-mix(in oklch, var(--foreground) 80%, transparent); }
+.p3d-links a { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; transition: border-color .2s, color .2s; }
+.p3d-links a small { color: var(--muted-foreground); font-size: 11px; }
+.p3d-links a:hover { border-color: var(--primary); color: var(--primary); }
+.p3d-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 4px; }
+.p3d-stats span { display: grid; gap: 2px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 4px; font-size: 13px; }
+.p3d-stats small { font: 10px monospace; letter-spacing: .14em; text-transform: uppercase; color: var(--muted-foreground); }
+.p3d-certs { display: grid; gap: 8px; }
+.p3d-certs li { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+.p3d-certs li > svg { flex-shrink: 0; color: var(--primary); }
+.p3d-certs li > span { display: grid; flex: 1; }
+.p3d-certs small { color: var(--muted-foreground); font-size: 11px; }
+.p3d-certs a { color: var(--muted-foreground); }
+.p3d-certs a:hover { color: var(--primary); }
+.p3d-email { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid color-mix(in oklch, var(--primary) 40%, transparent); border-radius: 4px; font-size: clamp(14px, 1.6vw, 18px); color: var(--primary); overflow-wrap: anywhere; }
+.p3d-email svg:last-child { margin-left: auto; flex-shrink: 0; }
+
+/* ── phones: portrait rides up top, panels fill the width below it ────── */
+@media (max-width: 767px) {
+  .p3d-hud, .p3d-chips li[data-spot="c"], .p3d-chips li[data-spot="d"] { display: none; }
+  .p3d-chips li[data-spot="a"] { top: 6%; left: 16px; }
+  .p3d-chips li[data-spot="b"] { top: 14%; right: 16px; }
+  .p3d-name { top: 20%; }
+  .p3d-section { align-items: flex-end !important; justify-content: center !important; padding: 0 16px 6vh; }
+  .p3d-section:not([data-panel="none"]) { padding-top: 46svh; }
+  .p3d-panel, .p3d-section[data-panel="bottom"] .p3d-panel { width: 100%; }
+  .p3d-panel { background: color-mix(in oklch, var(--card) 92%, transparent); }
+  .p3d-panel-body { padding: 18px 16px 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .p3d-panel, .p3d-hud button span, .p3d-hud button i { transition: none; }
+  .p3d-scroll svg, .p3d-loading span, .p3d-chips li { animation: none; }
+}
+
+@keyframes p3d-spin { to { transform: rotate(360deg); } }
+@keyframes p3d-float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -8px; } }
+@keyframes p3d-nudge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(4px); } }

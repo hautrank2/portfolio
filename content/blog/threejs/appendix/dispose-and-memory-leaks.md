@@ -3,7 +3,7 @@ title: "dispose() và rò rỉ bộ nhớ GPU"
 description: scene.remove() không giải phóng gì cả. Bug số một khi nhét Three.js vào SPA.
 status: seed
 created: 2026-08-23
-updated: 2026-11-05
+updated: 2026-11-06
 tags: [threejs, performance, react]
 ---
 
@@ -159,6 +159,8 @@ onTick((delta) => {
 bao giờ giảm. Bấm chuột một cái, con số lập tức đứng yên quanh 40–80.
 
 Đây là toàn bộ bài học, ở dạng một con số chạy trên màn hình.
+
+![Phụ lục — Máy đo rò rỉ](lab:phu-luc/dispose-va-memory-leak)
 
 **Thử phá:**
 

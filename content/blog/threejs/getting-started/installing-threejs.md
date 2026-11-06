@@ -3,7 +3,7 @@ title: "Bài 4 — Cài three và @types/three"
 description: Hai gói, và một quy tắc về phiên bản khiến nhiều tutorial trên mạng chạy không được.
 status: seed
 created: 2026-08-23
-updated: 2026-08-23
+updated: 2026-11-06
 tags: [threejs, setup]
 ---
 
@@ -74,3 +74,5 @@ console.log(new THREE.Vector3(1, 2, 3));
 ```
 
 Console in ra `three 182` là xong bài.
+
+![Bài 4 — Kiểm tra đã cài đúng](lab:chuan-bi/cai-threejs)

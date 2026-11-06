@@ -3,7 +3,7 @@ title: "Bài 17 — Các material hay dùng"
 description: Tám loại đặt cạnh nhau, và cây quyết định chọn loại nào.
 status: seed
 created: 2026-08-23
-updated: 2026-11-05
+updated: 2026-11-06
 tags: [threejs, material]
 ---
 
@@ -110,6 +110,8 @@ không cần font loader.
 
 **Kết quả:** hàng trên `Basic`, `Lambert`, `Phong`, `Standard`; hàng dưới `Physical`,
 `Normal`, `Toon`, `Depth`.
+
+![Bài 17 — Tám loại đứng cạnh nhau](lab:geometry-material/common-materials)
 
 **Thử phá:**
 

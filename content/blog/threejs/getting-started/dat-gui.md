@@ -3,7 +3,7 @@ title: "Bài 7 — GUI để vặn tham số"
 description: Vì sao dat.GUI đã cũ, dùng lil-gui thay thế, và cách gắn vào bất cứ thứ gì.
 status: seed
 created: 2026-08-23
-updated: 2026-08-23
+updated: 2026-11-06
 tags: [threejs, tools]
 ---
 
@@ -81,6 +81,8 @@ onTick((delta) => {
 
 **Kết quả:** panel ở góc phải với thanh trượt tốc độ, ô chọn màu, checkbox wireframe,
 một nút reset, và một thư mục `Vị trí` chứa ba thanh trượt.
+
+![Bài 7 — Bốn kiểu control](lab:chuan-bi/dat-gui)
 
 **Thử phá:**
 

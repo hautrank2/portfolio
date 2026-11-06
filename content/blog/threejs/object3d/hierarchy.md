@@ -3,7 +3,7 @@ title: "Bài 14 — Object3D hierarchy"
 description: Cây scene chính là phép nhân ma trận dây chuyền. Hệ mặt trời không cần một dòng lượng giác.
 status: seed
 created: 2026-08-23
-updated: 2026-11-05
+updated: 2026-11-06
 tags: [threejs, math]
 ---
 
@@ -108,6 +108,8 @@ tiết kiệm bộ nhớ đầu tiên nên tập quen.
 **Kết quả:** trái đất quay quanh mặt trời, mặt trăng bám theo trái đất. Nửa quay ra ngoài
 thì tối, vì chỉ có một nguồn sáng đặt ở tâm.
 
+![Bài 14 — Hệ mặt trời hai tầng](lab:object3d/hierarchy?demo=solar)
+
 **Thử phá:**
 
 - `earthOrbit.scale.set(2, 1, 1)` — quỹ đạo méo thành elip, **và** trái đất bị kéo xiên
@@ -167,10 +169,14 @@ onTick((delta) => {
 
 **Kết quả:** `local x` đứng yên ở `1.50` suốt, còn `world x` và `world z` chạy liên tục.
 
+![Bài 14 — Nhìn thấy local và world cùng lúc](lab:object3d/hierarchy?demo=local-world)
+
 **Thử phá:**
 
 - Đổi `dir.copy(world).normalize()` thành `arrow.setDirection(world.normalize())` — mũi
-  tên co lại rồi biến mất, vì `normalize()` **sửa luôn** `world` thành vector dài 1. Gần
-  như mọi phương thức của `Vector3` đều sửa tại chỗ
+  tên vẫn xoay đúng hướng nhưng **kẹt ở độ dài 1**, không còn chạm quả bóng: `normalize()`
+  **sửa luôn** `world` thành vector dài 1, nên dòng `world.length()` ngay sau luôn ra 1
+  (con số `world x` ở góc trái cũng sai theo). Gần như mọi phương thức của `Vector3` đều
+  sửa tại chỗ
 - Thay `group.rotation.y += ...` bằng `group.position.x += delta` — mũi tên vẫn bám đúng,
   vì `getWorldPosition` không quan tâm parent đang xoay hay đang trượt

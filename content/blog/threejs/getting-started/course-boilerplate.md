@@ -3,7 +3,7 @@ title: "Bài 8 — Bộ khung dùng lại cho 37 bài còn lại"
 description: Một file lab.ts viết một lần, để mọi bài tập sau chỉ tốn 5 dòng là bắt đầu được.
 status: seed
 created: 2026-08-23
-updated: 2026-08-23
+updated: 2026-11-06
 tags: [threejs, setup]
 ---
 
@@ -135,6 +135,8 @@ onTick((delta) => {
 
 **Kết quả:** một khối xanh xoay chậm trên nền lưới. Kéo chuột để xoay camera, lăn chuột
 để zoom, chuột phải để dịch ngang.
+
+![Bài 8 — Khối hộp đầu tiên](lab:chuan-bi/course-boilerplate)
 
 **Thử phá:**
 

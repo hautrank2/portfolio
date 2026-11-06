@@ -3,7 +3,7 @@ title: "Bài 20 — Shadows"
 description: Ba công tắc phải bật cùng lúc, và cách chữa shadow acne mà không tạo peter-panning.
 status: seed
 created: 2026-08-23
-updated: 2026-08-23
+updated: 2026-11-06
 tags: [threejs, lighting, performance]
 ---
 
@@ -168,6 +168,8 @@ onTick((_delta, elapsed) => {
   });
 });
 ```
+
+![Bài 20 — Ba công tắc, và khung shadow camera](lab:anh-sang/shadows)
 
 **Thử phá:**
 

@@ -3,7 +3,7 @@ title: "Bài 12 — Animation loop và delta time"
 description: Vì sao animation chạy nhanh gấp đôi trên màn 120Hz, và vì sao getDelta() gọi hai lần là hỏng.
 status: seed
 created: 2026-08-23
-updated: 2026-08-23
+updated: 2026-11-06
 tags: [threejs, animation, basics]
 ---
 
@@ -135,6 +135,8 @@ onTick((delta) => {
 
 **Kết quả:** trên màn 60Hz hai khối quay gần bằng nhau — không thấy vấn đề gì. Chính vì
 vậy bug này sống sót rất lâu.
+
+![Bài 12 — Hằng số và delta, đặt cạnh nhau](lab:ba-thanh-phan/animation-loop)
 
 **Thử phá:** đây mới là phần quan trọng.
 

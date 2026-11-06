@@ -3,7 +3,7 @@ title: "Bài 6 — Stats panel"
 description: Ba con số ở góc màn hình, và lý do nên bật nó ngay từ bài đầu.
 status: seed
 created: 2026-08-23
-updated: 2026-08-23
+updated: 2026-11-06
 tags: [threejs, performance, tools]
 ---
 
@@ -85,6 +85,8 @@ onTick((delta) => {
 
 **Kết quả:** khoảng 20 `TorusKnot` đầu vẫn 60 FPS. Bấm chuột vài lần tới khi thấy con số
 tụt — trên laptop tầm trung thường bắt đầu tụt quanh 200–300 cái.
+
+![Bài 6 — Nhìn FPS tụt theo thời gian thực](lab:chuan-bi/stats-panel)
 
 **Thử phá:**
 

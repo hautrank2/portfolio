@@ -3,7 +3,7 @@ title: "Bài 19 — Lights"
 description: Sáu loại đèn, cái nào rẻ cái nào đắt, và vì sao RectAreaLight hay đen thui.
 status: seed
 created: 2026-08-23
-updated: 2026-08-23
+updated: 2026-11-06
 tags: [threejs, lighting]
 ---
 
@@ -207,6 +207,8 @@ onTick((delta) => {
 
 **Kết quả:** mặc định bật `ambient` + `directional` — bố cục cơ bản nhất và cũng đủ dùng
 cho phần lớn trường hợp. Góc trái liệt kê đèn nào đang bật.
+
+![Bài 19 — Sáu loại đèn, bật tắt từng cái](lab:anh-sang/lights)
 
 **Thử phá:** đây là bài đáng nghịch lâu nhất trong cả chặng.
 

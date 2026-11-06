@@ -3,7 +3,7 @@ title: "Bài 10 — Camera"
 description: Bốn tham số của PerspectiveCamera, và một dòng quên gọi là hỏng cả bài.
 status: seed
 created: 2026-08-23
-updated: 2026-08-23
+updated: 2026-11-06
 tags: [threejs, basics, camera]
 ---
 
@@ -116,6 +116,8 @@ apply();
 
 **Kết quả:** ba thanh trượt, và ô chữ góc trái in luôn tỉ lệ `far/near` để thấy khi nào
 sắp gặp z-fighting.
+
+![Bài 10 — Bốn khối giống hệt nhau, đặt xa dần](lab:ba-thanh-phan/camera)
 
 **Thử phá:**
 

@@ -3,7 +3,7 @@ title: "Bài 11 — Renderer"
 description: Nơi duy nhất chạm vào GPU, và ba thiết lập quyết định scene đẹp hay nhoè.
 status: seed
 created: 2026-08-23
-updated: 2026-11-05
+updated: 2026-11-06
 tags: [threejs, basics, performance]
 ---
 
@@ -120,6 +120,8 @@ onTick((delta) => {
 
 **Kết quả:** một torus knot kim loại quay, panel bên phải để đổi pixel ratio và tone
 mapping, góc trái in FPS, draw call, số triangles và số **triệu pixel** phải vẽ mỗi frame.
+
+![Bài 11 — Pixel ratio, tone mapping và ba con số](lab:ba-thanh-phan/renderer)
 
 **Thử phá:**
 

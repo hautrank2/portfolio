@@ -3,7 +3,7 @@ title: "Bài 21 — Environment maps"
 description: Thứ thật sự làm scene đẹp lên, và nó rẻ hơn thêm đèn.
 status: seed
 created: 2026-08-23
-updated: 2026-08-23
+updated: 2026-11-06
 tags: [threejs, lighting, pbr]
 ---
 
@@ -152,6 +152,8 @@ addEventListener("beforeunload", () => {
 
 **Kết quả:** quả bên trái như gương, quả bên phải mờ như kim loại xước. Toàn bộ ánh sáng
 đến từ căn phòng dựng sẵn.
+
+![Bài 21 — Năm quả cầu kim loại, không một cái đèn nào](lab:anh-sang/environment-maps)
 
 **Thử phá:**
 

@@ -3,7 +3,7 @@ title: "Bài 15 — Geometries"
 description: Hình dạng chỉ là mảng số. Biết vậy thì tự dựng hình và tối ưu vertices là cùng một việc.
 status: seed
 created: 2026-08-23
-updated: 2026-11-05
+updated: 2026-11-06
 tags: [threejs, geometry]
 ---
 
@@ -108,6 +108,8 @@ readout(lines.join("\n"));
 **Kết quả:** lưới 12 hình, và bảng số ở góc trái. Nhìn bảng đó một lần là hết ngạc nhiên
 khi thấy `SphereGeometry` tốn gấp mấy chục lần `BoxGeometry`.
 
+![Bài 15 — Bảng tra 12 geometry dựng sẵn](lab:geometry-material/geometries?demo=bang-tra)
+
 **Thử phá:**
 
 - Bật `wireframe` để thấy từng loại được chia triangles thế nào. `Plane` chỉ có 2
@@ -148,6 +150,8 @@ onTick((delta) => {
   mesh.rotation.y += 0.8 * delta;
 });
 ```
+
+![Bài 15 — Tự dựng một triangle](lab:geometry-material/geometries?demo=tam-giac)
 
 **Thử phá:**
 
@@ -193,6 +197,8 @@ onTick((_delta, elapsed) => {
 
 Chỗ đáng chú ý là `base`: phải giữ **bản gốc** của mảng toạ độ, vì nếu tính sóng chồng
 lên toạ độ đã bị sửa của frame trước thì mặt phẳng sẽ trôi đi vô hạn.
+
+![Bài 15 — Sửa từng vertex lúc chạy](lab:geometry-material/geometries?demo=song)
 
 **Thử phá:**
 

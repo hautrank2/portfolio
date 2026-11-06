@@ -3,7 +3,7 @@ title: "Bài 18 — lil-gui"
 description: "Bảng điều khiển đầy đủ: thư mục, dropdown, preset, và mẹo trỏ thẳng vào object Three.js."
 status: seed
 created: 2026-08-23
-updated: 2026-08-23
+updated: 2026-11-06
 tags: [threejs, tools]
 ---
 
@@ -130,6 +130,8 @@ mesh.geometry = shapes[name];
 Chỉ gán lại `geometry` là xong — `Mesh` không quan tâm geometry nào, miễn là một
 `BufferGeometry`. Bốn hình được tạo sẵn **một lần** ở trên chứ không tạo mới mỗi lần đổi,
 nếu không là rò rỉ bộ nhớ GPU.
+
+![Bài 18 — Dashboard đầy đủ: thư mục, dropdown, preset](lab:geometry-material/lil-gui)
 
 **Thử phá:**
 

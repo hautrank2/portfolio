@@ -2,6 +2,8 @@
 export const localKeys = {
   /** Project the admin task list was last filtered by — its default filter. */
   adminTaskProject: "admin:tasks:project",
+  /** `"1"` when the FPS / network meter is folded down to a dot. */
+  perfMeterCollapsed: "site:perf-meter:collapsed",
 } as const;
 
 export type LocalKey = (typeof localKeys)[keyof typeof localKeys];
